@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
+import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriasRoute = CategoriasRouteImport.update({
@@ -41,6 +48,11 @@ const PraticarRoute = PraticarRouteImport.update({
   path: '/praticar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgressoRoute = ProgressoRouteImport.update({
+  id: '/progresso',
+  path: '/progresso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimuladosRoute = SimuladosRouteImport.update({
   id: '/simulados',
   path: '/simulados',
@@ -49,51 +61,76 @@ const SimuladosRoute = SimuladosRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/categorias' | '/erros' | '/favoritos' | '/praticar' | '/simulados'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categorias' | '/erros' | '/favoritos' | '/praticar' | '/simulados'
-  id:
-    | '__root__'
     | '/'
+    | '/auth'
     | '/categorias'
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/progresso'
+    | '/simulados'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/auth'
+    | '/categorias'
+    | '/erros'
+    | '/favoritos'
+    | '/praticar'
+    | '/progresso'
+    | '/simulados'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/categorias'
+    | '/erros'
+    | '/favoritos'
+    | '/praticar'
+    | '/progresso'
     | '/simulados'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   CategoriasRoute: typeof CategoriasRoute
   ErrosRoute: typeof ErrosRoute
   FavoritosRoute: typeof FavoritosRoute
   PraticarRoute: typeof PraticarRoute
+  ProgressoRoute: typeof ProgressoRoute
   SimuladosRoute: typeof SimuladosRoute
 }
 
@@ -104,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categorias': {
@@ -134,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PraticarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progresso': {
+      id: '/progresso'
+      path: '/progresso'
+      fullPath: '/progresso'
+      preLoaderRoute: typeof ProgressoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulados': {
       id: '/simulados'
       path: '/simulados'
@@ -146,10 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   CategoriasRoute: CategoriasRoute,
   ErrosRoute: ErrosRoute,
   FavoritosRoute: FavoritosRoute,
   PraticarRoute: PraticarRoute,
+  ProgressoRoute: ProgressoRoute,
   SimuladosRoute: SimuladosRoute,
 }
 export const routeTree = rootRouteImport
