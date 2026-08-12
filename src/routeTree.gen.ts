@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CategoriasRouteImport } from './routes/categorias'
+import { Route as ErrosRouteImport } from './routes/erros'
+import { Route as FavoritosRouteImport } from './routes/favoritos'
+import { Route as PraticarRouteImport } from './routes/praticar'
+import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as SimuladosRouteImport } from './routes/simulados'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriasRoute = CategoriasRouteImport.update({
+  id: '/categorias',
+  path: '/categorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrosRoute = ErrosRouteImport.update({
+  id: '/erros',
+  path: '/erros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritosRoute = FavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PraticarRoute = PraticarRouteImport.update({
+  id: '/praticar',
+  path: '/praticar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressoRoute = ProgressoRouteImport.update({
+  id: '/progresso',
+  path: '/progresso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SimuladosRoute = SimuladosRouteImport.update({
+  id: '/simulados',
+  path: '/simulados',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/categorias': typeof CategoriasRoute
+  '/erros': typeof ErrosRoute
+  '/favoritos': typeof FavoritosRoute
+  '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/categorias': typeof CategoriasRoute
+  '/erros': typeof ErrosRoute
+  '/favoritos': typeof FavoritosRoute
+  '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/categorias': typeof CategoriasRoute
+  '/erros': typeof ErrosRoute
+  '/favoritos': typeof FavoritosRoute
+  '/praticar': typeof PraticarRoute
+  '/progresso': typeof ProgressoRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/categorias'
+    | '/erros'
+    | '/favoritos'
+    | '/praticar'
+    | '/progresso'
+    | '/simulados'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/categorias'
+    | '/erros'
+    | '/favoritos'
+    | '/praticar'
+    | '/progresso'
+    | '/simulados'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/categorias'
+    | '/erros'
+    | '/favoritos'
+    | '/praticar'
+    | '/progresso'
+    | '/simulados'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  CategoriasRoute: typeof CategoriasRoute
+  ErrosRoute: typeof ErrosRoute
+  FavoritosRoute: typeof FavoritosRoute
+  PraticarRoute: typeof PraticarRoute
+  ProgressoRoute: typeof ProgressoRoute
+  SimuladosRoute: typeof SimuladosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categorias': {
+      id: '/categorias'
+      path: '/categorias'
+      fullPath: '/categorias'
+      preLoaderRoute: typeof CategoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/erros': {
+      id: '/erros'
+      path: '/erros'
+      fullPath: '/erros'
+      preLoaderRoute: typeof ErrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favoritos': {
+      id: '/favoritos'
+      path: '/favoritos'
+      fullPath: '/favoritos'
+      preLoaderRoute: typeof FavoritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/praticar': {
+      id: '/praticar'
+      path: '/praticar'
+      fullPath: '/praticar'
+      preLoaderRoute: typeof PraticarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progresso': {
+      id: '/progresso'
+      path: '/progresso'
+      fullPath: '/progresso'
+      preLoaderRoute: typeof ProgressoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/simulados': {
+      id: '/simulados'
+      path: '/simulados'
+      fullPath: '/simulados'
+      preLoaderRoute: typeof SimuladosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  CategoriasRoute: CategoriasRoute,
+  ErrosRoute: ErrosRoute,
+  FavoritosRoute: FavoritosRoute,
+  PraticarRoute: PraticarRoute,
+  ProgressoRoute: ProgressoRoute,
+  SimuladosRoute: SimuladosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
