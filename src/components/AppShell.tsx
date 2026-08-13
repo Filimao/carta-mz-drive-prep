@@ -82,13 +82,38 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
             <ThemeToggle />
             <Link
-              to="/auth"
-              className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
+              to="/precos"
+              className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
             >
-              Entrar
+              Preços
             </Link>
+            {session.isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary sm:inline-flex"
+              >
+                Admin
+              </Link>
+            )}
+            {session.userId ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="hidden rounded-xl border border-border px-4 py-2 text-sm font-semibold sm:inline-flex"
+              >
+                Sair
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
+              >
+                Entrar
+              </Link>
+            )}
           </div>
         </div>
         <div className="road-stripes h-[3px] opacity-70" aria-hidden />
