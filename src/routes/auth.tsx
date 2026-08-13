@@ -151,6 +151,26 @@ function Auth() {
           >
             {mode === "login" ? "Ainda não tenho conta" : "Já tenho conta"}
           </button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!form.email) {
+                toast.error("Escreva o seu email para recuperar a conta.");
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+                redirectTo: `${window.location.origin}/redefinir-senha`,
+              });
+              if (error) {
+                toast.error(error.message);
+                return;
+              }
+              toast.success("Enviámos um link de recuperação para o seu email.");
+            }}
+            className="w-full text-sm font-medium text-muted-foreground underline"
+          >
+            Esqueci a minha senha
+          </button>
         </form>
       </div>
     </AppShell>
