@@ -53,7 +53,7 @@ export function Brand() {
       <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
         MZ
       </span>
-      <span className="font-display text-base font-semibold">Carta Fácil MZ</span>
+      <span className="font-display text-base font-semibold">Carta MZ Quiz</span>
     </Link>
   );
 }
@@ -101,7 +101,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           Esta plataforma é uma ferramenta independente de estudo e não representa oficialmente o
           INATTER ou qualquer entidade governamental.
         </p>
-        <p className="mt-2">Carta Fácil MZ — Aprende. Pratica. Passa.</p>
+        <p className="mt-2">Carta MZ Quiz — Aprende. Pratica. Passa.</p>
       </footer>
 
       <nav

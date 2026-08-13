@@ -8,12 +8,12 @@ import { readLocal } from "@/lib/quiz";
 export const Route = createFileRoute("/favoritos")({
   head: () => ({
     meta: [
-      { title: "Questões marcadas — Carta Fácil MZ" },
+      { title: "Questões marcadas — Carta MZ Quiz" },
       {
         name: "description",
         content: "Reveja as questões que marcou como favoritas para estudar mais tarde.",
       },
-      { property: "og:title", content: "Questões marcadas — Carta Fácil MZ" },
+      { property: "og:title", content: "Questões marcadas — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "A sua lista pessoal de questões para revisão.",

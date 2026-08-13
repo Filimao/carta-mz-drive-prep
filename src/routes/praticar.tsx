@@ -9,13 +9,13 @@ import { fetchCategories, type Difficulty } from "@/lib/quiz";
 export const Route = createFileRoute("/praticar")({
   head: () => ({
     meta: [
-      { title: "Modo Prática — Carta Fácil MZ" },
+      { title: "Modo Prática — Carta MZ Quiz" },
       {
         name: "description",
         content:
           "Pratique questões de condução sem limite de tempo, com explicação imediata de cada resposta.",
       },
-      { property: "og:title", content: "Modo Prática — Carta Fácil MZ" },
+      { property: "og:title", content: "Modo Prática — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "Escolha o número de questões, a categoria e a dificuldade e comece a praticar.",

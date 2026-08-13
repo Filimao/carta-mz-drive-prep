@@ -10,13 +10,13 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar ou criar conta — Carta Fácil MZ" },
+      { title: "Entrar ou criar conta — Carta MZ Quiz" },
       {
         name: "description",
         content:
           "Crie a sua conta para guardar o progresso, XP, badges e histórico de simulados em qualquer dispositivo.",
       },
-      { property: "og:title", content: "Entrar ou criar conta — Carta Fácil MZ" },
+      { property: "og:title", content: "Entrar ou criar conta — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "Sincronize o seu estudo entre telemóvel, tablet e computador.",
