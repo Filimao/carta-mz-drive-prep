@@ -17,6 +17,7 @@ import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
 import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const ProgressoRoute = ProgressoRouteImport.update({
   path: '/progresso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimuladosRoute = SimuladosRouteImport.update({
   id: '/simulados',
   path: '/simulados',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   PraticarRoute: typeof PraticarRoute
   PrecosRoute: typeof PrecosRoute
   ProgressoRoute: typeof ProgressoRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulados': {
       id: '/simulados'
       path: '/simulados'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   PraticarRoute: PraticarRoute,
   PrecosRoute: PrecosRoute,
   ProgressoRoute: ProgressoRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
 }
 export const routeTree = rootRouteImport
