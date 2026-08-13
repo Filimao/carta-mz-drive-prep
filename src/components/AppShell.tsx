@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { InstallButton } from "@/components/PwaInstall";
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
+
 const NAV = [
   { to: "/", label: "Início", icon: Home },
   { to: "/praticar", label: "Praticar", icon: Dumbbell },
