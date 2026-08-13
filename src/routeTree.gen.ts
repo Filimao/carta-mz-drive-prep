@@ -15,6 +15,7 @@ import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
+import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 
@@ -48,6 +49,11 @@ const PraticarRoute = PraticarRouteImport.update({
   path: '/praticar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrecosRoute = PrecosRouteImport.update({
+  id: '/precos',
+  path: '/precos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressoRoute = ProgressoRouteImport.update({
   id: '/progresso',
   path: '/progresso',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
   '/simulados': typeof SimuladosRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
     | '/simulados'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
     | '/simulados'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
     | '/simulados'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   ErrosRoute: typeof ErrosRoute
   FavoritosRoute: typeof FavoritosRoute
   PraticarRoute: typeof PraticarRoute
+  PrecosRoute: typeof PrecosRoute
   ProgressoRoute: typeof ProgressoRoute
   SimuladosRoute: typeof SimuladosRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PraticarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/precos': {
+      id: '/precos'
+      path: '/precos'
+      fullPath: '/precos'
+      preLoaderRoute: typeof PrecosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progresso': {
       id: '/progresso'
       path: '/progresso'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   ErrosRoute: ErrosRoute,
   FavoritosRoute: FavoritosRoute,
   PraticarRoute: PraticarRoute,
+  PrecosRoute: PrecosRoute,
   ProgressoRoute: ProgressoRoute,
   SimuladosRoute: SimuladosRoute,
 }
