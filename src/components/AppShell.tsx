@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { InstallButton } from "@/components/PwaInstall";
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
+
 const NAV = [
   { to: "/", label: "Início", icon: Home },
   { to: "/praticar", label: "Praticar", icon: Dumbbell },
@@ -53,13 +57,20 @@ export function Brand() {
       <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
         MZ
       </span>
-      <span className="font-display text-base font-semibold">Carta Fácil MZ</span>
+      <span className="font-display text-base font-semibold">Carta MZ Quiz</span>
     </Link>
   );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const session = useSession();
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    window.location.assign("/");
+  }
+
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
@@ -82,13 +93,38 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
             <ThemeToggle />
             <Link
-              to="/auth"
-              className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
+              to="/precos"
+              className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
             >
-              Entrar
+              Preços
             </Link>
+            {session.isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary sm:inline-flex"
+              >
+                Admin
+              </Link>
+            )}
+            {session.userId ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="hidden rounded-xl border border-border px-4 py-2 text-sm font-semibold sm:inline-flex"
+              >
+                Sair
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
+              >
+                Entrar
+              </Link>
+            )}
           </div>
         </div>
         <div className="road-stripes h-[3px] opacity-70" aria-hidden />
@@ -101,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           Esta plataforma é uma ferramenta independente de estudo e não representa oficialmente o
           INATTER ou qualquer entidade governamental.
         </p>
-        <p className="mt-2">Carta Fácil MZ — Aprende. Pratica. Passa.</p>
+        <p className="mt-2">Carta MZ Quiz — Aprende. Pratica. Passa.</p>
       </footer>
 
       <nav

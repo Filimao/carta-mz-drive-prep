@@ -10,13 +10,13 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar ou criar conta — Carta Fácil MZ" },
+      { title: "Entrar ou criar conta — Carta MZ Quiz" },
       {
         name: "description",
         content:
           "Crie a sua conta para guardar o progresso, XP, badges e histórico de simulados em qualquer dispositivo.",
       },
-      { property: "og:title", content: "Entrar ou criar conta — Carta Fácil MZ" },
+      { property: "og:title", content: "Entrar ou criar conta — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "Sincronize o seu estudo entre telemóvel, tablet e computador.",
@@ -150,6 +150,26 @@ function Auth() {
             className="w-full text-sm font-semibold text-primary"
           >
             {mode === "login" ? "Ainda não tenho conta" : "Já tenho conta"}
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!form.email) {
+                toast.error("Escreva o seu email para recuperar a conta.");
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+                redirectTo: `${window.location.origin}/redefinir-senha`,
+              });
+              if (error) {
+                toast.error(error.message);
+                return;
+              }
+              toast.success("Enviámos um link de recuperação para o seu email.");
+            }}
+            className="w-full text-sm font-medium text-muted-foreground underline"
+          >
+            Esqueci a minha senha
           </button>
         </form>
       </div>

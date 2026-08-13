@@ -10,17 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
+import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -48,15 +56,30 @@ const PraticarRoute = PraticarRouteImport.update({
   path: '/praticar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrecosRoute = PrecosRouteImport.update({
+  id: '/precos',
+  path: '/precos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressoRoute = ProgressoRouteImport.update({
   id: '/progresso',
   path: '/progresso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SimuladosRoute = SimuladosRouteImport.update({
   id: '/simulados',
   path: '/simulados',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -66,8 +89,11 @@ export interface FileRoutesByFullPath {
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,19 +102,26 @@ export interface FileRoutesByTo {
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
+  '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,8 +132,11 @@ export interface FileRouteTypes {
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
+    | '/admin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,28 +145,38 @@ export interface FileRouteTypes {
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
+    | '/admin'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/categorias'
     | '/erros'
     | '/favoritos'
     | '/praticar'
+    | '/precos'
     | '/progresso'
+    | '/redefinir-senha'
     | '/simulados'
+    | '/_authenticated/admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CategoriasRoute: typeof CategoriasRoute
   ErrosRoute: typeof ErrosRoute
   FavoritosRoute: typeof FavoritosRoute
   PraticarRoute: typeof PraticarRoute
+  PrecosRoute: typeof PrecosRoute
   ProgressoRoute: typeof ProgressoRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
 }
 
@@ -141,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -178,11 +231,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PraticarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/precos': {
+      id: '/precos'
+      path: '/precos'
+      fullPath: '/precos'
+      preLoaderRoute: typeof PrecosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progresso': {
       id: '/progresso'
       path: '/progresso'
       fullPath: '/progresso'
       preLoaderRoute: typeof ProgressoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/simulados': {
@@ -192,17 +259,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimuladosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CategoriasRoute: CategoriasRoute,
   ErrosRoute: ErrosRoute,
   FavoritosRoute: FavoritosRoute,
   PraticarRoute: PraticarRoute,
+  PrecosRoute: PrecosRoute,
   ProgressoRoute: ProgressoRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
 }
 export const routeTree = rootRouteImport

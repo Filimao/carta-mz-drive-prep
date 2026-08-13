@@ -9,13 +9,13 @@ import { fetchCategories, readLocal } from "@/lib/quiz";
 export const Route = createFileRoute("/categorias")({
   head: () => ({
     meta: [
-      { title: "Categorias de estudo — Carta Fácil MZ" },
+      { title: "Categorias de estudo — Carta MZ Quiz" },
       {
         name: "description",
         content:
           "Estude por tema: sinais de trânsito, prioridade, velocidade, álcool, condução nocturna e muito mais.",
       },
-      { property: "og:title", content: "Categorias de estudo — Carta Fácil MZ" },
+      { property: "og:title", content: "Categorias de estudo — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "24 temas de estudo com prática dirigida para o exame teórico de condução.",

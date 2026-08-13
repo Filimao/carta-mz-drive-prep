@@ -8,13 +8,13 @@ import { countQuestions, fetchCategories } from "@/lib/quiz";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Carta Fácil MZ — Simulados da Carta de Condução em Moçambique" },
+      { title: "Carta MZ Quiz — Simulados da Carta de Condução em Moçambique" },
       {
         name: "description",
         content:
           "Pratique questões de condução, sinais de trânsito e segurança rodoviária com simulados interactivos para preparação da carta de condução em Moçambique.",
       },
-      { property: "og:title", content: "Carta Fácil MZ — Aprende. Pratica. Passa." },
+      { property: "og:title", content: "Carta MZ Quiz — Aprende. Pratica. Passa." },
       {
         property: "og:description",
         content:
@@ -45,7 +45,7 @@ function Index() {
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-semibold">
             Aprende. Pratica. Passa.
           </span>
-          <h1 className="mt-5 font-display text-4xl font-bold sm:text-6xl">Carta Fácil MZ</h1>
+          <h1 className="mt-5 font-display text-4xl font-bold sm:text-6xl">Carta MZ Quiz</h1>
           <p className="mt-4 text-lg font-medium">
             Prepare-se melhor para o exame teórico de condução.
           </p>

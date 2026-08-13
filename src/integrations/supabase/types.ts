@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_emails: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           code: string
@@ -137,6 +152,8 @@ export type Database = {
           full_name: string | null
           id: string
           last_study_date: string | null
+          plan: Database["public"]["Enums"]["plan_tier"]
+          plan_expires_at: string | null
           streak_days: number
           updated_at: string
           xp: number
@@ -147,6 +164,8 @@ export type Database = {
           full_name?: string | null
           id: string
           last_study_date?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          plan_expires_at?: string | null
           streak_days?: number
           updated_at?: string
           xp?: number
@@ -157,6 +176,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_study_date?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          plan_expires_at?: string | null
           streak_days?: number
           updated_at?: string
           xp?: number
@@ -374,6 +395,48 @@ export type Database = {
           },
         ]
       }
+      subscription_requests: {
+        Row: {
+          amount_mzn: number
+          created_at: string
+          id: string
+          payment_method: string
+          payment_reference: string | null
+          plan: Database["public"]["Enums"]["plan_tier"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_mzn: number
+          created_at?: string
+          id?: string
+          payment_method?: string
+          payment_reference?: string | null
+          plan: Database["public"]["Enums"]["plan_tier"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_mzn?: number
+          created_at?: string
+          id?: string
+          payment_method?: string
+          payment_reference?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_code: string
@@ -440,6 +503,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       difficulty_level: "facil" | "medio" | "dificil"
+      plan_tier: "free" | "pro" | "premium"
       question_source: "PDF" | "AUTHORED"
       review_state: "nova" | "aprendendo" | "revisao" | "dominada"
     }
@@ -571,6 +635,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       difficulty_level: ["facil", "medio", "dificil"],
+      plan_tier: ["free", "pro", "premium"],
       question_source: ["PDF", "AUTHORED"],
       review_state: ["nova", "aprendendo", "revisao", "dominada"],
     },

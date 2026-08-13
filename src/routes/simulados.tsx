@@ -8,13 +8,13 @@ import type { Difficulty } from "@/lib/quiz";
 export const Route = createFileRoute("/simulados")({
   head: () => ({
     meta: [
-      { title: "Simulados e Modo Exame — Carta Fácil MZ" },
+      { title: "Simulados e Modo Exame — Carta MZ Quiz" },
       {
         name: "description",
         content:
           "Gere simulados equilibrados com tempo cronometrado, sem ver respostas antes de terminar, como no exame real.",
       },
-      { property: "og:title", content: "Simulados e Modo Exame — Carta Fácil MZ" },
+      { property: "og:title", content: "Simulados e Modo Exame — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "Escolha o número de questões, a dificuldade e a fonte e gere o seu simulado.",
