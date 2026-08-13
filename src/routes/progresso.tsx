@@ -8,13 +8,13 @@ import { levelFor, readLocal, streakDays, type LocalState } from "@/lib/quiz";
 export const Route = createFileRoute("/progresso")({
   head: () => ({
     meta: [
-      { title: "O meu progresso — Carta MZ Quiz" },
+      { title: "O meu progresso — Carta Fácil MZ" },
       {
         name: "description",
         content:
           "Acompanhe a taxa de acerto, XP, nível, sequência de estudo e evolução dos seus simulados.",
       },
-      { property: "og:title", content: "O meu progresso — Carta MZ Quiz" },
+      { property: "og:title", content: "O meu progresso — Carta Fácil MZ" },
       {
         property: "og:description",
         content: "Estatísticas de desempenho e evolução ao longo dos dias.",

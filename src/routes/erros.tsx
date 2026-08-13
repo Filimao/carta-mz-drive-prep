@@ -8,13 +8,13 @@ import { readLocal } from "@/lib/quiz";
 export const Route = createFileRoute("/erros")({
   head: () => ({
     meta: [
-      { title: "Treinar os meus erros — Carta MZ Quiz" },
+      { title: "Treinar os meus erros — Carta Fácil MZ" },
       {
         name: "description",
         content:
           "Revise apenas as questões que respondeu incorrectamente, com repetição espaçada para fixar a matéria.",
       },
-      { property: "og:title", content: "Treinar os meus erros — Carta MZ Quiz" },
+      { property: "og:title", content: "Treinar os meus erros — Carta Fácil MZ" },
       {
         property: "og:description",
         content: "Um quiz gerado automaticamente a partir dos seus pontos fracos.",
