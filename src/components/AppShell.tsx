@@ -60,6 +60,13 @@ export function Brand() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const session = useSession();
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    window.location.assign("/");
+  }
+
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
