@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_usage: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          questions_answered: number
+          sessions_started: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string
+          id?: string
+          questions_answered?: number
+          sessions_started?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          questions_answered?: number
+          sessions_started?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -152,9 +182,11 @@ export type Database = {
           full_name: string | null
           id: string
           last_study_date: string | null
+          phone: string | null
           plan: Database["public"]["Enums"]["plan_tier"]
           plan_expires_at: string | null
           streak_days: number
+          terms_accepted_at: string | null
           updated_at: string
           xp: number
         }
@@ -164,9 +196,11 @@ export type Database = {
           full_name?: string | null
           id: string
           last_study_date?: string | null
+          phone?: string | null
           plan?: Database["public"]["Enums"]["plan_tier"]
           plan_expires_at?: string | null
           streak_days?: number
+          terms_accepted_at?: string | null
           updated_at?: string
           xp?: number
         }
@@ -176,9 +210,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_study_date?: string | null
+          phone?: string | null
           plan?: Database["public"]["Enums"]["plan_tier"]
           plan_expires_at?: string | null
           streak_days?: number
+          terms_accepted_at?: string | null
           updated_at?: string
           xp?: number
         }
@@ -400,9 +436,12 @@ export type Database = {
           amount_mzn: number
           created_at: string
           id: string
+          payer_phone: string | null
           payment_method: string
           payment_reference: string | null
           plan: Database["public"]["Enums"]["plan_tier"]
+          proof_url: string | null
+          rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -413,9 +452,12 @@ export type Database = {
           amount_mzn: number
           created_at?: string
           id?: string
+          payer_phone?: string | null
           payment_method?: string
           payment_reference?: string | null
           plan: Database["public"]["Enums"]["plan_tier"]
+          proof_url?: string | null
+          rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -426,12 +468,48 @@ export type Database = {
           amount_mzn?: number
           created_at?: string
           id?: string
+          payer_phone?: string | null
           payment_method?: string
           payment_reference?: string | null
           plan?: Database["public"]["Enums"]["plan_tier"]
+          proof_url?: string | null
+          rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          data_expiracao: string | null
+          data_inicio: string
+          estado: string
+          id: string
+          plano: Database["public"]["Enums"]["plan_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_expiracao?: string | null
+          data_inicio?: string
+          estado?: string
+          id?: string
+          plano?: Database["public"]["Enums"]["plan_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_expiracao?: string | null
+          data_inicio?: string
+          estado?: string
+          id?: string
+          plano?: Database["public"]["Enums"]["plan_tier"]
           updated_at?: string
           user_id?: string
         }
@@ -492,12 +570,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_subscription_request: {
+        Args: { _id: string }
+        Returns: undefined
+      }
+      effective_plan: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["plan_tier"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      my_plan_status: { Args: never; Returns: Json }
+      reject_subscription_request: {
+        Args: { _id: string; _reason: string }
+        Returns: undefined
+      }
+      start_study_session: {
+        Args: { _mode: string; _requested: number }
+        Returns: Json
       }
     }
     Enums: {
