@@ -58,7 +58,7 @@ function Field({
   children,
 }: {
   label: string;
-  error?: string | null;
+  error?: string | null | undefined;
   children: React.ReactNode;
 }) {
   return (
@@ -87,19 +87,25 @@ function Auth() {
   });
 
   const errors = useMemo(() => {
-    const e: Record<string, string | null> = {};
-    e.email = !form.email
+    const e: {
+      name?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      password?: string | null;
+      confirm?: string | null;
+    } = {};
+    e["email"] = !form.email
       ? "Escreva o seu e-mail."
       : EMAIL_RE.test(form.email.trim())
         ? null
         : "E-mail inválido.";
-    e.password = !form.password ? "Escreva a password." : passwordProblem(form.password);
+    e["password"] = !form.password ? "Escreva a password." : passwordProblem(form.password);
     if (mode === "register") {
-      e.name = form.name.trim().length >= 3 ? null : "Escreva o seu nome completo.";
-      e.phone = PHONE_RE.test(form.phone.replace(/\s/g, ""))
+      e["name"] = form.name.trim().length >= 3 ? null : "Escreva o seu nome completo.";
+      e["phone"] = PHONE_RE.test(form.phone.replace(/\s/g, ""))
         ? null
         : "Número moçambicano inválido (84/85/86/87 + 7 dígitos).";
-      e.confirm = form.confirm === form.password ? null : "As passwords não coincidem.";
+      e["confirm"] = form.confirm === form.password ? null : "As passwords não coincidem.";
     }
     return e;
   }, [form, mode]);
@@ -183,7 +189,7 @@ function Auth() {
         <form onSubmit={submit} className="surface mt-6 space-y-4 rounded-3xl p-6" noValidate>
           {mode === "register" && (
             <>
-              <Field label="Nome completo" error={touched.name ? errors.name : null}>
+              <Field label="Nome completo" error={touched["name"] ? errors["name"] : null}>
                 <input
                   value={form.name}
                   onChange={(e) => set("name", e.target.value)}
@@ -193,7 +199,7 @@ function Auth() {
                   maxLength={120}
                 />
               </Field>
-              <Field label="Número de telefone" error={touched.phone ? errors.phone : null}>
+              <Field label="Número de telefone" error={touched["phone"] ? errors["phone"] : null}>
                 <input
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value.replace(/[^\d]/g, "").slice(0, 9))}
@@ -207,7 +213,7 @@ function Auth() {
             </>
           )}
 
-          <Field label="E-mail" error={touched.email ? errors.email : null}>
+          <Field label="E-mail" error={touched["email"] ? errors["email"] : null}>
             <input
               type="email"
               value={form.email}
@@ -219,7 +225,7 @@ function Auth() {
             />
           </Field>
 
-          <Field label="Password" error={touched.password ? errors.password : null}>
+          <Field label="Password" error={touched["password"] ? errors["password"] : null}>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
@@ -241,7 +247,7 @@ function Auth() {
           </Field>
 
           {mode === "register" && (
-            <Field label="Confirmar password" error={touched.confirm ? errors.confirm : null}>
+            <Field label="Confirmar password" error={touched["confirm"] ? errors["confirm"] : null}>
               <input
                 type={showPass ? "text" : "password"}
                 value={form.confirm}
