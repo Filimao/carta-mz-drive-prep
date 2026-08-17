@@ -18,6 +18,7 @@ import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
 import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -66,6 +67,11 @@ const ProgressoRoute = ProgressoRouteImport.update({
   path: '/progresso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
     | '/redefinir-senha'
     | '/simulados'
     | '/admin'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
     | '/redefinir-senha'
     | '/simulados'
     | '/admin'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
     | '/redefinir-senha'
     | '/simulados'
     | '/_authenticated/admin'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   PraticarRoute: typeof PraticarRoute
   PrecosRoute: typeof PrecosRoute
   ProgressoRoute: typeof ProgressoRoute
+  RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
 }
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recuperar-password': {
+      id: '/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof RecuperarPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redefinir-senha': {
       id: '/redefinir-senha'
       path: '/redefinir-senha'
@@ -290,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   PraticarRoute: PraticarRoute,
   PrecosRoute: PrecosRoute,
   ProgressoRoute: ProgressoRoute,
+  RecuperarPasswordRoute: RecuperarPasswordRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
 }
