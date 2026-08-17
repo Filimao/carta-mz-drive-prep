@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
+import { Route as EstatisticasRouteImport } from './routes/estatisticas'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as PraticarRouteImport } from './routes/praticar'
 import { Route as PrecosRouteImport } from './routes/precos'
@@ -48,6 +49,11 @@ const CategoriasRoute = CategoriasRouteImport.update({
 const ErrosRoute = ErrosRouteImport.update({
   id: '/erros',
   path: '/erros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstatisticasRoute = EstatisticasRouteImport.update({
+  id: '/estatisticas',
+  path: '/estatisticas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritosRoute = FavoritosRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
     | '/praticar'
     | '/precos'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
     | '/praticar'
     | '/precos'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
     | '/praticar'
     | '/precos'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CategoriasRoute: typeof CategoriasRoute
   ErrosRoute: typeof ErrosRoute
+  EstatisticasRoute: typeof EstatisticasRoute
   FavoritosRoute: typeof FavoritosRoute
   PraticarRoute: typeof PraticarRoute
   PrecosRoute: typeof PrecosRoute
@@ -266,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/erros'
       fullPath: '/erros'
       preLoaderRoute: typeof ErrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estatisticas': {
+      id: '/estatisticas'
+      path: '/estatisticas'
+      fullPath: '/estatisticas'
+      preLoaderRoute: typeof EstatisticasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favoritos': {
@@ -369,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CategoriasRoute: CategoriasRoute,
   ErrosRoute: ErrosRoute,
+  EstatisticasRoute: EstatisticasRoute,
   FavoritosRoute: FavoritosRoute,
   PraticarRoute: PraticarRoute,
   PrecosRoute: PrecosRoute,
