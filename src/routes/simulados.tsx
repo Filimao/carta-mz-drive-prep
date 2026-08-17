@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { toast } from "sonner";
+
 import { AppShell } from "@/components/AppShell";
+import { LimitModal } from "@/components/PlanGate";
 import { QuizEngine } from "@/components/QuizEngine";
+import { requestSession } from "@/lib/plan-access";
 import type { Difficulty } from "@/lib/quiz";
 
 export const Route = createFileRoute("/simulados")({
@@ -30,6 +34,31 @@ function Simulados() {
   const [source, setSource] = useState<"todas" | "PDF" | "AUTHORED">("todas");
   const [timed, setTimed] = useState(true);
   const [started, setStarted] = useState(false);
+  const [granted, setGranted] = useState(count);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [starting, setStarting] = useState(false);
+
+  async function start() {
+    setStarting(true);
+    try {
+      const grant = await requestSession("simulado", count);
+      if (!grant.allowed) {
+        setLimitOpen(true);
+        return;
+      }
+      if (grant.grantedQuestions < count) {
+        toast.info(
+          `O teu plano permite simulados até ${grant.maxQuestions} questões. Vamos usar ${grant.grantedQuestions}.`,
+        );
+      }
+      setGranted(grant.grantedQuestions);
+      setStarted(true);
+    } catch {
+      toast.error("Não foi possível iniciar o simulado. Tente novamente.");
+    } finally {
+      setStarting(false);
+    }
+  }
 
   if (started) {
     return (
@@ -37,8 +66,8 @@ function Simulados() {
         <QuizEngine
           mode="simulado"
           title="Exame simulado"
-          config={{ count, difficulty, source }}
-          {...(timed ? { timeLimitSeconds: count * 60 } : {})}
+          config={{ count: granted, difficulty, source }}
+          {...(timed ? { timeLimitSeconds: granted * 60 } : {})}
         />
       </AppShell>
     );

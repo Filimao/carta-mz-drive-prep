@@ -2,8 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { toast } from "sonner";
+
 import { AppShell } from "@/components/AppShell";
+import { LimitModal } from "@/components/PlanGate";
 import { QuizEngine } from "@/components/QuizEngine";
+import { requestSession } from "@/lib/plan-access";
 import { fetchCategories, type Difficulty } from "@/lib/quiz";
 
 export const Route = createFileRoute("/praticar")({
@@ -31,6 +35,31 @@ function Praticar() {
   const [categoryId, setCategoryId] = useState<string>("");
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
   const [started, setStarted] = useState(false);
+  const [granted, setGranted] = useState(count);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [starting, setStarting] = useState(false);
+
+  async function start() {
+    setStarting(true);
+    try {
+      const grant = await requestSession("pratica", count);
+      if (!grant.allowed) {
+        setLimitOpen(true);
+        return;
+      }
+      if (grant.grantedQuestions < count) {
+        toast.info(
+          `O teu plano permite ${grant.maxQuestions} questões por sessão. Vamos começar com ${grant.grantedQuestions}.`,
+        );
+      }
+      setGranted(grant.grantedQuestions);
+      setStarted(true);
+    } catch {
+      toast.error("Não foi possível iniciar a sessão. Tente novamente.");
+    } finally {
+      setStarting(false);
+    }
+  }
 
   if (started) {
     return (
@@ -38,7 +67,7 @@ function Praticar() {
         <QuizEngine
           mode="pratica"
           title="Modo Prática"
-          config={{ count, categoryId: categoryId || null, difficulty }}
+          config={{ count: granted, categoryId: categoryId || null, difficulty }}
         />
       </AppShell>
     );
@@ -103,12 +132,15 @@ function Praticar() {
 
         <button
           type="button"
-          onClick={() => setStarted(true)}
-          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground sm:w-auto"
+          disabled={starting}
+          onClick={() => void start()}
+          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 sm:w-auto"
         >
-          Começar prática
+          {starting ? "A preparar..." : "Começar prática"}
         </button>
       </div>
+
+      <LimitModal open={limitOpen} onClose={() => setLimitOpen(false)} />
     </AppShell>
   );
 }
