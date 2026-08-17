@@ -14,13 +14,19 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
+import { Route as EstatisticasRouteImport } from './routes/estatisticas'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
+import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as PraticarRouteImport } from './routes/praticar'
 import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as ProgressoRouteImport } from './routes/progresso'
+import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
+import { Route as RedefinirPasswordRouteImport } from './routes/redefinir-password'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminPagamentosRouteImport } from './routes/_authenticated/admin/pagamentos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,9 +52,19 @@ const ErrosRoute = ErrosRouteImport.update({
   path: '/erros',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EstatisticasRoute = EstatisticasRouteImport.update({
+  id: '/estatisticas',
+  path: '/estatisticas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FavoritosRoute = FavoritosRouteImport.update({
   id: '/favoritos',
   path: '/favoritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PraticarRoute = PraticarRouteImport.update({
@@ -66,6 +82,16 @@ const ProgressoRoute = ProgressoRouteImport.update({
   path: '/progresso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirPasswordRoute = RedefinirPasswordRouteImport.update({
+  id: '/redefinir-password',
+  path: '/redefinir-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
@@ -76,37 +102,60 @@ const SimuladosRoute = SimuladosRouteImport.update({
   path: '/simulados',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminPagamentosRoute =
+  AuthenticatedAdminPagamentosRouteImport.update({
+    id: '/admin/pagamentos',
+    path: '/admin/pagamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,13 +164,19 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/categorias': typeof CategoriasRoute
   '/erros': typeof ErrosRoute
+  '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
   '/progresso': typeof ProgressoRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
+  '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,25 +185,37 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
+    | '/offline'
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
+    | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
-    | '/admin'
+    | '/perfil'
+    | '/admin/pagamentos'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
+    | '/offline'
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
+    | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
+    | '/perfil'
+    | '/admin/pagamentos'
     | '/admin'
   id:
     | '__root__'
@@ -157,13 +224,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categorias'
     | '/erros'
+    | '/estatisticas'
     | '/favoritos'
+    | '/offline'
     | '/praticar'
     | '/precos'
     | '/progresso'
+    | '/recuperar-password'
+    | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
-    | '/_authenticated/admin'
+    | '/_authenticated/perfil'
+    | '/_authenticated/admin/pagamentos'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,10 +245,14 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CategoriasRoute: typeof CategoriasRoute
   ErrosRoute: typeof ErrosRoute
+  EstatisticasRoute: typeof EstatisticasRoute
   FavoritosRoute: typeof FavoritosRoute
+  OfflineRoute: typeof OfflineRoute
   PraticarRoute: typeof PraticarRoute
   PrecosRoute: typeof PrecosRoute
   ProgressoRoute: typeof ProgressoRoute
+  RecuperarPasswordRoute: typeof RecuperarPasswordRoute
+  RedefinirPasswordRoute: typeof RedefinirPasswordRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
 }
@@ -217,11 +294,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ErrosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/estatisticas': {
+      id: '/estatisticas'
+      path: '/estatisticas'
+      fullPath: '/estatisticas'
+      preLoaderRoute: typeof EstatisticasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/favoritos': {
       id: '/favoritos'
       path: '/favoritos'
       fullPath: '/favoritos'
       preLoaderRoute: typeof FavoritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/praticar': {
@@ -245,6 +336,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recuperar-password': {
+      id: '/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof RecuperarPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-password': {
+      id: '/redefinir-password'
+      path: '/redefinir-password'
+      fullPath: '/redefinir-password'
+      preLoaderRoute: typeof RedefinirPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redefinir-senha': {
       id: '/redefinir-senha'
       path: '/redefinir-senha'
@@ -259,22 +364,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimuladosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
       path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/pagamentos': {
+      id: '/_authenticated/admin/pagamentos'
+      path: '/admin/pagamentos'
+      fullPath: '/admin/pagamentos'
+      preLoaderRoute: typeof AuthenticatedAdminPagamentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedAdminPagamentosRoute: typeof AuthenticatedAdminPagamentosRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedAdminPagamentosRoute: AuthenticatedAdminPagamentosRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -286,10 +409,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CategoriasRoute: CategoriasRoute,
   ErrosRoute: ErrosRoute,
+  EstatisticasRoute: EstatisticasRoute,
   FavoritosRoute: FavoritosRoute,
+  OfflineRoute: OfflineRoute,
   PraticarRoute: PraticarRoute,
   PrecosRoute: PrecosRoute,
   ProgressoRoute: ProgressoRoute,
+  RecuperarPasswordRoute: RecuperarPasswordRoute,
+  RedefinirPasswordRoute: RedefinirPasswordRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
 }

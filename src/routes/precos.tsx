@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Crown, X } from "lucide-react";
+import { Check, Crown, Loader2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { ExpiredBanner, PlanBadge } from "@/components/PlanGate";
+import { usePlano } from "@/hooks/usePlano";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import { PAYMENT_NUMBERS } from "@/lib/plan-access";
 import { PLANS, PLAN_ORDER, type PlanTier } from "@/lib/plans";
 
 export const Route = createFileRoute("/precos")({
@@ -29,21 +32,50 @@ export const Route = createFileRoute("/precos")({
   component: Precos,
 });
 
+const PHONE_RE = /^8[4-7]\d{7}$/;
+
 function Precos() {
   const session = useSession();
+  const plano = usePlano();
   const [pending, setPending] = useState<PlanTier | null>(null);
+  const [method, setMethod] = useState<"mpesa" | "emola">("mpesa");
+  const [payerPhone, setPayerPhone] = useState("");
   const [reference, setReference] = useState("");
+  const [proof, setProof] = useState<File | null>(null);
   const [sending, setSending] = useState(false);
 
   async function submit(tier: PlanTier) {
     if (!session.userId) return;
+    if (!PHONE_RE.test(payerPhone)) {
+      toast.error("Escreva o número usado para pagar (84/85/86/87 + 7 dígitos).");
+      return;
+    }
+    if (proof && proof.size > 5 * 1024 * 1024) {
+      toast.error("O comprovativo deve ter menos de 5 MB.");
+      return;
+    }
     setSending(true);
+    let proofPath: string | null = null;
+    if (proof) {
+      const ext = proof.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const path = `${session.userId}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("comprovativos").upload(path, proof);
+      if (upErr) {
+        setSending(false);
+        toast.error("Não foi possível enviar o comprovativo.");
+        return;
+      }
+      proofPath = path;
+    }
+
     const { error } = await supabase.from("subscription_requests").insert({
       user_id: session.userId,
       plan: tier,
       amount_mzn: PLANS[tier].priceMzn,
-      payment_method: "mpesa",
-      payment_reference: reference || null,
+      payment_method: method,
+      payer_phone: payerPhone,
+      payment_reference: reference.trim() || null,
+      proof_url: proofPath,
       status: "pendente",
     });
     setSending(false);
@@ -53,26 +85,40 @@ function Precos() {
     }
     setPending(null);
     setReference("");
-    toast.success("Pedido enviado! Vamos activar o plano após confirmar o pagamento.");
+    setPayerPhone("");
+    setProof(null);
+    plano.refresh();
+    toast.success(
+      "Recebemos o teu pedido! Vamos confirmar o pagamento e activar o teu plano em breve.",
+    );
   }
+
+  const inputClass =
+    "mt-2 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm font-normal";
 
   return (
     <AppShell>
+      {plano.status.expired && <ExpiredBanner />}
       <h1 className="font-display text-3xl font-semibold">Planos e preços</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         Comece grátis. Quando estiver pronto para estudar a sério, active o Pro ou o Premium por
-        M-Pesa, e-Mola ou transferência.
+        M-Pesa ou e-Mola.
       </p>
       {!session.loading && session.userId && (
-        <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-secondary/60 px-3 py-1.5 text-xs font-semibold">
-          <Crown className="h-3.5 w-3.5 text-primary" /> Plano actual: {session.plan.name}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <PlanBadge tier={plano.status.tier} label={`Plano actual: ${plano.status.plan.name}`} />
+          {plano.status.paymentPending && (
+            <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+              Pagamento em análise
+            </span>
+          )}
+        </div>
       )}
 
       <div className="mt-8 grid gap-5 lg:grid-cols-3">
         {PLAN_ORDER.map((tier) => {
           const plan = PLANS[tier];
-          const active = session.plan.tier === tier && session.userId != null;
+          const active = plano.status.tier === tier && session.userId != null && !plano.status.expired;
           return (
             <div
               key={tier}
@@ -116,8 +162,8 @@ function Precos() {
                     Praticar grátis
                   </Link>
                 ) : active ? (
-                  <span className="block w-full rounded-xl bg-secondary px-4 py-2.5 text-center text-sm font-semibold">
-                    Plano activo
+                  <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-center text-sm font-semibold">
+                    <Crown className="h-4 w-4 text-primary" /> Plano activo
                   </span>
                 ) : session.userId ? (
                   <button
@@ -142,40 +188,106 @@ function Precos() {
       </div>
 
       {pending && (
-        <div className="surface mt-8 max-w-xl rounded-3xl p-6">
-          <h2 className="font-display text-lg font-semibold">
-            Activar {PLANS[pending].name} — {PLANS[pending].priceMzn} MT
-          </h2>
-          <ol className="mt-3 space-y-1 text-sm text-muted-foreground">
-            <li>1. Envie {PLANS[pending].priceMzn} MT por M-Pesa ou e-Mola para 84 000 0000.</li>
-            <li>2. Introduza abaixo a referência da mensagem de confirmação.</li>
-            <li>3. Activamos o plano depois de confirmar o pagamento.</li>
-          </ol>
-          <label className="mt-4 block text-sm font-semibold">
-            Referência do pagamento
-            <input
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              placeholder="Ex.: PP240813.1234.A56789"
-              className="mt-2 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm font-normal"
-            />
-          </label>
-          <div className="mt-4 flex gap-2">
-            <button
-              type="button"
-              disabled={sending}
-              onClick={() => void submit(pending)}
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
-            >
-              {sending ? "A enviar..." : "Enviar pedido"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setPending(null)}
-              className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold"
-            >
-              Cancelar
-            </button>
+        <div
+          className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/60 px-4 py-8 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="surface w-full max-w-lg rounded-3xl p-6">
+            <h2 className="font-display text-xl font-semibold">
+              Activar {PLANS[pending].name} — {PLANS[pending].priceMzn} MT
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Envia o valor exacto para um dos números abaixo e depois submete o comprovativo. A tua
+              conta será activada em até algumas horas após confirmação.
+            </p>
+
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border p-3">
+                <p className="text-xs font-semibold text-muted-foreground">M-Pesa</p>
+                <p className="font-display text-lg font-bold">{PAYMENT_NUMBERS.mpesa}</p>
+              </div>
+              <div className="rounded-2xl border border-border p-3">
+                <p className="text-xs font-semibold text-muted-foreground">e-Mola</p>
+                <p className="font-display text-lg font-bold">{PAYMENT_NUMBERS.emola}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              <fieldset>
+                <legend className="text-sm font-semibold">Método usado</legend>
+                <div className="mt-2 flex gap-2">
+                  {(["mpesa", "emola"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMethod(m)}
+                      className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                        method === m ? "border-primary bg-primary/10 text-primary" : "border-border"
+                      }`}
+                    >
+                      {m === "mpesa" ? "M-Pesa" : "e-Mola"}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+
+              <label className="block text-sm font-semibold">
+                Número de telefone usado para pagar
+                <input
+                  value={payerPhone}
+                  onChange={(e) => setPayerPhone(e.target.value.replace(/\D/g, "").slice(0, 9))}
+                  placeholder="84XXXXXXX"
+                  inputMode="numeric"
+                  className={inputClass}
+                />
+              </label>
+
+              <label className="block text-sm font-semibold">
+                Referência / ID da transacção (opcional)
+                <input
+                  value={reference}
+                  onChange={(e) => setReference(e.target.value)}
+                  placeholder="Ex.: PP240813.1234.A56789"
+                  maxLength={80}
+                  className={inputClass}
+                />
+              </label>
+
+              <label className="block text-sm font-semibold">
+                Comprovativo (screenshot, recomendado)
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setProof(e.target.files?.[0] ?? null)}
+                  className="mt-2 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm font-normal"
+                />
+              </label>
+            </div>
+
+            <p className="mt-4 text-xs text-muted-foreground">
+              Os pagamentos são processados manualmente via M-Pesa/e-Mola. Guarda o teu comprovativo
+              até a confirmação.
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={sending}
+                onClick={() => void submit(pending)}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {sending && <Loader2 className="h-4 w-4 animate-spin" />}
+                Confirmar pagamento enviado
+              </button>
+              <button
+                type="button"
+                onClick={() => setPending(null)}
+                className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}
