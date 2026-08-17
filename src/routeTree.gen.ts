@@ -22,8 +22,8 @@ import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-passwo
 import { Route as RedefinirPasswordRouteImport } from './routes/redefinir-password'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -89,14 +89,14 @@ const SimuladosRoute = SimuladosRouteImport.update({
   path: '/simulados',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
@@ -113,8 +113,8 @@ export interface FileRoutesByFullPath {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,8 +129,8 @@ export interface FileRoutesByTo {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,8 +147,8 @@ export interface FileRoutesById {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -165,8 +165,8 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
-    | '/admin'
     | '/perfil'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -181,8 +181,8 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
-    | '/admin'
     | '/perfil'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -198,8 +198,8 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
-    | '/_authenticated/admin'
     | '/_authenticated/perfil'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -311,13 +311,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimuladosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -325,17 +318,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
