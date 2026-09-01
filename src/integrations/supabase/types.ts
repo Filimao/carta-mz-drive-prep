@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -574,6 +574,10 @@ export type Database = {
         Args: { _id: string }
         Returns: undefined
       }
+      aprovar_pagamento: {
+        Args: { p_dias?: number; p_plano: string; p_user_id: string }
+        Returns: undefined
+      }
       effective_plan: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["plan_tier"]
@@ -586,6 +590,10 @@ export type Database = {
         Returns: boolean
       }
       my_plan_status: { Args: never; Returns: Json }
+      registar_progresso: {
+        Args: { p_manter_streak?: boolean; p_xp_ganho: number }
+        Returns: undefined
+      }
       reject_subscription_request: {
         Args: { _id: string; _reason: string }
         Returns: undefined
