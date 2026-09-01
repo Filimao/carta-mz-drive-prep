@@ -86,20 +86,34 @@ function Simulados() {
         <fieldset>
           <legend className="text-sm font-semibold">Número de perguntas</legend>
           <div className="mt-3 flex flex-wrap gap-2">
-            {[10, 20, 30, 40, 50].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setCount(n)}
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                  count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
+            {[10, 20, 30, 40, 50].map((n) => {
+              const locked = n > maxAllowed;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  disabled={locked}
+                  title={locked ? `Disponível em planos superiores (limite: ${maxAllowed})` : undefined}
+                  onClick={() => setCount(n)}
+                  className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                    count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
+                  } ${locked ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  {n}
+                </button>
+              );
+            })}
           </div>
+          {maxAllowed < 50 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              O plano {plano.status.plan.name} permite simulados até {maxAllowed} questões.{" "}
+              <Link to="/precos" className="font-semibold text-primary">
+                Ver planos
+              </Link>
+            </p>
+          )}
         </fieldset>
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">
