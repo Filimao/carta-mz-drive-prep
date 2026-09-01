@@ -7,6 +7,9 @@ import {
   XCircle,
   Star,
   BarChart3,
+  LineChart,
+  WifiOff,
+  UserRound,
   Moon,
   Sun,
 } from "lucide-react";
@@ -24,7 +27,10 @@ const NAV = [
   { to: "/erros", label: "Erros", icon: XCircle },
   { to: "/favoritos", label: "Favoritos", icon: Star },
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
+  { to: "/estatisticas", label: "Estatísticas", icon: LineChart },
+  { to: "/offline", label: "Offline", icon: WifiOff },
 ] as const;
+
 
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
@@ -102,14 +108,32 @@ export function AppShell({ children }: { children: ReactNode }) {
               Preços
             </Link>
             {session.isAdmin && (
+              <>
+                <Link
+                  to="/admin"
+                  className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary sm:inline-flex"
+                >
+                  Admin
+                </Link>
+                <Link
+                  to="/admin/pagamentos"
+                  className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary lg:inline-flex"
+                >
+                  Pagamentos
+                </Link>
+              </>
+            )}
+            {session.userId && (
               <Link
-                to="/admin"
-                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary sm:inline-flex"
+                to="/perfil"
+                aria-label="A minha conta"
+                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary sm:inline-flex"
               >
-                Admin
+                <UserRound className="h-4 w-4" />
               </Link>
             )}
             {session.userId ? (
+
               <button
                 type="button"
                 onClick={() => void signOut()}

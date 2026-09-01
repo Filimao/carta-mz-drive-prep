@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { toast } from "sonner";
@@ -6,8 +6,10 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { LimitModal } from "@/components/PlanGate";
 import { QuizEngine } from "@/components/QuizEngine";
+import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import type { Difficulty } from "@/lib/quiz";
+
 
 export const Route = createFileRoute("/simulados")({
   head: () => ({
@@ -29,7 +31,10 @@ export const Route = createFileRoute("/simulados")({
 });
 
 function Simulados() {
+  const plano = usePlano();
+  const maxAllowed = plano.status.plan.maxExamQuestions;
   const [count, setCount] = useState(30);
+
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
   const [source, setSource] = useState<"todas" | "PDF" | "AUTHORED">("todas");
   const [timed, setTimed] = useState(true);
@@ -84,20 +89,34 @@ function Simulados() {
         <fieldset>
           <legend className="text-sm font-semibold">Número de perguntas</legend>
           <div className="mt-3 flex flex-wrap gap-2">
-            {[10, 20, 30, 40, 50].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setCount(n)}
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                  count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
+            {[10, 20, 30, 40, 50].map((n) => {
+              const locked = n > maxAllowed;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  disabled={locked}
+                  title={locked ? `Disponível em planos superiores (limite: ${maxAllowed})` : undefined}
+                  onClick={() => setCount(n)}
+                  className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                    count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
+                  } ${locked ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  {n}
+                </button>
+              );
+            })}
           </div>
+          {maxAllowed < 50 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              O plano {plano.status.plan.name} permite simulados até {maxAllowed} questões.{" "}
+              <Link to="/precos" className="font-semibold text-primary">
+                Ver planos
+              </Link>
+            </p>
+          )}
         </fieldset>
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">
@@ -147,12 +166,16 @@ function Simulados() {
 
         <button
           type="button"
-          onClick={() => setStarted(true)}
-          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground sm:w-auto"
+          disabled={starting}
+          onClick={() => void start()}
+          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 sm:w-auto"
         >
-          Gerar simulado
+          {starting ? "A preparar..." : "Gerar simulado"}
         </button>
       </div>
+
+      <LimitModal open={limitOpen} onClose={() => setLimitOpen(false)} />
+
     </AppShell>
   );
 }

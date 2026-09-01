@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { LimitModal } from "@/components/PlanGate";
 import { QuizEngine } from "@/components/QuizEngine";
+import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import { fetchCategories, type Difficulty } from "@/lib/quiz";
+
 
 export const Route = createFileRoute("/praticar")({
   head: () => ({
@@ -31,6 +33,8 @@ export const Route = createFileRoute("/praticar")({
 
 function Praticar() {
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const plano = usePlano();
+  const maxAllowed = plano.status.plan.maxQuestionsPerQuiz;
   const [count, setCount] = useState(20);
   const [categoryId, setCategoryId] = useState<string>("");
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
@@ -38,6 +42,7 @@ function Praticar() {
   const [granted, setGranted] = useState(count);
   const [limitOpen, setLimitOpen] = useState(false);
   const [starting, setStarting] = useState(false);
+
 
   async function start() {
     setStarting(true);
@@ -84,20 +89,34 @@ function Praticar() {
         <fieldset>
           <legend className="text-sm font-semibold">Número de questões</legend>
           <div className="mt-3 flex flex-wrap gap-2">
-            {[10, 20, 30, 50, 100].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setCount(n)}
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                  count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
+            {[10, 20, 30, 50, 100].map((n) => {
+              const locked = n > maxAllowed;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  disabled={locked}
+                  title={locked ? `Disponível em planos superiores (limite: ${maxAllowed})` : undefined}
+                  onClick={() => setCount(n)}
+                  className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                    count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
+                  } ${locked ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  {n}
+                </button>
+              );
+            })}
           </div>
+          {maxAllowed < 100 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              O plano {plano.status.plan.name} permite até {maxAllowed} questões por sessão.{" "}
+              <Link to="/precos" className="font-semibold text-primary">
+                Ver planos
+              </Link>
+            </p>
+          )}
         </fieldset>
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">
