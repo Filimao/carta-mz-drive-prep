@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { LimitModal } from "@/components/PlanGate";
 import { QuizEngine } from "@/components/QuizEngine";
+import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import { fetchCategories, type Difficulty } from "@/lib/quiz";
+
 
 export const Route = createFileRoute("/praticar")({
   head: () => ({
