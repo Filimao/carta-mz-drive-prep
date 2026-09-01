@@ -149,12 +149,16 @@ function Simulados() {
 
         <button
           type="button"
-          onClick={() => setStarted(true)}
-          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground sm:w-auto"
+          disabled={starting}
+          onClick={() => void start()}
+          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 sm:w-auto"
         >
-          Gerar simulado
+          {starting ? "A preparar..." : "Gerar simulado"}
         </button>
       </div>
+
+      <LimitModal open={limitOpen} onClose={() => setLimitOpen(false)} />
+
     </AppShell>
   );
 }
