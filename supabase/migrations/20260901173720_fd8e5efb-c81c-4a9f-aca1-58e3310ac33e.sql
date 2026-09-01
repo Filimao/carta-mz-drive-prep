@@ -1,0 +1,20 @@
+REVOKE ALL ON FUNCTION public.effective_plan(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.approve_subscription_request(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.reject_subscription_request(uuid, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.start_study_session(text, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.my_plan_status() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.registar_progresso(integer, boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.aprovar_pagamento(uuid, text, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.set_updated_at() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.bloquear_colunas_sensiveis_profiles() FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.approve_subscription_request(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.reject_subscription_request(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.registar_progresso(integer, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.start_study_session(text, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.my_plan_status() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO service_role;
+GRANT EXECUTE ON FUNCTION public.effective_plan(uuid) TO service_role;
