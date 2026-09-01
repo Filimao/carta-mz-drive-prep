@@ -25,6 +25,7 @@ import { Route as RedefinirPasswordRouteImport } from './routes/redefinir-passwo
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminPagamentosRouteImport } from './routes/_authenticated/admin/pagamentos'
 
@@ -107,6 +108,11 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/simulados'
     | '/perfil'
+    | '/api/chat'
     | '/admin/pagamentos'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/simulados'
     | '/perfil'
+    | '/api/chat'
     | '/admin/pagamentos'
     | '/admin'
   id:
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/simulados'
     | '/_authenticated/perfil'
+    | '/api/chat'
     | '/_authenticated/admin/pagamentos'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -255,6 +267,7 @@ export interface RootRouteChildren {
   RedefinirPasswordRoute: typeof RedefinirPasswordRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -419,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirPasswordRoute: RedefinirPasswordRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
