@@ -7,6 +7,9 @@ import {
   XCircle,
   Star,
   BarChart3,
+  LineChart,
+  WifiOff,
+  UserRound,
   Moon,
   Sun,
 } from "lucide-react";
@@ -24,7 +27,10 @@ const NAV = [
   { to: "/erros", label: "Erros", icon: XCircle },
   { to: "/favoritos", label: "Favoritos", icon: Star },
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
+  { to: "/estatisticas", label: "Estatísticas", icon: LineChart },
+  { to: "/offline", label: "Offline", icon: WifiOff },
 ] as const;
+
 
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
