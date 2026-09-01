@@ -31,7 +31,10 @@ export const Route = createFileRoute("/simulados")({
 });
 
 function Simulados() {
+  const plano = usePlano();
+  const maxAllowed = plano.status.plan.maxExamQuestions;
   const [count, setCount] = useState(30);
+
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
   const [source, setSource] = useState<"todas" | "PDF" | "AUTHORED">("todas");
   const [timed, setTimed] = useState(true);
