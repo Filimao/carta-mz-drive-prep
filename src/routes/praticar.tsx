@@ -31,6 +31,8 @@ export const Route = createFileRoute("/praticar")({
 
 function Praticar() {
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const plano = usePlano();
+  const maxAllowed = plano.status.plan.maxQuestionsPerQuiz;
   const [count, setCount] = useState(20);
   const [categoryId, setCategoryId] = useState<string>("");
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
@@ -38,6 +40,7 @@ function Praticar() {
   const [granted, setGranted] = useState(count);
   const [limitOpen, setLimitOpen] = useState(false);
   const [starting, setStarting] = useState(false);
+
 
   async function start() {
     setStarting(true);
