@@ -95,6 +95,36 @@ function shuffle<T>(items: T[]): T[] {
 const SELECT_COLUMNS =
   "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id";
 
+const LETTER_KEYS: Letter[] = ["A", "B", "C", "D"];
+
+/**
+ * Randomiza a posição das alternativas de cada questão e recalcula a letra
+ * correcta, para que a resposta certa não fique sempre na mesma opção.
+ */
+export function shuffleOptions(q: Question): Question {
+  const entries = LETTER_KEYS.map((letter) => ({
+    letter,
+    text:
+      letter === "A"
+        ? q.option_a
+        : letter === "B"
+          ? q.option_b
+          : letter === "C"
+            ? q.option_c
+            : q.option_d,
+  }));
+  const shuffled = shuffle(entries);
+  const correctIndex = shuffled.findIndex((e) => e.letter === q.correct_answer);
+  return {
+    ...q,
+    option_a: shuffled[0]!.text,
+    option_b: shuffled[1]!.text,
+    option_c: shuffled[2]!.text,
+    option_d: shuffled[3]!.text,
+    correct_answer: LETTER_KEYS[correctIndex >= 0 ? correctIndex : 0]!,
+  };
+}
+
 export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]> {
   let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
 
@@ -106,7 +136,9 @@ export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]
 
   const { data, error } = await query.limit(600);
   if (error) throw error;
-  return shuffle((data ?? []) as Question[]).slice(0, config.count);
+  return shuffle((data ?? []) as Question[])
+    .slice(0, config.count)
+    .map(shuffleOptions);
 }
 
 export async function searchQuestions(term: string): Promise<Question[]> {
