@@ -136,7 +136,9 @@ export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]
 
   const { data, error } = await query.limit(600);
   if (error) throw error;
-  return shuffle((data ?? []) as Question[]).slice(0, config.count);
+  return shuffle((data ?? []) as Question[])
+    .slice(0, config.count)
+    .map(shuffleOptions);
 }
 
 export async function searchQuestions(term: string): Promise<Question[]> {
