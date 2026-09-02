@@ -12,10 +12,24 @@ import {
   UserRound,
   Moon,
   Sun,
+  Menu,
+  Tag,
+  ShieldCheck,
+  Receipt,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,6 +43,13 @@ const NAV = [
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
   { to: "/estatisticas", label: "Estatísticas", icon: LineChart },
   { to: "/offline", label: "Offline", icon: WifiOff },
+] as const;
+
+const BOTTOM_NAV = [
+  { to: "/", label: "Início", icon: Home },
+  { to: "/praticar", label: "Praticar", icon: Dumbbell },
+  { to: "/simulados", label: "Simulados", icon: ClipboardList },
+  { to: "/progresso", label: "Progresso", icon: BarChart3 },
 ] as const;
 
 
