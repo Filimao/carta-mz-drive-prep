@@ -61,7 +61,7 @@ export const Route = createFileRoute("/api/chat")({
         const result = streamText({
           model: gateway("openai/gpt-5.6-sol"),
           system: SYSTEM_PROMPT,
-          messages: convertToModelMessages(messages),
+          messages: await convertToModelMessages(messages),
           stopWhen: stepCountIs(50),
           providerOptions: {
             lovable: { reasoningEffort: "none", max_completion_tokens: 1200 },
