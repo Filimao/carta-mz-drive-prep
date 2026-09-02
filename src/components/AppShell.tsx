@@ -12,10 +12,24 @@ import {
   UserRound,
   Moon,
   Sun,
+  Menu,
+  Tag,
+  ShieldCheck,
+  Receipt,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,6 +43,13 @@ const NAV = [
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
   { to: "/estatisticas", label: "Estatísticas", icon: LineChart },
   { to: "/offline", label: "Offline", icon: WifiOff },
+] as const;
+
+const BOTTOM_NAV = [
+  { to: "/", label: "Início", icon: Home },
+  { to: "/praticar", label: "Praticar", icon: Dumbbell },
+  { to: "/simulados", label: "Simulados", icon: ClipboardList },
+  { to: "/progresso", label: "Progresso", icon: BarChart3 },
 ] as const;
 
 
@@ -68,15 +89,104 @@ export function Brand() {
   );
 }
 
+function MobileMenu({
+  open,
+  onOpenChange,
+  pathname,
+  isAdmin,
+  isLoggedIn,
+  onSignOut,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  pathname: string;
+  isAdmin: boolean;
+  isLoggedIn: boolean;
+  onSignOut: () => void;
+}) {
+  const extra = [
+    { to: "/precos", label: "Preços", icon: Tag },
+    ...(isLoggedIn ? [{ to: "/perfil", label: "A minha conta", icon: UserRound }] : []),
+    ...(isAdmin
+      ? [
+          { to: "/admin", label: "Admin", icon: ShieldCheck },
+          { to: "/admin/pagamentos", label: "Pagamentos", icon: Receipt },
+        ]
+      : []),
+  ];
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Abrir menu"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-[85vw] max-w-sm overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="font-display">Menu</SheetTitle>
+        </SheetHeader>
+        <nav className="mt-4 flex flex-col gap-1" aria-label="Navegação móvel">
+          {[...NAV, ...extra].map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => onOpenChange(false)}
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
+                  active ? "bg-secondary text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="mt-6 flex flex-col gap-2 border-t border-border pt-4">
+          <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold" />
+          {isLoggedIn ? (
+            <button
+              type="button"
+              onClick={() => {
+                onOpenChange(false);
+                onSignOut();
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-3 text-sm font-semibold"
+            >
+              <LogOut className="h-4 w-4" /> Sair
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              onClick={() => onOpenChange(false)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground"
+            >
+              <LogIn className="h-4 w-4" /> Entrar
+            </Link>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const session = useSession();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   async function signOut() {
     await supabase.auth.signOut();
     window.location.assign("/");
   }
-
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
