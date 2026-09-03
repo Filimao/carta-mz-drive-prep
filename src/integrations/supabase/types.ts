@@ -220,6 +220,51 @@ export type Database = {
         }
         Relationships: []
       }
+      question_imports: {
+        Row: {
+          created_at: string
+          created_by: string
+          error_message: string | null
+          failed_pages: number[]
+          file_name: string
+          id: string
+          processed_pages: number
+          questions_found: number
+          status: string
+          storage_path: string
+          total_pages: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          error_message?: string | null
+          failed_pages?: number[]
+          file_name: string
+          id?: string
+          processed_pages?: number
+          questions_found?: number
+          status?: string
+          storage_path: string
+          total_pages?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          error_message?: string | null
+          failed_pages?: number[]
+          file_name?: string
+          id?: string
+          processed_pages?: number
+          questions_found?: number
+          status?: string
+          storage_path?: string
+          total_pages?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       questions: {
         Row: {
           category_id: string | null
@@ -229,6 +274,7 @@ export type Database = {
           explanation: string
           id: string
           image_url: string | null
+          import_id: string | null
           is_published: boolean
           is_verified: boolean
           needs_review: boolean
@@ -251,6 +297,7 @@ export type Database = {
           explanation?: string
           id?: string
           image_url?: string | null
+          import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
           needs_review?: boolean
@@ -273,6 +320,7 @@ export type Database = {
           explanation?: string
           id?: string
           image_url?: string | null
+          import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
           needs_review?: boolean
@@ -293,6 +341,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "question_imports"
             referencedColumns: ["id"]
           },
         ]
