@@ -11,12 +11,25 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { registerSW } from "virtual:pwa-register";
 
 function useServiceWorkerRegistration() {
   useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch((err) => {
-      console.error("[PWA] Service worker registration failed:", err);
+    if (typeof window === "undefined") return;
+    
+    registerSW({
+      onNeedRefresh() {
+        console.log("[PWA] Nova versão disponível!");
+      },
+      onOfflineReady() {
+        console.log("[PWA] Carta MZ Quiz disponível offline!");
+      },
+      onRegistered(registration) {
+        console.log("[PWA] Service Worker registado com sucesso", registration);
+      },
+      onRegisterError(error) {
+        console.error("[PWA] Erro ao registar Service Worker:", error);
+      },
     });
   }, []);
 }
