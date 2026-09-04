@@ -26,6 +26,16 @@ export default defineConfig({
           display: "standalone",
           start_url: "/",
           scope: "/",
+          orientation: "portrait-primary",
+          categories: ["education", "productivity"],
+          screenshots: [
+            {
+              src: "/icons/icon-512.png",
+              sizes: "512x512",
+              type: "image/png",
+              form_factor: "narrow"
+            }
+          ],
           icons: [
             {
               src: "/icons/icon-192.png",
@@ -38,6 +48,12 @@ export default defineConfig({
               sizes: "512x512",
               type: "image/png",
               purpose: "any"
+            },
+            {
+              src: "/icons/icon-512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable"
             }
           ]
         },
