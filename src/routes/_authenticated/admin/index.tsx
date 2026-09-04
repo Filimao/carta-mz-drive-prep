@@ -56,6 +56,7 @@ interface AdminQuestion {
   difficulty: "facil" | "medio" | "dificil";
   source_document: string | null;
   source_page: number | null;
+  image_url: string | null;
   needs_review: boolean;
   is_published: boolean;
   is_verified: boolean;
@@ -220,7 +221,7 @@ function ReviewPanel() {
       let q = supabase
         .from("questions")
         .select(
-          "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,category_id,difficulty,source_document,source_page,needs_review,is_published,is_verified",
+          "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,category_id,difficulty,source_document,source_page,image_url,needs_review,is_published,is_verified",
         )
         .order("created_at", { ascending: false })
         .limit(80);
@@ -275,9 +276,30 @@ function ReviewPanel() {
     toast.success(`${ids.length} questões aprovadas.`);
   }
 
+  async function deleteAllQuestions() {
+    const confirmation = window.prompt(
+      "Esta ação apaga TODAS as questões. Escreve APAGAR para confirmar.",
+    );
+    if (confirmation !== "APAGAR") return;
+    const { error } = await supabase.from("questions").delete().not("id", "is", null);
+    if (error) {
+      toast.error("Não foi possível apagar as questões.");
+      return;
+    }
+    await refresh();
+    toast.success("Todas as questões foram apagadas.");
+  }
+
   return (
     <div className="mt-6 space-y-5">
       <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void deleteAllQuestions()}
+          className="ml-auto rounded-xl border border-destructive/50 px-4 py-2 text-sm font-semibold text-destructive"
+        >
+          Apagar todas as questões
+        </button>
         {(
           [
             ["revisao", "Para revisão"],
@@ -399,6 +421,13 @@ function QuestionCard({
 
       <div className="mt-3 space-y-2">
         {field("question_text", "Pergunta")}
+        {question.image_url && (
+          <img
+            src={question.image_url}
+            alt="Imagem da questão"
+            className="max-h-48 w-full rounded-xl border border-border bg-white object-contain"
+          />
+        )}
         <div className="grid gap-2 sm:grid-cols-2">
           {field("option_a", "Opção A")}
           {field("option_b", "Opção B")}

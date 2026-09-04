@@ -17,6 +17,7 @@ export interface Question {
   source: "PDF" | "AUTHORED";
   source_document: string | null;
   category_id: string | null;
+  image_url: string | null;
 }
 
 export interface Category {
@@ -94,7 +95,7 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 const SELECT_COLUMNS =
-  "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id";
+  "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id,image_url";
 
 const LETTER_KEYS: Letter[] = ["A", "B", "C", "D"];
 

@@ -257,6 +257,14 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
           {current.question_text}
         </h2>
 
+        {current.image_url && (
+          <img
+            src={current.image_url}
+            alt="Imagem associada à questão"
+            className="mt-4 max-h-64 w-full rounded-xl border border-border object-contain bg-white"
+          />
+        )}
+
         <ul className="mt-5 space-y-3">
           {LETTERS.map((letter) => {
             const chosen = selected === letter;

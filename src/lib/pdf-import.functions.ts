@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const MODEL = "gemini-3.6-flash";
+const MODEL = "gemini-2.5-flash";
 
 const extractedQuestionSchema = z.object({
   question_text: z.string().min(5),
@@ -18,6 +18,11 @@ const extractedQuestionSchema = z.object({
   difficulty: z.enum(["facil", "medio", "dificil"]).default("medio"),
   category_slug: z.string().nullable().default(null),
   confidence: z.number().min(0).max(1).default(0.5),
+  image_region: z
+    .object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })
+    .nullable()
+    .default(null),
+  image_url: z.string().url().nullable().default(null),
 });
 
 export type ExtractedQuestion = z.infer<typeof extractedQuestionSchema>;
@@ -25,12 +30,13 @@ export type ExtractedQuestion = z.infer<typeof extractedQuestionSchema>;
 const SYSTEM = `És um especialista em extrair questões de exame teórico da carta de condução de Moçambique a partir de páginas de PDF (digitalizadas ou com texto).
 
 Devolve SEMPRE um objecto JSON válido com esta forma:
-{"questions":[{"question_text":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_answer":"A|B|C|D","explanation":"...","tip":null,"difficulty":"facil|medio|dificil","category_slug":null,"confidence":0.0}]}
+{"questions":[{"question_text":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_answer":"A|B|C|D","explanation":"...","tip":null,"difficulty":"facil|medio|dificil","category_slug":null,"confidence":0.0,"image_region":{"x":0.0,"y":0.0,"width":0.3,"height":0.3}}]}
 
 Regras:
 - Português de Moçambique, sem alterar o sentido original.
 - Se a página não tiver questões, devolve {"questions":[]}.
 - A imagem pode ser uma captura de ecrã comprida com várias questões. Lê cada bloco separadamente, de cima para baixo, sem duplicar questões.
+- Para cada questão, identifica a fotografia/figura/sinal no lado esquerdo. Devolve image_region com coordenadas relativas à imagem completa, entre 0 e 1. Se não existir imagem, devolve null.
 - As alternativas podem ser A-C ou A-D. Se uma alternativa não estiver visível, usa exactamente "[Alternativa não apresentada]" e confiança < 0.6; nunca inventes texto.
 - A resposta correcta neste tipo de material costuma estar escrita a verde. Usa essa cor, negrito, sublinhado ou X como evidência; se não for claro, usa confiança < 0.6.
 - Transcreve o texto visível com fidelidade, incluindo números, unidades, pontuação e acentos. Não uses o texto da imagem para criar perguntas que não estejam visíveis.
@@ -132,6 +138,8 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
         confidence: missingOption
           ? Math.min(typeof candidate.confidence === "number" ? candidate.confidence : 0.5, 0.59)
           : candidate.confidence,
+        image_region: candidate.image_region ?? null,
+        image_url: null,
       };
       const result = extractedQuestionSchema.safeParse(normalized);
       if (result.success) questions.push(result.data);
@@ -174,6 +182,7 @@ export const saveImportedQuestions = createServerFn({ method: "POST" })
         source_document: data.sourceDocument,
         source_page: q.page,
         import_id: data.importId,
+        image_url: q.image_url,
         needs_review: lowConfidence,
         is_published: !lowConfidence,
         is_verified: false,

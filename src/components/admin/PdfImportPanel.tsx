@@ -62,7 +62,7 @@ export function PdfImportPanel() {
 
   /** Renderiza uma página em imagem + texto e envia para a IA. */
   const processPage = useCallback(
-    async (pageNumber: number) => {
+    async (pageNumber: number, imageFolder: string) => {
       const doc = docRef.current;
       if (!doc) throw new Error("PDF não carregado.");
       const page = await doc.getPage(pageNumber);
@@ -84,13 +84,45 @@ export function PdfImportPanel() {
         data: { imageBase64, pageText, page: pageNumber, categories: catList },
       });
 
-      const found = result.questions.map((q, i) => ({
-        ...q,
-        key: `${pageNumber}-${i}-${Math.random().toString(36).slice(2, 7)}`,
-        page: pageNumber,
-        category_id:
-          (categories ?? []).find((c) => c.slug === q.category_slug)?.id ?? null,
-      }));
+      const found = await Promise.all(
+        result.questions.map(async (q, i) => {
+          let imageUrl = q.image_url;
+          const region = q.image_region;
+          if (region && region.width > 0 && region.height > 0) {
+            const crop = document.createElement("canvas");
+            const x = Math.max(0, Math.floor(region.x * canvas.width));
+            const y = Math.max(0, Math.floor(region.y * canvas.height));
+            const width = Math.min(canvas.width - x, Math.floor(region.width * canvas.width));
+            const height = Math.min(canvas.height - y, Math.floor(region.height * canvas.height));
+            if (width > 0 && height > 0) {
+              crop.width = width;
+              crop.height = height;
+              crop.getContext("2d")?.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+              const blob = await new Promise<Blob | null>((resolve) =>
+                crop.toBlob(resolve, "image/jpeg", 0.86),
+              );
+              if (blob) {
+                const path = `${imageFolder}/${pageNumber}-${i}.jpg`;
+                const upload = await supabase.storage.from("question-images").upload(path, blob, {
+                  contentType: "image/jpeg",
+                  upsert: true,
+                });
+                if (!upload.error) {
+                  imageUrl = supabase.storage.from("question-images").getPublicUrl(path).data.publicUrl;
+                }
+              }
+            }
+          }
+          return {
+            ...q,
+            image_url: imageUrl,
+            key: `${pageNumber}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+            page: pageNumber,
+            category_id:
+              (categories ?? []).find((c) => c.slug === q.category_slug)?.id ?? null,
+          };
+        }),
+      );
       setDrafts((prev) => [...prev, ...found]);
       return found.length;
     },
@@ -98,7 +130,7 @@ export function PdfImportPanel() {
   );
 
   const runPages = useCallback(
-    async (pages: number[], id: string) => {
+    async (pages: number[], id: string, imageFolder: string) => {
       setStatus("running");
       pausedRef.current = false;
       let done = processed;
@@ -112,7 +144,7 @@ export function PdfImportPanel() {
           return;
         }
         try {
-          found += await processPage(pageNumber);
+          found += await processPage(pageNumber, imageFolder);
           failures.delete(pageNumber);
         } catch (err) {
           failures.add(pageNumber);
@@ -182,6 +214,7 @@ export function PdfImportPanel() {
       await runPages(
         Array.from({ length: doc.numPages }, (_, i) => i + 1),
         row.data.id,
+        `${userId}/${row.data.id}`,
       );
     } catch (err) {
       setStatus("error");
@@ -191,15 +224,19 @@ export function PdfImportPanel() {
 
   async function resume() {
     if (!importId) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
     const remaining = Array.from({ length: totalPages }, (_, i) => i + 1).slice(processed);
-    await runPages(remaining, importId);
+    await runPages(remaining, importId, `${data.user.id}/${importId}`);
   }
 
   async function retryFailed() {
     if (!importId || failedPages.length === 0) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
     const pages = [...failedPages];
     setProcessed((p) => Math.max(0, p - pages.length));
-    await runPages(pages, importId);
+    await runPages(pages, importId, `${data.user.id}/${importId}`);
   }
 
   async function publish() {
