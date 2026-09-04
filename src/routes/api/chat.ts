@@ -59,7 +59,7 @@ export const Route = createFileRoute("/api/chat")({
         const gateway = createLovableAiGatewayProvider(apiKey);
 
         const result = streamText({
-          model: gateway("gemini-2.5-flash"),
+          model: gateway("gemini-3.6-flash"),
           system: SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages),
           stopWhen: stepCountIs(50),
