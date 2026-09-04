@@ -3,8 +3,8 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3.7-flash";
+const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+const MODEL = "gemini-2.5-flash";
 
 const extractedQuestionSchema = z.object({
   question_text: z.string().min(5),
@@ -58,7 +58,7 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as never, context.userId);
 
-    const apiKey = process.env["LOVABLE_API_KEY"];
+    const apiKey = process.env["GEMINI_API_KEY"] ?? process.env["Gemini_API_Key"];
     if (!apiKey) throw new Error("Assistente de IA não configurado.");
 
     const catList =
@@ -76,7 +76,10 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
 
     const response = await fetch(GATEWAY_URL, {
       method: "POST",
-      headers: { "content-type": "application/json", "Lovable-API-Key": apiKey },
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
       body: JSON.stringify({
         model: MODEL,
         response_format: { type: "json_object" },

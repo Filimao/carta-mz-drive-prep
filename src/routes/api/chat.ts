@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env["LOVABLE_API_KEY"];
+        const apiKey = process.env["GEMINI_API_KEY"] ?? process.env["Gemini_API_Key"];
         if (!apiKey) {
           return new Response(JSON.stringify({ error: "Assistente não configurado." }), {
             status: 500,
@@ -59,13 +59,11 @@ export const Route = createFileRoute("/api/chat")({
         const gateway = createLovableAiGatewayProvider(apiKey);
 
         const result = streamText({
-          model: gateway("openai/gpt-5.6-sol"),
+          model: gateway("gemini-2.5-flash"),
           system: SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages),
           stopWhen: stepCountIs(50),
-          providerOptions: {
-            lovable: { reasoningEffort: "none", max_completion_tokens: 1200 },
-          },
+          providerOptions: { gemini: { max_tokens: 1200 } },
           tools: {
             questaoAleatoria: tool({
               description:
