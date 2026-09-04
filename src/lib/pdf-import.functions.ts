@@ -30,8 +30,10 @@ Devolve SEMPRE um objecto JSON válido com esta forma:
 Regras:
 - Português de Moçambique, sem alterar o sentido original.
 - Se a página não tiver questões, devolve {"questions":[]}.
-- Se faltarem alternativas, completa de forma plausível e baixa a confiança (< 0.6).
-- A resposta correcta pode estar assinalada a verde, em negrito, sublinhada ou marcada com X. Se não for claro, escolhe a mais provável e usa confiança < 0.6.
+- A imagem pode ser uma captura de ecrã comprida com várias questões. Lê cada bloco separadamente, de cima para baixo, sem duplicar questões.
+- As alternativas podem ser A-C ou A-D. Se uma alternativa não estiver visível, usa exactamente "[Alternativa não apresentada]" e confiança < 0.6; nunca inventes texto.
+- A resposta correcta neste tipo de material costuma estar escrita a verde. Usa essa cor, negrito, sublinhado ou X como evidência; se não for claro, usa confiança < 0.6.
+- Transcreve o texto visível com fidelidade, incluindo números, unidades, pontuação e acentos. Não uses o texto da imagem para criar perguntas que não estejam visíveis.
 - "explanation": justificação curta (1-2 frases). "tip": dica opcional.
 - "category_slug": usa apenas um dos slugs fornecidos, ou null.
 - "confidence": 0 a 1, quão fiável foi a leitura desta questão.
@@ -101,7 +103,11 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
     const raw = payload.choices?.[0]?.message?.content ?? "{}";
     let parsed: unknown;
     try {
-      parsed = JSON.parse(raw.replace(/^```json\s*|```$/g, "").trim());
+      const json = raw.replace(/^```(?:json)?\s*|```$/gi, "").trim();
+      const start = json.indexOf("{");
+      const end = json.lastIndexOf("}");
+      if (start < 0 || end <= start) throw new Error("JSON ausente");
+      parsed = JSON.parse(json.slice(start, end + 1));
     } catch {
       throw new Error("A IA devolveu um formato inesperado nesta página.");
     }
@@ -109,7 +115,22 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
     const list = (parsed as { questions?: unknown[] }).questions ?? [];
     const questions: ExtractedQuestion[] = [];
     for (const item of list) {
-      const result = extractedQuestionSchema.safeParse(item);
+      if (!item || typeof item !== "object") continue;
+      const candidate = item as Record<string, unknown>;
+      const missingOption = ["option_a", "option_b", "option_c", "option_d"].some(
+        (key) => typeof candidate[key] !== "string" || candidate[key].trim() === "",
+      );
+      const normalized = {
+        ...candidate,
+        option_a: candidate.option_a || "[Alternativa não apresentada]",
+        option_b: candidate.option_b || "[Alternativa não apresentada]",
+        option_c: candidate.option_c || "[Alternativa não apresentada]",
+        option_d: candidate.option_d || "[Alternativa não apresentada]",
+        confidence: missingOption
+          ? Math.min(typeof candidate.confidence === "number" ? candidate.confidence : 0.5, 0.59)
+          : candidate.confidence,
+      };
+      const result = extractedQuestionSchema.safeParse(normalized);
       if (result.success) questions.push(result.data);
     }
     return { page: data.page, questions };
