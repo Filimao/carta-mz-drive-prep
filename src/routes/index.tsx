@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { CategoryIcon } from "@/lib/category-icons";
 import { countQuestions, fetchCategories } from "@/lib/quiz";
 
 export const Route = createFileRoute("/")({
@@ -119,7 +120,7 @@ function Index() {
               to="/categorias"
               className="surface rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
             >
-              <p className="text-2xl">{cat.emoji}</p>
+              <CategoryIcon name={cat.icon} className="h-7 w-7 text-primary" />
               <p className="mt-2 text-sm font-semibold">{cat.name}</p>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{cat.description}</p>
             </Link>

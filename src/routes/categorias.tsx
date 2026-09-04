@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { CategoryIcon } from "@/lib/category-icons";
 import { QuizEngine } from "@/components/QuizEngine";
 import { fetchCategories, readLocal } from "@/lib/quiz";
 
@@ -78,7 +79,7 @@ function Categorias() {
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((cat) => (
             <article key={cat.id} className="surface flex flex-col rounded-2xl p-5">
-              <p className="text-2xl">{cat.emoji}</p>
+              <CategoryIcon name={cat.icon} className="h-7 w-7 text-primary" />
               <h2 className="mt-2 font-display text-base font-semibold">{cat.name}</h2>
               <p className="mt-1 flex-1 text-xs leading-relaxed text-muted-foreground">
                 {cat.description}

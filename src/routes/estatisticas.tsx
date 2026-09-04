@@ -50,7 +50,7 @@ function Estatisticas() {
           .select("is_correct,question_id,questions(category_id)")
           .eq("user_id", userId)
           .limit(2000),
-        supabase.from("categories").select("id,name,emoji"),
+        supabase.from("categories").select("id,name"),
       ]);
       const byCat = new Map<string, { total: number; correct: number }>();
       for (const row of (answers.data ?? []) as unknown as {
@@ -68,7 +68,7 @@ function Estatisticas() {
         .map((c) => {
           const e = byCat.get(c.id);
           return {
-            name: `${c.emoji} ${c.name}`,
+            name: c.name,
             respondidas: e?.total ?? 0,
             acerto: e && e.total > 0 ? Math.round((e.correct / e.total) * 100) : 0,
           };

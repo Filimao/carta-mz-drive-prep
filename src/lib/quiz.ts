@@ -25,6 +25,7 @@ export interface Category {
   name: string;
   description: string | null;
   emoji: string;
+  icon: string;
   sort_order: number;
 }
 
@@ -60,7 +61,7 @@ export function levelFor(xp: number) {
 export async function fetchCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from("categories")
-    .select("id,slug,name,description,emoji,sort_order")
+    .select("id,slug,name,description,emoji,icon,sort_order")
     .order("sort_order");
   if (error) throw error;
   return (data ?? []) as Category[];

@@ -443,7 +443,7 @@ function QuestionCard({
               <option value="">Sem categoria</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.emoji} {c.name}
+                  {c.name}
                 </option>
               ))}
             </select>
@@ -620,7 +620,7 @@ function NewQuestionPanel() {
             <option value="">Sem categoria</option>
             {(categories ?? []).map((c) => (
               <option key={c.id} value={c.id}>
-                {c.emoji} {c.name}
+                {c.name}
               </option>
             ))}
           </select>

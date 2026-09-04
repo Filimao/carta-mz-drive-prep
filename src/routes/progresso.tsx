@@ -55,7 +55,7 @@ function Progresso() {
     { label: "Questões respondidas", value: answered },
     { label: "Taxa de acerto", value: `${rate}%` },
     { label: "Melhor resultado", value: `${best}%` },
-    { label: "Sequência de estudo", value: `🔥 ${streakDays(state.days)} dias` },
+    { label: "Sequência de estudo", value: `${streakDays(state.days)} dias` },
     { label: "Tempo estudado", value: `${minutes} min` },
     { label: "Questões dominadas", value: correct },
     { label: "Questões para rever", value: answered - correct },
