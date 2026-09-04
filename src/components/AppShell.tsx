@@ -209,6 +209,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <MobileMenu
+              open={menuOpen}
+              onOpenChange={setMenuOpen}
+              pathname={pathname}
+              isAdmin={session.isAdmin}
+              isLoggedIn={session.userId != null}
+              onSignOut={() => void signOut()}
+            />
             <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
             <ThemeToggle />
             <Link
