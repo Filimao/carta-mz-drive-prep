@@ -13,6 +13,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { PdfImportPanel } from "@/components/admin/PdfImportPanel";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_ORDER, PLANS, type PlanTier } from "@/lib/plans";
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: Admin,
 });
 
-type Tab = "resumo" | "revisao" | "nova" | "utilizadores";
+type Tab = "resumo" | "revisao" | "importar" | "nova" | "utilizadores";
 
 interface AdminQuestion {
   id: string;
@@ -63,6 +64,7 @@ interface AdminQuestion {
 const TABS: [Tab, string][] = [
   ["resumo", "Resumo"],
   ["revisao", "Questões"],
+  ["importar", "Importar PDF"],
   ["nova", "Nova questão"],
   ["utilizadores", "Utilizadores"],
 ];
@@ -123,6 +125,7 @@ function Admin() {
       </div>
       {tab === "resumo" && <OverviewPanel />}
       {tab === "revisao" && <ReviewPanel />}
+      {tab === "importar" && <PdfImportPanel />}
       {tab === "nova" && <NewQuestionPanel />}
       {tab === "utilizadores" && <UsersPanel />}
     </AppShell>

@@ -35,6 +35,7 @@ const SUGESTOES = [
 
 function ChatPanel({ onClose }: { onClose: () => void }) {
   const [text, setText] = useState("");
+  const [lastQuestion, setLastQuestion] = useState("");
   const { messages, sendMessage, status, stop, error } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
@@ -45,11 +46,12 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
     const limpo = valor.trim();
     if (!limpo || busy) return;
     setText("");
+    setLastQuestion(limpo);
     void sendMessage({ text: limpo });
   }
 
   return (
-    <div className="flex h-[min(80vh,600px)] w-[min(100vw-1.5rem,26rem)] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl">
+    <div className="flex h-[min(80vh,600px)] w-[calc(100vw-2rem)] max-w-[26rem] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
           <img
@@ -148,9 +150,18 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
           )}
           {status === "submitted" && <Shimmer>A pensar...</Shimmer>}
           {error && (
-            <p className="text-xs text-destructive">
-              Ocorreu um erro a falar com o assistente. Tenta novamente.
-            </p>
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              <p>Ocorreu um erro. Tenta novamente.</p>
+              {lastQuestion && (
+                <button
+                  type="button"
+                  onClick={() => enviar(lastQuestion)}
+                  className="shrink-0 rounded-md border border-destructive/30 px-2 py-1 font-semibold"
+                >
+                  Tentar
+                </button>
+              )}
+            </div>
           )}
         </ConversationContent>
         <ConversationScrollButton />
