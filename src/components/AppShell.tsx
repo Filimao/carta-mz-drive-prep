@@ -287,7 +287,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         aria-label="Navegação inferior"
       >
         <ul className="flex items-stretch justify-between px-1">
-          {NAV.slice(0, 5).map((item) => {
+          {BOTTOM_NAV.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.to;
             return (
@@ -304,8 +304,20 @@ export function AppShell({ children }: { children: ReactNode }) {
               </li>
             );
           })}
+          <li className="flex-1">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              className="flex w-full flex-col items-center gap-1 py-2.5 text-[11px] font-medium text-muted-foreground"
+            >
+              <Menu className="h-5 w-5" />
+              Menu
+            </button>
+          </li>
         </ul>
       </nav>
+
+      <ChatBot />
     </div>
   );
 }
