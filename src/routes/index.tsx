@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
+import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
 import { CategoryIcon } from "@/lib/category-icons";
 import { countQuestions, fetchCategories } from "@/lib/quiz";
 
