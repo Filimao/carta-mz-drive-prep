@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
+import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
+import { CategoryIcon } from "@/lib/category-icons";
 import { countQuestions, fetchCategories } from "@/lib/quiz";
 
 export const Route = createFileRoute("/")({
@@ -37,6 +40,21 @@ const STEPS = [
 function Index() {
   const { data: total } = useQuery({ queryKey: ["question-count"], queryFn: countQuestions });
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const session = useSession();
+  const navigate = useNavigate();
+
+  // O ecrã de entrada é o login: visitantes sem sessão vão directos para /auth.
+  useEffect(() => {
+    if (!session.loading && !session.userId) void navigate({ to: "/auth", replace: true });
+  }, [session.loading, session.userId, navigate]);
+
+  if (!session.loading && !session.userId) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground">A abrir o ecrã de início de sessão...</p>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -119,7 +137,7 @@ function Index() {
               to="/categorias"
               className="surface rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
             >
-              <p className="text-2xl">{cat.emoji}</p>
+              <CategoryIcon name={cat.icon} className="h-7 w-7 text-primary" />
               <p className="mt-2 text-sm font-semibold">{cat.name}</p>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{cat.description}</p>
             </Link>
