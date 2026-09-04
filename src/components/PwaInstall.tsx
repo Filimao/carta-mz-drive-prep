@@ -34,19 +34,20 @@ export function useInstallPrompt() {
   }, []);
 
   async function install() {
-    if (!event) {
-      toast.info(
-        "No telemóvel abra o menu do navegador e escolha “Instalar aplicação” ou “Adicionar ao ecrã principal”.",
-      );
-      return;
-    }
+    if (!event) return;
     await event.prompt();
     const choice = await event.userChoice;
     if (choice.outcome === "accepted") setInstalled(true);
     setEvent(null);
   }
 
-  return { canInstall: !installed, promptAvailable: event != null, installed, install };
+  // Só expõe o botão quando o navegador tem realmente um prompt de instalação.
+  return {
+    canInstall: !installed && event != null,
+    promptAvailable: event != null,
+    installed,
+    install,
+  };
 }
 
 export function InstallButton({ className }: { className?: string }) {
