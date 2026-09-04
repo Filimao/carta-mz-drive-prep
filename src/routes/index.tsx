@@ -38,6 +38,21 @@ const STEPS = [
 function Index() {
   const { data: total } = useQuery({ queryKey: ["question-count"], queryFn: countQuestions });
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const session = useSession();
+  const navigate = useNavigate();
+
+  // O ecrã de entrada é o login: visitantes sem sessão vão directos para /auth.
+  useEffect(() => {
+    if (!session.loading && !session.userId) void navigate({ to: "/auth", replace: true });
+  }, [session.loading, session.userId, navigate]);
+
+  if (!session.loading && !session.userId) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground">A abrir o ecrã de início de sessão...</p>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
