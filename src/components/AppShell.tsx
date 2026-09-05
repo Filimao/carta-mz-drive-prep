@@ -10,8 +10,6 @@ import {
   LineChart,
   WifiOff,
   UserRound,
-  Moon,
-  Sun,
   Menu,
   Tag,
   ShieldCheck,
@@ -19,10 +17,11 @@ import {
   LogIn,
   LogOut,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import { ThemePicker } from "@/components/ThemePicker";
 import {
   Sheet,
   SheetContent,
@@ -51,32 +50,6 @@ const BOTTOM_NAV = [
   { to: "/simulados", label: "Simulados", icon: ClipboardList },
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
 ] as const;
-
-
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-  useEffect(() => {
-    const stored = window.localStorage.getItem("carta-mz-theme");
-    const prefers = stored ? stored === "dark" : true;
-    setDark(prefers);
-    document.documentElement.classList.toggle("dark", prefers);
-  }, []);
-  return (
-    <button
-      type="button"
-      aria-label={dark ? "Activar modo claro" : "Activar modo escuro"}
-      onClick={() => {
-        const next = !dark;
-        setDark(next);
-        document.documentElement.classList.toggle("dark", next);
-        window.localStorage.setItem("carta-mz-theme", next ? "dark" : "light");
-      }}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
-    >
-      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
-  );
-}
 
 export function Brand() {
   return (
@@ -218,7 +191,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onSignOut={() => void signOut()}
             />
             <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
-            <ThemeToggle />
+            <ThemePicker />
             <Link
               to="/precos"
               className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
