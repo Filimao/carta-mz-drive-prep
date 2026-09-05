@@ -36,7 +36,7 @@ Regras:
 - Português de Moçambique, sem alterar o sentido original.
 - Se a página não tiver questões, devolve {"questions":[]}.
 - A imagem pode ser uma captura de ecrã comprida com várias questões. Lê cada bloco separadamente, de cima para baixo, sem duplicar questões.
-- Para cada questão, identifica a fotografia/figura/sinal no lado esquerdo. Devolve image_region com coordenadas relativas à imagem completa, entre 0 e 1. Se não existir imagem, devolve null.
+- Para cada questão, identifica qualquer fotografia, figura, sinal, esquema ou tabela que faça parte da pergunta, esteja à esquerda, à direita, acima ou abaixo do texto. Devolve image_region com as coordenadas relativas à imagem completa, entre 0 e 1. A região deve conter apenas essa imagem (e uma margem pequena), nunca a página inteira. Só devolve null quando a questão realmente não tiver nenhum elemento visual relevante; não ignores sinais ou diagramas pequenos.
 - As alternativas podem ser A-C ou A-D. Se uma alternativa não estiver visível, usa exactamente "[Alternativa não apresentada]" e confiança < 0.6; nunca inventes texto.
 - A resposta correcta neste tipo de material costuma estar escrita a verde. Usa essa cor, negrito, sublinhado ou X como evidência; se não for claro, usa confiança < 0.6.
 - Transcreve o texto visível com fidelidade, incluindo números, unidades, pontuação e acentos. Não uses o texto da imagem para criar perguntas que não estejam visíveis.

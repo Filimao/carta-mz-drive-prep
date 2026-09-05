@@ -190,7 +190,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <header className="liquid-glass sticky top-0 z-30 border-x-0 border-t-0">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Brand />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navegação principal">
@@ -274,7 +274,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
 
-      <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
+      <footer className="liquid-glass border-x-0 border-b-0 px-4 py-8 text-center text-xs text-muted-foreground">
         <p className="mx-auto max-w-3xl">
           Esta plataforma é uma ferramenta independente de estudo e não representa oficialmente o
           INATTER ou qualquer entidade governamental.
@@ -283,7 +283,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="liquid-glass fixed inset-x-0 bottom-0 z-30 border-x-0 border-b-0 md:hidden"
         aria-label="Navegação inferior"
       >
         <ul className="flex items-center justify-between px-2 gap-1">
