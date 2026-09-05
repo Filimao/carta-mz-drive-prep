@@ -110,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#0B1220" },
+      { name: "theme-color", content: "#0a0b0f" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Carta MZ" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -137,7 +137,7 @@ function RootShell({ children }: { children: ReactNode }) {
   useServiceWorkerRegistration();
 
   return (
-    <html lang="pt-MZ">
+    <html lang="pt-MZ" className="dark">
       <head>
         <HeadContent />
       </head>
