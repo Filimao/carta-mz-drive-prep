@@ -10,6 +10,8 @@ import {
   LineChart,
   WifiOff,
   UserRound,
+  Moon,
+  Sun,
   Menu,
   Tag,
   ShieldCheck,
@@ -17,10 +19,11 @@ import {
   LogIn,
   LogOut,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import { ThemePicker } from "@/components/ThemePicker";
 import {
   Sheet,
   SheetContent,
@@ -49,6 +52,32 @@ const BOTTOM_NAV = [
   { to: "/simulados", label: "Simulados", icon: ClipboardList },
   { to: "/progresso", label: "Progresso", icon: BarChart3 },
 ] as const;
+
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const stored = window.localStorage.getItem("carta-mz-theme");
+    const prefers = stored ? stored === "dark" : true;
+    setDark(prefers);
+    document.documentElement.classList.toggle("dark", prefers);
+  }, []);
+  return (
+    <button
+      type="button"
+      aria-label={dark ? "Activar modo claro" : "Activar modo escuro"}
+      onClick={() => {
+        const next = !dark;
+        setDark(next);
+        document.documentElement.classList.toggle("dark", next);
+        window.localStorage.setItem("carta-mz-theme", next ? "dark" : "light");
+      }}
+      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
+    >
+      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
+  );
+}
 
 export function Brand() {
   return (
@@ -162,7 +191,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <header className="liquid-glass sticky top-0 z-30 border-x-0 border-t-0">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Brand />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navegação principal">
@@ -190,6 +219,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               onSignOut={() => void signOut()}
             />
             <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
+<<<<<<< Updated upstream
+            <ThemeToggle />
+=======
+            <ThemePicker />
+>>>>>>> Stashed changes
             <Link
               to="/precos"
               className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
@@ -245,7 +279,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
 
-      <footer className="liquid-glass border-x-0 border-b-0 px-4 py-8 text-center text-xs text-muted-foreground">
+      <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
         <p className="mx-auto max-w-3xl">
           Esta plataforma é uma ferramenta independente de estudo e não representa oficialmente o
           INATTER ou qualquer entidade governamental.
@@ -254,7 +288,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav
-        className="liquid-glass fixed inset-x-0 bottom-0 z-30 border-x-0 border-b-0 md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden"
         aria-label="Navegação inferior"
       >
         <ul className="flex items-center justify-between px-2 gap-1">

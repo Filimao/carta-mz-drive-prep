@@ -21,28 +21,7 @@ import { fetchCategories } from "@/lib/quiz";
 type Draft = ExtractedQuestion & { key: string; page: number; category_id: string | null };
 
 const LETTERS = ["A", "B", "C", "D"] as const;
-
-const VISUAL_QUESTION_PATTERN =
-  /\b(sinal|sinais|placa|placas|imagem|imagens|figura|figuras|ilustra[çc][ãa]o|fotografia|foto|diagrama|esquema|representad[oa]|mostrad[oa])\b/i;
-
-function getCropBounds(
-  region: NonNullable<ExtractedQuestion["image_region"]>,
-  canvas: HTMLCanvasElement,
-) {
-  // Vision models occasionally place an edge a little outside the page. Clamp
-  // the rectangle before drawing so a valid image is still retained.
-  const left = Math.max(0, Math.min(1, region.x));
-  const top = Math.max(0, Math.min(1, region.y));
-  const right = Math.max(left, Math.min(1, region.x + region.width));
-  const bottom = Math.max(top, Math.min(1, region.y + region.height));
-
-  return {
-    x: Math.floor(left * canvas.width),
-    y: Math.floor(top * canvas.height),
-    width: Math.floor((right - left) * canvas.width),
-    height: Math.floor((bottom - top) * canvas.height),
-  };
-}
+const PAGE_REQUEST_INTERVAL_MS = 12_000;
 
 /** Carrega o pdfjs apenas no browser e configura o worker. */
 async function loadPdfjs() {
@@ -111,20 +90,13 @@ export function PdfImportPanel() {
         result.questions.map(async (q, i) => {
           let imageUrl = q.image_url;
           const region = q.image_region;
-          const cropBounds =
-            region && region.width > 0 && region.height > 0
-              ? getCropBounds(region, canvas)
-              : VISUAL_QUESTION_PATTERN.test(q.question_text)
-                ? { x: 0, y: 0, width: canvas.width, height: canvas.height }
-                : null;
-
-          if (cropBounds) {
+          if (region && region.width > 0 && region.height > 0) {
             const crop = document.createElement("canvas");
-            const { x, y, width, height } = cropBounds;
+            const x = Math.max(0, Math.floor(region.x * canvas.width));
+            const y = Math.max(0, Math.floor(region.y * canvas.height));
+            const width = Math.min(canvas.width - x, Math.floor(region.width * canvas.width));
+            const height = Math.min(canvas.height - y, Math.floor(region.height * canvas.height));
             if (width > 0 && height > 0) {
-              // If the model missed the coordinates for a visual question, the
-              // complete rendered page is still preferable to losing its sign
-              // or diagram. This also makes the failure visible for review.
               crop.width = width;
               crop.height = height;
               crop.getContext("2d")?.drawImage(canvas, x, y, width, height, 0, 0, width, height);
@@ -137,10 +109,9 @@ export function PdfImportPanel() {
                   contentType: "image/jpeg",
                   upsert: true,
                 });
-                if (upload.error) {
-                  throw new Error(`Não foi possível guardar a imagem da questão: ${upload.error.message}`);
+                if (!upload.error) {
+                  imageUrl = supabase.storage.from("question-images").getPublicUrl(path).data.publicUrl;
                 }
-                imageUrl = supabase.storage.from("question-images").getPublicUrl(path).data.publicUrl;
               }
             }
           }
@@ -190,6 +161,10 @@ export function PdfImportPanel() {
           failed_pages: [...failures],
           status: "em_progresso",
         });
+        if (pageNumber !== pages[pages.length - 1]) {
+          setMessage("A preparar a próxima página para evitar o limite da IA...");
+          await new Promise((resolve) => window.setTimeout(resolve, PAGE_REQUEST_INTERVAL_MS));
+        }
       }
 
       setStatus("done");

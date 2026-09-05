@@ -5,6 +5,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 const MODEL = "gemini-3.6-flash";
+const MAX_RATE_LIMIT_RETRIES = 4;
+
+const wait = (milliseconds: number) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 
 const extractedQuestionSchema = z.object({
   question_text: z.string().min(5),
@@ -36,7 +39,7 @@ Regras:
 - Português de Moçambique, sem alterar o sentido original.
 - Se a página não tiver questões, devolve {"questions":[]}.
 - A imagem pode ser uma captura de ecrã comprida com várias questões. Lê cada bloco separadamente, de cima para baixo, sem duplicar questões.
-- Para cada questão, identifica qualquer fotografia, figura, sinal, esquema ou tabela que faça parte da pergunta, esteja à esquerda, à direita, acima ou abaixo do texto. Devolve image_region com as coordenadas relativas à imagem completa, entre 0 e 1. A região deve conter apenas essa imagem (e uma margem pequena), nunca a página inteira. Só devolve null quando a questão realmente não tiver nenhum elemento visual relevante; não ignores sinais ou diagramas pequenos.
+- Para cada questão, identifica a fotografia/figura/sinal no lado esquerdo. Devolve image_region com coordenadas relativas à imagem completa, entre 0 e 1. Se não existir imagem, devolve null.
 - As alternativas podem ser A-C ou A-D. Se uma alternativa não estiver visível, usa exactamente "[Alternativa não apresentada]" e confiança < 0.6; nunca inventes texto.
 - A resposta correcta neste tipo de material costuma estar escrita a verde. Usa essa cor, negrito, sublinhado ou X como evidência; se não for claro, usa confiança < 0.6.
 - Transcreve o texto visível com fidelidade, incluindo números, unidades, pontuação e acentos. Não uses o texto da imagem para criar perguntas que não estejam visíveis.
@@ -89,21 +92,22 @@ Transcreve exactamente o texto visível. Não confundas o número da questão co
       { type: "image_url", image_url: { url: data.imageBase64 } },
     ];
 
-    const response = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "user", content: userContent },
-        ],
-      }),
-    });
+    let response: Response | undefined;
+    for (let attempt = 0; attempt <= MAX_RATE_LIMIT_RETRIES; attempt += 1) {
+      response = await fetch(GATEWAY_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: MODEL,
+          response_format: { type: "json_object" },
+          messages: [{ role: "system", content: SYSTEM }, { role: "user", content: userContent }],
+        }),
+      });
+      if (response.status !== 429 || attempt === MAX_RATE_LIMIT_RETRIES) break;
+      const retryAfter = Number(response.headers.get("retry-after"));
+      await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 5_000 * (attempt + 1));
+    }
+    if (!response) throw new Error("Não foi possível contactar a IA.");
 
     if (!response.ok) {
       const body = await response.text();
