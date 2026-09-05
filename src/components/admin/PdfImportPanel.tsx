@@ -66,14 +66,15 @@ export function PdfImportPanel() {
       const doc = docRef.current;
       if (!doc) throw new Error("PDF não carregado.");
       const page = await doc.getPage(pageNumber);
-      const viewport = page.getViewport({ scale: 2 });
+      // Higher resolution preserves small letters and the green answer marker.
+      const viewport = page.getViewport({ scale: 3 });
       const canvas = document.createElement("canvas");
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Não foi possível preparar o canvas.");
       await page.render({ canvas, canvasContext: ctx, viewport } as never).promise;
-      const imageBase64 = canvas.toDataURL("image/jpeg", 0.8);
+      const imageBase64 = canvas.toDataURL("image/jpeg", 0.92);
       const text = await page.getTextContent();
       const pageText = text.items
         .map((i) => ("str" in i ? i.str : ""))
