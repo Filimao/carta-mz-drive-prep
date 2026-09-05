@@ -220,7 +220,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
             <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             <ThemeToggle />
+=======
+            <ThemePicker />
+>>>>>>> Stashed changes
 =======
             <ThemePicker />
 >>>>>>> Stashed changes
