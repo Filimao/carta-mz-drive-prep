@@ -179,7 +179,12 @@ function MobileMenu({
           })}
         </nav>
         <div className="mt-6 flex flex-col gap-2 border-t border-border pt-4">
+          <div className="flex items-center justify-between rounded-xl surface px-3 py-2 text-sm font-semibold">
+            <span>Tema</span>
+            <ThemeToggle />
+          </div>
           <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl surface px-3 py-3 text-sm font-semibold" />
+
           {isLoggedIn ? (
             <button
               type="button"
