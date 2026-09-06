@@ -155,7 +155,7 @@ function MobileMenu({
           <Menu className="h-5 w-5" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[85vw] max-w-sm overflow-y-auto">
+      <SheetContent side="right" className="w-[85vw] max-w-sm overflow-y-auto border-l border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150">
         <SheetHeader>
           <SheetTitle className="font-display">Menu</SheetTitle>
         </SheetHeader>
