@@ -131,14 +131,14 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
       );
       const normalized = {
         ...candidate,
-        option_a: candidate.option_a || "[Alternativa não apresentada]",
-        option_b: candidate.option_b || "[Alternativa não apresentada]",
-        option_c: candidate.option_c || "[Alternativa não apresentada]",
-        option_d: candidate.option_d || "[Alternativa não apresentada]",
+        option_a: candidate["option_a"] || "[Alternativa não apresentada]",
+        option_b: candidate["option_b"] || "[Alternativa não apresentada]",
+        option_c: candidate["option_c"] || "[Alternativa não apresentada]",
+        option_d: candidate["option_d"] || "[Alternativa não apresentada]",
         confidence: missingOption
-          ? Math.min(typeof candidate.confidence === "number" ? candidate.confidence : 0.5, 0.59)
-          : candidate.confidence,
-        image_region: candidate.image_region ?? null,
+          ? Math.min(typeof candidate["confidence"] === "number" ? candidate["confidence"] : 0.5, 0.59)
+          : candidate["confidence"],
+        image_region: candidate["image_region"] ?? null,
         image_url: null,
       };
       const result = extractedQuestionSchema.safeParse(normalized);
