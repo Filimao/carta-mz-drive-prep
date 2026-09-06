@@ -13,6 +13,7 @@ import {
   Moon,
   Sun,
   Menu,
+  Sparkles,
   Tag,
   ShieldCheck,
   Receipt,
