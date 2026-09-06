@@ -23,7 +23,6 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
-import { ThemePicker } from "@/components/ThemePicker";
 import {
   Sheet,
   SheetContent,
@@ -219,15 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onSignOut={() => void signOut()}
             />
             <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
             <ThemeToggle />
-=======
-            <ThemePicker />
->>>>>>> Stashed changes
-=======
-            <ThemePicker />
->>>>>>> Stashed changes
             <Link
               to="/precos"
               className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
