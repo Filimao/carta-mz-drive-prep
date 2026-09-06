@@ -53,30 +53,58 @@ const BOTTOM_NAV = [
 ] as const;
 
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+type ThemeName = "light" | "dark" | "midnight";
+
+const THEMES: { value: ThemeName; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Tema claro", icon: Sun },
+  { value: "dark", label: "Tema escuro", icon: Moon },
+  { value: "midnight", label: "Tema azul-noite", icon: Sparkles },
+];
+
+function applyTheme(theme: ThemeName) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme !== "light");
+  root.classList.toggle("midnight", theme === "midnight");
+}
+
+function ThemeToggle({ className = "" }: { className?: string }) {
+  const [theme, setTheme] = useState<ThemeName>("dark");
   useEffect(() => {
-    const stored = window.localStorage.getItem("carta-mz-theme");
-    const prefers = stored ? stored === "dark" : true;
-    setDark(prefers);
-    document.documentElement.classList.toggle("dark", prefers);
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem("carta-mz-theme");
+    } catch {
+      stored = null;
+    }
+    const initial: ThemeName =
+      stored === "light" || stored === "dark" || stored === "midnight" ? stored : "dark";
+    setTheme(initial);
+    applyTheme(initial);
   }, []);
+  const current = THEMES.findIndex((t) => t.value === theme);
+  const next = THEMES[(current + 1) % THEMES.length]!;
+  const Icon = THEMES[current === -1 ? 1 : current]!.icon;
   return (
     <button
       type="button"
-      aria-label={dark ? "Activar modo claro" : "Activar modo escuro"}
+      aria-label={`Mudar para ${next.label}`}
+      title={`Mudar para ${next.label}`}
       onClick={() => {
-        const next = !dark;
-        setDark(next);
-        document.documentElement.classList.toggle("dark", next);
-        window.localStorage.setItem("carta-mz-theme", next ? "dark" : "light");
+        setTheme(next.value);
+        applyTheme(next.value);
+        try {
+          window.localStorage.setItem("carta-mz-theme", next.value);
+        } catch {
+          /* armazenamento indisponível */
+        }
       }}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl surface text-foreground transition-colors hover:bg-secondary ${className}`}
     >
-      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      <Icon className="h-4 w-4" />
     </button>
   );
 }
+
 
 export function Brand() {
   return (
