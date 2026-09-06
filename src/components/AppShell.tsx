@@ -150,7 +150,7 @@ function MobileMenu({
         <button
           type="button"
           aria-label="Abrir menu"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl surface text-foreground md:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -179,7 +179,7 @@ function MobileMenu({
           })}
         </nav>
         <div className="mt-6 flex flex-col gap-2 border-t border-border pt-4">
-          <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold" />
+          <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl surface px-3 py-3 text-sm font-semibold" />
           {isLoggedIn ? (
             <button
               type="button"
@@ -219,7 +219,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Brand />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navegação principal">
@@ -246,7 +246,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               isLoggedIn={session.userId != null}
               onSignOut={() => void signOut()}
             />
-            <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
+            <InstallButton className="hidden items-center gap-2 rounded-xl surface px-3 py-2 text-sm font-semibold sm:inline-flex" />
             <ThemeToggle />
             <Link
               to="/precos"
@@ -274,7 +274,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 to="/perfil"
                 aria-label="A minha conta"
-                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary sm:inline-flex"
+                className="hidden h-10 w-10 items-center justify-center rounded-xl surface text-foreground hover:bg-secondary sm:inline-flex"
               >
                 <UserRound className="h-4 w-4" />
               </Link>
@@ -312,7 +312,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150 md:hidden"
         aria-label="Navegação inferior"
       >
         <ul className="flex items-center justify-between px-2 gap-1">
