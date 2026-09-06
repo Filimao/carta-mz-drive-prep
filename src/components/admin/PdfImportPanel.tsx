@@ -21,32 +21,6 @@ import { fetchCategories } from "@/lib/quiz";
 type Draft = ExtractedQuestion & { key: string; page: number; category_id: string | null };
 
 const LETTERS = ["A", "B", "C", "D"] as const;
-const PAGE_REQUEST_INTERVAL_MS = 12_000;
-<<<<<<< Updated upstream
-=======
-
-const VISUAL_QUESTION_PATTERN =
-  /\b(sinal|sinais|placa|placas|imagem|imagens|figura|figuras|ilustra[çc][ãa]o|fotografia|foto|diagrama|esquema|representad[oa]|mostrad[oa])\b/i;
-
-function getCropBounds(
-  region: NonNullable<ExtractedQuestion["image_region"]>,
-  canvas: HTMLCanvasElement,
-) {
-  // Vision models occasionally place an edge a little outside the page. Clamp
-  // the rectangle before drawing so a valid image is still retained.
-  const left = Math.max(0, Math.min(1, region.x));
-  const top = Math.max(0, Math.min(1, region.y));
-  const right = Math.max(left, Math.min(1, region.x + region.width));
-  const bottom = Math.max(top, Math.min(1, region.y + region.height));
-
-  return {
-    x: Math.floor(left * canvas.width),
-    y: Math.floor(top * canvas.height),
-    width: Math.floor((right - left) * canvas.width),
-    height: Math.floor((bottom - top) * canvas.height),
-  };
-}
->>>>>>> Stashed changes
 
 /** Carrega o pdfjs apenas no browser e configura o worker. */
 async function loadPdfjs() {
@@ -81,7 +55,7 @@ export function PdfImportPanel() {
 
   const updateImportRow = useCallback(
     async (id: string, patch: Record<string, unknown>) => {
-      await supabase.from("question_imports").update(patch).eq("id", id);
+      await supabase.from("question_imports").update(patch as never).eq("id", id);
     },
     [],
   );
@@ -92,15 +66,14 @@ export function PdfImportPanel() {
       const doc = docRef.current;
       if (!doc) throw new Error("PDF não carregado.");
       const page = await doc.getPage(pageNumber);
-      // Higher resolution preserves small letters and the green answer marker.
-      const viewport = page.getViewport({ scale: 3 });
+      const viewport = page.getViewport({ scale: 2 });
       const canvas = document.createElement("canvas");
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Não foi possível preparar o canvas.");
       await page.render({ canvas, canvasContext: ctx, viewport } as never).promise;
-      const imageBase64 = canvas.toDataURL("image/jpeg", 0.92);
+      const imageBase64 = canvas.toDataURL("image/jpeg", 0.8);
       const text = await page.getTextContent();
       const pageText = text.items
         .map((i) => ("str" in i ? i.str : ""))
@@ -186,10 +159,6 @@ export function PdfImportPanel() {
           failed_pages: [...failures],
           status: "em_progresso",
         });
-        if (pageNumber !== pages[pages.length - 1]) {
-          setMessage("A preparar a próxima página para evitar o limite da IA...");
-          await new Promise((resolve) => window.setTimeout(resolve, PAGE_REQUEST_INTERVAL_MS));
-        }
       }
 
       setStatus("done");

@@ -4,10 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const MODEL = "gemini-3.6-flash";
-const MAX_RATE_LIMIT_RETRIES = 4;
-
-const wait = (milliseconds: number) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+const MODEL = "gemini-2.5-flash";
 
 const extractedQuestionSchema = z.object({
   question_text: z.string().min(5),
@@ -78,36 +75,26 @@ export const extractQuestionsFromPage = createServerFn({ method: "POST" })
     const userContent: unknown[] = [
       {
         type: "text",
-        text: `Página ${data.page}. Categorias permitidas: ${catList}.
-
-Este PDF é uma captura de ecrã de um teste: cada bloco tem um número, uma pergunta, uma imagem opcional à esquerda e alternativas por baixo. Pode haver duas ou mais questões na mesma página. Lê todos os blocos visíveis de cima para baixo.
-
-Texto extraído do PDF (pode estar vazio ou desordenado):
-"""
-${(data.pageText ?? "").slice(0, 6000)}
-"""
-
-Transcreve exactamente o texto visível. Não confundas o número da questão com uma alternativa, não juntes dois blocos e não dupliques questões. Devolve apenas o JSON pedido.`,
+        text: `Página ${data.page}. Categorias permitidas: ${catList}.\n\nTexto extraído do PDF (pode estar vazio se for digitalizado):\n"""\n${(data.pageText ?? "").slice(0, 6000)}\n"""\n\nAnalisa a imagem da página e devolve o JSON pedido.`,
       },
       { type: "image_url", image_url: { url: data.imageBase64 } },
     ];
 
-    let response: Response | undefined;
-    for (let attempt = 0; attempt <= MAX_RATE_LIMIT_RETRIES; attempt += 1) {
-      response = await fetch(GATEWAY_URL, {
-        method: "POST",
-        headers: { "content-type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: MODEL,
-          response_format: { type: "json_object" },
-          messages: [{ role: "system", content: SYSTEM }, { role: "user", content: userContent }],
-        }),
-      });
-      if (response.status !== 429 || attempt === MAX_RATE_LIMIT_RETRIES) break;
-      const retryAfter = Number(response.headers.get("retry-after"));
-      await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 5_000 * (attempt + 1));
-    }
-    if (!response) throw new Error("Não foi possível contactar a IA.");
+    const response = await fetch(GATEWAY_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: userContent },
+        ],
+      }),
+    });
 
     if (!response.ok) {
       const body = await response.text();
@@ -144,14 +131,14 @@ Transcreve exactamente o texto visível. Não confundas o número da questão co
       );
       const normalized = {
         ...candidate,
-        option_a: candidate.option_a || "[Alternativa não apresentada]",
-        option_b: candidate.option_b || "[Alternativa não apresentada]",
-        option_c: candidate.option_c || "[Alternativa não apresentada]",
-        option_d: candidate.option_d || "[Alternativa não apresentada]",
+        option_a: candidate["option_a"] || "[Alternativa não apresentada]",
+        option_b: candidate["option_b"] || "[Alternativa não apresentada]",
+        option_c: candidate["option_c"] || "[Alternativa não apresentada]",
+        option_d: candidate["option_d"] || "[Alternativa não apresentada]",
         confidence: missingOption
-          ? Math.min(typeof candidate.confidence === "number" ? candidate.confidence : 0.5, 0.59)
-          : candidate.confidence,
-        image_region: candidate.image_region ?? null,
+          ? Math.min(typeof candidate["confidence"] === "number" ? candidate["confidence"] : 0.5, 0.59)
+          : candidate["confidence"],
+        image_region: candidate["image_region"] ?? null,
         image_url: null,
       };
       const result = extractedQuestionSchema.safeParse(normalized);

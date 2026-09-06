@@ -102,46 +102,6 @@
   --ring: oklch(0.7 0.17 245);
 }
 
-.dark[data-theme="gray"] {
-  --background: oklch(0.2 0.008 260);
-  --foreground: oklch(0.96 0.004 260);
-  --card: oklch(0.29 0.01 260 / 72%);
-  --card-foreground: oklch(0.96 0.004 260);
-  --popover: oklch(0.27 0.01 260 / 90%);
-  --popover-foreground: oklch(0.96 0.004 260);
-  --primary: oklch(0.72 0.05 250);
-  --primary-foreground: oklch(0.19 0.008 260);
-  --secondary: oklch(0.36 0.01 260 / 70%);
-  --secondary-foreground: oklch(0.96 0.004 260);
-  --muted: oklch(0.34 0.01 260 / 66%);
-  --muted-foreground: oklch(0.72 0.012 260);
-  --accent: oklch(0.72 0.05 250);
-  --accent-foreground: oklch(0.19 0.008 260);
-  --border: oklch(1 0 0 / 19%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.05 250);
-}
-
-.dark[data-theme="gray"] {
-  --background: oklch(0.2 0.008 260);
-  --foreground: oklch(0.96 0.004 260);
-  --card: oklch(0.29 0.01 260 / 72%);
-  --card-foreground: oklch(0.96 0.004 260);
-  --popover: oklch(0.27 0.01 260 / 90%);
-  --popover-foreground: oklch(0.96 0.004 260);
-  --primary: oklch(0.72 0.05 250);
-  --primary-foreground: oklch(0.19 0.008 260);
-  --secondary: oklch(0.36 0.01 260 / 70%);
-  --secondary-foreground: oklch(0.96 0.004 260);
-  --muted: oklch(0.34 0.01 260 / 66%);
-  --muted-foreground: oklch(0.72 0.012 260);
-  --accent: oklch(0.72 0.05 250);
-  --accent-foreground: oklch(0.19 0.008 260);
-  --border: oklch(1 0 0 / 19%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.05 250);
-}
-
 @layer base {
   * {
     border-color: var(--color-border);
@@ -152,29 +112,6 @@
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
   }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-  :root[data-theme="light"] body {
-    background-image:
-      radial-gradient(ellipse 72% 48% at 4% -12%, oklch(0.75 0.1 245 / 0.28), transparent 68%),
-      radial-gradient(ellipse 55% 42% at 100% 5%, oklch(0.78 0.08 290 / 0.18), transparent 68%),
-      radial-gradient(ellipse 55% 35% at 45% 105%, oklch(0.76 0.08 210 / 0.15), transparent 72%);
-  }
-  :root[data-theme="gray"] body {
-    background-image:
-      radial-gradient(ellipse 72% 48% at 4% -12%, oklch(0.48 0.02 245 / 0.3), transparent 68%),
-      radial-gradient(ellipse 55% 42% at 100% 5%, oklch(0.42 0.015 290 / 0.2), transparent 68%);
-  }
-  input,
-  select,
-  textarea {
-    background-color: color-mix(in oklch, var(--color-card) 86%, transparent);
-    box-shadow: inset 0 1px 0 oklch(1 0 0 / 12%);
-  }
->>>>>>> Stashed changes
   h1,
   h2,
   h3,
