@@ -74,7 +74,16 @@
   --chart-3: oklch(0.78 0.15 80);
   --chart-4: oklch(0.58 0.22 27);
   --chart-5: oklch(0.62 0.19 250);
+  --glass-bg: oklch(1 0 0 / 0.55);
+  --glass-border: oklch(1 0 0 / 0.7);
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 1px oklch(1 0 0 / 0.6) inset, 0 10px 30px oklch(0.45 0.1 255 / 0.14);
+  --page-bg-1: oklch(0.62 0.19 250 / 0.22);
+  --page-bg-2: oklch(0.5 0.19 254 / 0.16);
+  --page-bg-3: oklch(0.78 0.15 80 / 0.12);
 }
+
+
 
 .dark {
   --background: oklch(0.19 0.04 258);
@@ -100,6 +109,52 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.7 0.17 245);
+  --glass-bg: oklch(0.28 0.05 258 / 0.55);
+  --glass-border: oklch(1 0 0 / 0.14);
+  --glass-blur: 20px;
+  --glass-shadow: 0 1px 1px oklch(1 0 0 / 0.08) inset, 0 14px 40px oklch(0.1 0.03 258 / 0.5);
+  --page-bg-1: oklch(0.66 0.19 252 / 0.22);
+  --page-bg-2: oklch(0.7 0.17 245 / 0.16);
+  --page-bg-3: oklch(0.5 0.19 254 / 0.18);
+}
+
+/* Tema azul-noite: escuro total com tons azuis */
+.midnight {
+  --background: oklch(0.13 0.035 258);
+  --foreground: oklch(0.96 0.012 240);
+  --card: oklch(0.17 0.045 256);
+  --card-foreground: oklch(0.96 0.012 240);
+  --popover: oklch(0.17 0.045 256);
+  --popover-foreground: oklch(0.96 0.012 240);
+  --primary: oklch(0.7 0.2 245);
+  --primary-foreground: oklch(0.12 0.035 258);
+  --secondary: oklch(0.22 0.05 254);
+  --secondary-foreground: oklch(0.96 0.012 240);
+  --muted: oklch(0.21 0.045 254);
+  --muted-foreground: oklch(0.74 0.04 240);
+  --accent: oklch(0.76 0.16 210);
+  --accent-foreground: oklch(0.12 0.035 258);
+  --destructive: oklch(0.66 0.2 27);
+  --destructive-foreground: oklch(0.12 0.035 258);
+  --success: oklch(0.72 0.15 165);
+  --success-foreground: oklch(0.12 0.035 258);
+  --warning: oklch(0.84 0.14 85);
+  --warning-foreground: oklch(0.12 0.035 258);
+  --border: oklch(0.7 0.15 240 / 20%);
+  --input: oklch(0.7 0.15 240 / 24%);
+  --ring: oklch(0.76 0.16 210);
+  --chart-1: oklch(0.7 0.2 245);
+  --chart-2: oklch(0.76 0.16 210);
+  --chart-3: oklch(0.72 0.15 165);
+  --chart-4: oklch(0.84 0.14 85);
+  --chart-5: oklch(0.66 0.19 252);
+  --glass-bg: oklch(0.19 0.05 252 / 0.5);
+  --glass-border: oklch(0.7 0.16 235 / 0.28);
+  --glass-blur: 24px;
+  --glass-shadow: 0 1px 1px oklch(0.8 0.15 235 / 0.14) inset, 0 18px 50px oklch(0.06 0.03 258 / 0.65);
+  --page-bg-1: oklch(0.62 0.2 250 / 0.3);
+  --page-bg-2: oklch(0.7 0.16 210 / 0.2);
+  --page-bg-3: oklch(0.45 0.18 268 / 0.28);
 }
 
 @layer base {
@@ -108,6 +163,10 @@
   }
   body {
     background-color: var(--color-background);
+    background-image: radial-gradient(1100px 620px at 8% -8%, var(--page-bg-1), transparent 62%),
+      radial-gradient(900px 520px at 96% 4%, var(--page-bg-2), transparent 58%),
+      radial-gradient(800px 600px at 40% 108%, var(--page-bg-3), transparent 60%);
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
@@ -126,10 +185,19 @@
 }
 
 @utility surface {
-  background-color: var(--color-card);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-soft);
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
+
+@utility glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
 
 @utility hero-gradient {
   background-image: radial-gradient(

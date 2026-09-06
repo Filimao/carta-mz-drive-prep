@@ -13,6 +13,7 @@ import {
   Moon,
   Sun,
   Menu,
+  Sparkles,
   Tag,
   ShieldCheck,
   Receipt,
@@ -53,30 +54,58 @@ const BOTTOM_NAV = [
 ] as const;
 
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+type ThemeName = "light" | "dark" | "midnight";
+
+const THEMES: { value: ThemeName; label: string; icon: typeof Sun }[] = [
+  { value: "light", label: "Tema claro", icon: Sun },
+  { value: "dark", label: "Tema escuro", icon: Moon },
+  { value: "midnight", label: "Tema azul-noite", icon: Sparkles },
+];
+
+function applyTheme(theme: ThemeName) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme !== "light");
+  root.classList.toggle("midnight", theme === "midnight");
+}
+
+function ThemeToggle({ className = "" }: { className?: string }) {
+  const [theme, setTheme] = useState<ThemeName>("dark");
   useEffect(() => {
-    const stored = window.localStorage.getItem("carta-mz-theme");
-    const prefers = stored ? stored === "dark" : true;
-    setDark(prefers);
-    document.documentElement.classList.toggle("dark", prefers);
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem("carta-mz-theme");
+    } catch {
+      stored = null;
+    }
+    const initial: ThemeName =
+      stored === "light" || stored === "dark" || stored === "midnight" ? stored : "dark";
+    setTheme(initial);
+    applyTheme(initial);
   }, []);
+  const current = THEMES.findIndex((t) => t.value === theme);
+  const next = THEMES[(current + 1) % THEMES.length]!;
+  const Icon = THEMES[current === -1 ? 1 : current]!.icon;
   return (
     <button
       type="button"
-      aria-label={dark ? "Activar modo claro" : "Activar modo escuro"}
+      aria-label={`Mudar para ${next.label}`}
+      title={`Mudar para ${next.label}`}
       onClick={() => {
-        const next = !dark;
-        setDark(next);
-        document.documentElement.classList.toggle("dark", next);
-        window.localStorage.setItem("carta-mz-theme", next ? "dark" : "light");
+        setTheme(next.value);
+        applyTheme(next.value);
+        try {
+          window.localStorage.setItem("carta-mz-theme", next.value);
+        } catch {
+          /* armazenamento indisponível */
+        }
       }}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl surface text-foreground transition-colors hover:bg-secondary ${className}`}
     >
-      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      <Icon className="h-4 w-4" />
     </button>
   );
 }
+
 
 export function Brand() {
   return (
@@ -121,12 +150,12 @@ function MobileMenu({
         <button
           type="button"
           aria-label="Abrir menu"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl surface text-foreground md:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[85vw] max-w-sm overflow-y-auto">
+      <SheetContent side="right" className="w-[85vw] max-w-sm overflow-y-auto border-l border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150">
         <SheetHeader>
           <SheetTitle className="font-display">Menu</SheetTitle>
         </SheetHeader>
@@ -150,7 +179,12 @@ function MobileMenu({
           })}
         </nav>
         <div className="mt-6 flex flex-col gap-2 border-t border-border pt-4">
-          <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold" />
+          <div className="flex items-center justify-between rounded-xl surface px-3 py-2 text-sm font-semibold">
+            <span>Tema</span>
+            <ThemeToggle />
+          </div>
+          <InstallButton className="inline-flex items-center justify-center gap-2 rounded-xl surface px-3 py-3 text-sm font-semibold" />
+
           {isLoggedIn ? (
             <button
               type="button"
@@ -190,7 +224,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Brand />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Navegação principal">
@@ -217,7 +251,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               isLoggedIn={session.userId != null}
               onSignOut={() => void signOut()}
             />
-            <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
+            <InstallButton className="hidden items-center gap-2 rounded-xl surface px-3 py-2 text-sm font-semibold sm:inline-flex" />
             <ThemeToggle />
             <Link
               to="/precos"
@@ -245,7 +279,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 to="/perfil"
                 aria-label="A minha conta"
-                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary sm:inline-flex"
+                className="hidden h-10 w-10 items-center justify-center rounded-xl surface text-foreground hover:bg-secondary sm:inline-flex"
               >
                 <UserRound className="h-4 w-4" />
               </Link>
@@ -283,7 +317,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] backdrop-blur-xl backdrop-saturate-150 md:hidden"
         aria-label="Navegação inferior"
       >
         <ul className="flex items-center justify-between px-2 gap-1">
