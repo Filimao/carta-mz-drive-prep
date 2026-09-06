@@ -74,7 +74,16 @@
   --chart-3: oklch(0.78 0.15 80);
   --chart-4: oklch(0.58 0.22 27);
   --chart-5: oklch(0.62 0.19 250);
+  --glass-bg: oklch(1 0 0 / 0.55);
+  --glass-border: oklch(1 0 0 / 0.7);
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 1px oklch(1 0 0 / 0.6) inset, 0 10px 30px oklch(0.45 0.1 255 / 0.14);
+  --page-bg-1: oklch(0.62 0.19 250 / 0.22);
+  --page-bg-2: oklch(0.5 0.19 254 / 0.16);
+  --page-bg-3: oklch(0.78 0.15 80 / 0.12);
 }
+
+
 
 .dark {
   --background: oklch(0.19 0.04 258);
