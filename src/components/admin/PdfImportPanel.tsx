@@ -55,7 +55,7 @@ export function PdfImportPanel() {
 
   const updateImportRow = useCallback(
     async (id: string, patch: Record<string, unknown>) => {
-      await supabase.from("question_imports").update(patch).eq("id", id);
+      await supabase.from("question_imports").update(patch as never).eq("id", id);
     },
     [],
   );
