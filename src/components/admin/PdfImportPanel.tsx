@@ -83,14 +83,14 @@ async function extractPageImageBoxes(
           fn === OPS.paintInlineImageXObject) &&
         Array.isArray(args)
       ) {
-        const w = typeof args[1] === "number" ? args[1] : 1;
-        const h = typeof args[2] === "number" ? args[2] : w;
-        // Cantos do rectângulo da imagem em coordenadas PDF.
+        // paintImageXObject desenha a imagem no quadrado unitário (0..1)
+        // transformado pela CTM — a matriz já contém a escala de colocação.
+        // Usar a largura/altura em pixéis da imagem aqui distorcia as caixas.
         const corners = [
           viewport.convertToViewportPoint(e, f),
-          viewport.convertToViewportPoint(e + w * a, f + w * b),
-          viewport.convertToViewportPoint(e + c, f + h * d),
-          viewport.convertToViewportPoint(e + w * a + c, f + w * b + h * d),
+          viewport.convertToViewportPoint(e + a, f + b),
+          viewport.convertToViewportPoint(e + c, f + d),
+          viewport.convertToViewportPoint(e + a + c, f + b + d),
         ];
         const xs = corners.map((p) => p[0] ?? 0);
         const ys = corners.map((p) => p[1] ?? 0);
