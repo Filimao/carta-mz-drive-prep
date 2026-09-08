@@ -199,8 +199,3 @@ function Simulados() {
     </AppShell>
   );
 }
-
-
-    </AppShell>
-  );
-}
