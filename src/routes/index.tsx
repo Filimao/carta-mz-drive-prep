@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
+import { ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -57,44 +57,68 @@ function Index() {
   }
 
   return (
-    <AppShell>
-      <section className="hero-gradient -mx-4 -mt-8 px-4 pt-14 pb-16 sm:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-semibold">
-            Aprende. Pratica. Passa.
-          </span>
-          <h1 className="mt-5 font-display text-4xl font-bold sm:text-6xl">Carta MZ Quiz</h1>
-          <p className="mt-4 text-lg font-medium">
-            Prepare-se melhor para o exame teórico de condução.
-          </p>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Pratique questões, descubra os seus pontos fracos e faça simulados completos para chegar
-            ao exame mais preparado.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/praticar"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)]"
-            >
-              Começar Quiz <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/simulados"
-              className="rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold"
-            >
-              Fazer Simulado
-            </Link>
-            <Link
-              to="/categorias"
-              className="rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold"
-            >
-              Estudar por Tema
-            </Link>
+        <AppShell>
+      <section className="relative -mx-4 -mt-8 min-h-[85vh] overflow-hidden px-4 pt-14 pb-16 sm:px-8">
+        {/* Background Image/Overlay */}
+        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1920&q=80&fm=webp')] bg-cover bg-center bg-no-repeat">
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+
+        <div className="mx-auto max-w-5xl">
+          <div className="liquid-glass animate-fade-in-up p-8 md:p-12 lg:w-2/3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-white uppercase">
+              APRENDE. PRATICA. PASSA.
+            </span>
+            
+            <h1 className="mt-8 font-display text-5xl font-bold leading-tight text-white sm:text-7xl">
+              Preparado para <br />
+              <span style={{ color: '#2d5bd7' }}>passar no exame?</span>
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
+              Pratique questões, descubra os seus pontos fracos e faça simulados completos para chegar
+              ao exame mais preparado e confiante.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Link to="/praticar" className="hero-button group">
+                Começar Quiz
+              </Link>
+              <Link to="/simulados" className="hero-button-outline">
+                Fazer Simulado
+              </Link>
+              <span className="text-xs font-medium text-white/60">
+                230+ questões · Simulados completos
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-12 lg:mt-24">
+            <div className="liquid-glass flex flex-wrap items-center gap-6 p-6">
+              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+                <span className="text-xs font-bold text-white/60 uppercase">Categoria</span>
+                <span className="text-lg font-semibold text-white">Ligeiros</span>
+              </div>
+              <div className="h-10 w-px bg-white/10 hidden md:block" />
+              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+                <span className="text-xs font-bold text-white/60 uppercase">Tipo</span>
+                <span className="text-lg font-semibold text-white">Simulado</span>
+              </div>
+              <div className="h-10 w-px bg-white/10 hidden md:block" />
+              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+                <span className="text-xs font-bold text-white/60 uppercase">Dificuldade</span>
+                <span className="text-lg font-semibold text-white">Intermédio</span>
+              </div>
+              <Link to="/praticar" className="hero-button w-full md:w-auto">
+                Pesquisar Teste
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <section className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5 px-4">
+
         {[
           { icon: BookOpen, label: `${total ?? 200}+ questões` },
           { icon: Gauge, label: "Simulados completos" },
@@ -109,41 +133,48 @@ function Index() {
         ))}
       </section>
 
-      <section className="mt-14">
-        <h2 className="font-display text-2xl font-semibold">Como funciona?</h2>
-        <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <section className="mt-20">
+        <h2 className="font-display text-3xl font-bold">Como funciona?</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {STEPS.map((step, i) => (
-            <li key={step} className="surface flex items-center gap-3 rounded-2xl p-4">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+            <div key={step} className="liquid-glass group p-6 transition-all hover:bg-white/5">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/20 text-xl font-bold text-primary group-hover:scale-110 transition-transform">
                 {i + 1}
               </span>
-              <span className="text-sm font-medium">{step}</span>
-            </li>
+              <p className="mt-4 text-lg font-semibold">{step}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Passo essencial para garantir que estás preparado para o sucesso no teu exame de condução.
+              </p>
+            </div>
           ))}
-        </ol>
+        </div>
       </section>
 
-      <section className="mt-14">
+      <section className="mt-20 mb-12">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="font-display text-2xl font-semibold">Categorias de estudo</h2>
-          <Link to="/categorias" className="text-sm font-semibold text-primary">
+          <div>
+            <h2 className="font-display text-3xl font-bold">Categorias de estudo</h2>
+            <p className="mt-2 text-muted-foreground text-lg">Foca nos temas que mais precisas de praticar.</p>
+          </div>
+          <Link to="/categorias" className="text-sm font-bold text-primary hover:underline">
             Ver todas
           </Link>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {(categories ?? []).slice(0, 8).map((cat) => (
             <Link
               key={cat.id}
               to="/categorias"
-              className="surface rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
+              className="liquid-glass p-6 transition-transform hover:-translate-y-2"
             >
-              <CategoryIcon name={cat.icon} className="h-7 w-7 text-primary" />
-              <p className="mt-2 text-sm font-semibold">{cat.name}</p>
-              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{cat.description}</p>
+              <CategoryIcon name={cat.icon} className="h-10 w-10 text-primary" />
+              <p className="mt-4 text-lg font-bold">{cat.name}</p>
+              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{cat.description}</p>
             </Link>
           ))}
         </div>
       </section>
+
     </AppShell>
   );
 }

@@ -74,25 +74,37 @@
   --chart-3: oklch(0.78 0.15 80);
   --chart-4: oklch(0.58 0.22 27);
   --chart-5: oklch(0.62 0.19 250);
-  --glass-bg: oklch(1 0 0 / 0.55);
-  --glass-border: oklch(1 0 0 / 0.7);
-  --glass-blur: 18px;
-  --glass-shadow: 0 1px 1px oklch(1 0 0 / 0.6) inset, 0 10px 30px oklch(0.45 0.1 255 / 0.14);
+    --glass-bg: oklch(1 0 0 / 0.15);
+  --glass-border: oklch(1 0 0 / 0.2);
+  --glass-blur: 24px;
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), inset 0 0 0 1px oklch(1 0 0 / 0.1);
   --page-bg-1: oklch(0.62 0.19 250 / 0.22);
   --page-bg-2: oklch(0.5 0.19 254 / 0.16);
   --page-bg-3: oklch(0.78 0.15 80 / 0.12);
+  --liquid-accent: oklch(0.7 0.2 245);
+  --hero-bg: #101a2e;
+  --hero-accent: #1b3a8a;
+  --hero-highlight: #2d5bd7;
+}
+
+.dark, .midnight {
+  --glass-bg: oklch(0 0 0 / 0.25);
+  --glass-border: oklch(1 0 0 / 0.1);
+  --glass-blur: 32px;
+  --liquid-accent: oklch(0.66 0.19 252);
 }
 
 
 
+
 .dark {
-  --background: oklch(0.19 0.04 258);
+  --background: #101a2e;
   --foreground: oklch(0.97 0.008 250);
   --card: oklch(0.235 0.045 258);
   --card-foreground: oklch(0.97 0.008 250);
   --popover: oklch(0.235 0.045 258);
   --popover-foreground: oklch(0.97 0.008 250);
-  --primary: oklch(0.66 0.19 252);
+  --primary: #1b3a8a;
   --primary-foreground: oklch(0.16 0.04 258);
   --secondary: oklch(0.28 0.05 258);
   --secondary-foreground: oklch(0.97 0.008 250);
@@ -120,13 +132,13 @@
 
 /* Tema azul-noite: escuro total com tons azuis */
 .midnight {
-  --background: oklch(0.13 0.035 258);
+  --background: #101a2e;
   --foreground: oklch(0.96 0.012 240);
   --card: oklch(0.17 0.045 256);
   --card-foreground: oklch(0.96 0.012 240);
   --popover: oklch(0.17 0.045 256);
   --popover-foreground: oklch(0.96 0.012 240);
-  --primary: oklch(0.7 0.2 245);
+  --primary: #1b3a8a;
   --primary-foreground: oklch(0.12 0.035 258);
   --secondary: oklch(0.22 0.05 254);
   --secondary-foreground: oklch(0.96 0.012 240);
@@ -208,10 +220,72 @@
     radial-gradient(900px 400px at 90% 0%, oklch(0.5 0.19 254 / 0.22), transparent 55%);
 }
 
-@utility road-stripes {
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--color-warning) 0 28px,
-    transparent 28px 56px
-  );
+@utility liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 2rem;
 }
+
+@utility liquid-button {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
+  background: var(--liquid-accent);
+  color: white;
+  box-shadow: 0 4px 15px oklch(var(--liquid-accent) / 0.3);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px oklch(var(--liquid-accent) / 0.4);
+  }
+}
+
+@utility liquid-button-outline {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
+  background: oklch(1 0 0 / 0.05);
+  border: 1px solid oklch(1 0 0 / 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  &:hover {
+    background: oklch(1 0 0 / 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@utility hero-button {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
+  background: var(--hero-accent);
+  color: white;
+  box-shadow: 0 4px 15px rgba(27, 58, 138, 0.35);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(27, 58, 138, 0.45);
+  }
+}
+
+@utility hero-button-outline {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  color: white;
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
