@@ -31,6 +31,149 @@ async function loadPdfjs() {
   return pdfjs;
 }
 
+type ImageBox = { x: number; y: number; width: number; height: number };
+
+/** Multiplica duas matrizes 2D (formato pdf.js: [a, b, c, d, e, f]). */
+function multiplyMatrix(m1: number[], m2: number[]): number[] {
+  const [a1 = 0, b1 = 0, c1 = 0, d1 = 0, e1 = 0, f1 = 0] = m1;
+  const [a2 = 0, b2 = 0, c2 = 0, d2 = 0, e2 = 0, f2 = 0] = m2;
+  return [
+    a1 * a2 + c1 * b2,
+    b1 * a2 + d1 * b2,
+    a1 * c2 + c1 * d2,
+    b1 * c2 + d1 * d2,
+    a1 * e2 + c1 * f2 + e1,
+    b1 * e2 + d1 * f2 + f1,
+  ];
+}
+
+/**
+ * Extrai as caixas (em coordenadas do canvas) de todas as imagens embebidas
+ * na página, percorrendo a operator list do pdf.js.
+ */
+async function extractPageImageBoxes(
+  page: { getOperatorList: () => Promise<{ fnArray: number[]; argsArray: unknown[][] }> },
+  viewport: {
+    width: number;
+    height: number;
+    convertToViewportPoint: (x: number, y: number) => number[];
+  },
+  scale: number,
+): Promise<ImageBox[]> {
+  try {
+    const pdfjs = await loadPdfjs();
+    const { OPS } = pdfjs;
+    const { fnArray, argsArray } = await page.getOperatorList();
+    const boxes: ImageBox[] = [];
+    let ctm = [1, 0, 0, 1, 0, 0];
+    const stack: number[][] = [];
+    for (let i = 0; i < fnArray.length; i += 1) {
+      const fn = fnArray[i];
+      const args = argsArray[i];
+      const [a = 1, b = 0, c = 0, d = 1, e = 0, f = 0] = ctm;
+      if (fn === OPS.save) {
+        stack.push([...ctm]);
+      } else if (fn === OPS.restore) {
+        ctm = stack.pop() ?? [1, 0, 0, 1, 0, 0];
+      } else if (fn === OPS.transform && Array.isArray(args)) {
+        ctm = multiplyMatrix(args as number[], ctm);
+      } else if (
+        (fn === OPS.paintImageXObject ||
+          fn === OPS.paintImageXObjectRepeat ||
+          fn === OPS.paintInlineImageXObject) &&
+        Array.isArray(args)
+      ) {
+        const w = typeof args[1] === "number" ? args[1] : 1;
+        const h = typeof args[2] === "number" ? args[2] : w;
+        // Cantos do rectângulo da imagem em coordenadas PDF.
+        const corners = [
+          viewport.convertToViewportPoint(e, f),
+          viewport.convertToViewportPoint(e + w * a, f + w * b),
+          viewport.convertToViewportPoint(e + c, f + h * d),
+          viewport.convertToViewportPoint(e + w * a + c, f + w * b + h * d),
+        ];
+        const xs = corners.map((p) => p[0] ?? 0);
+        const ys = corners.map((p) => p[1] ?? 0);
+        const x = Math.min(...xs);
+        const y = Math.min(...ys);
+        const width = Math.max(...xs) - x;
+        const height = Math.max(...ys) - y;
+        // Ignora imagens minúsculas (padrões/logos de 1-2px repetidos).
+        if (width > 24 * scale && height > 24 * scale) {
+          boxes.push({ x, y, width, height });
+        }
+      }
+    }
+    return boxes.sort((a, b) => a.y - b.y);
+  } catch {
+    return [];
+  }
+}
+
+/** Área de interseção entre duas caixas. */
+function intersectionArea(a: ImageBox, b: ImageBox): number {
+  const w = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+  const h = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
+/**
+ * Escolhe a melhor imagem embebida para a região indicada pela IA.
+ * Se a IA não indicar região e houver tantas imagens como questões, usa a
+ * ordem vertical (as questões e as imagens vêm ambas de cima para baixo).
+ */
+function pickImageBox(
+  boxes: ImageBox[],
+  region: { x: number; y: number; width: number; height: number } | null,
+  canvasWidth: number,
+  canvasHeight: number,
+  questionIndex: number,
+  questionCount: number,
+): ImageBox | null {
+  if (boxes.length === 0) return null;
+  if (region && region.width > 0 && region.height > 0) {
+    const target: ImageBox = {
+      x: region.x * canvasWidth,
+      y: region.y * canvasHeight,
+      width: region.width * canvasWidth,
+      height: region.height * canvasHeight,
+    };
+    let best: ImageBox | null = null;
+    let bestArea = 0;
+    for (const box of boxes) {
+      const area = intersectionArea(box, target);
+      if (area > bestArea) {
+        bestArea = area;
+        best = box;
+      }
+    }
+    if (best) return best;
+    // Sem interseção: imagem mais próxima verticalmente do centro da região.
+    const cy = target.y + target.height / 2;
+    return boxes.reduce((a, b) =>
+      Math.abs(a.y + a.height / 2 - cy) < Math.abs(b.y + b.height / 2 - cy) ? a : b,
+    );
+  }
+  // Fallback: uma imagem por questão, na ordem de leitura.
+  if (boxes.length === questionCount) return boxes[questionIndex] ?? null;
+  return null;
+}
+
+/** Recorta uma caixa (com margem) do canvas renderizado para um JPEG Blob. */
+async function cropBoxToBlob(canvas: HTMLCanvasElement, box: ImageBox): Promise<Blob | null> {
+  const pad = Math.round(Math.min(box.width, box.height) * 0.03);
+  const x = Math.max(0, Math.floor(box.x - pad));
+  const y = Math.max(0, Math.floor(box.y - pad));
+  const width = Math.min(canvas.width - x, Math.ceil(box.width + pad * 2));
+  const height = Math.min(canvas.height - y, Math.ceil(box.height + pad * 2));
+  if (width <= 0 || height <= 0) return null;
+  const crop = document.createElement("canvas");
+  crop.width = width;
+  crop.height = height;
+  crop.getContext("2d")?.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+  return new Promise<Blob | null>((resolve) => crop.toBlob(resolve, "image/jpeg", 0.86));
+}
+
 export function PdfImportPanel() {
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
 
@@ -48,14 +191,22 @@ export function PdfImportPanel() {
   const [saving, setSaving] = useState(false);
 
   const pausedRef = useRef(false);
-  const docRef = useRef<Awaited<ReturnType<Awaited<ReturnType<typeof loadPdfjs>>["getDocument"]>["promise"]> | null>(
-    null,
-  );
+  const docRef = useRef<Awaited<
+    ReturnType<Awaited<ReturnType<typeof loadPdfjs>>["getDocument"]>["promise"]
+  > | null>(null);
 
   const catList = (categories ?? []).map((c) => ({ slug: c.slug, name: c.name }));
 
   const updateImportRow = useCallback(
-    async (id: string, patch: Record<string, unknown>) => {
+    async (
+      id: string,
+      patch: Partial<{
+        processed_pages: number;
+        questions_found: number;
+        failed_pages: number[];
+        status: string;
+      }>,
+    ) => {
       await supabase.from("question_imports").update(patch).eq("id", id);
     },
     [],
@@ -82,6 +233,10 @@ export function PdfImportPanel() {
         .join(" ")
         .trim();
 
+      // Posições reais das imagens embebidas na página (muchos mais fiáveis do
+      // que as coordenadas estimadas pela IA).
+      const imageBoxes = await extractPageImageBoxes(page, viewport, 3);
+
       const result = await extractQuestionsFromPage({
         data: { imageBase64, pageText, page: pageNumber, categories: catList },
       });
@@ -89,29 +244,25 @@ export function PdfImportPanel() {
       const found = await Promise.all(
         result.questions.map(async (q, i) => {
           let imageUrl = q.image_url;
-          const region = q.image_region;
-          if (region && region.width > 0 && region.height > 0) {
-            const crop = document.createElement("canvas");
-            const x = Math.max(0, Math.floor(region.x * canvas.width));
-            const y = Math.max(0, Math.floor(region.y * canvas.height));
-            const width = Math.min(canvas.width - x, Math.floor(region.width * canvas.width));
-            const height = Math.min(canvas.height - y, Math.floor(region.height * canvas.height));
-            if (width > 0 && height > 0) {
-              crop.width = width;
-              crop.height = height;
-              crop.getContext("2d")?.drawImage(canvas, x, y, width, height, 0, 0, width, height);
-              const blob = await new Promise<Blob | null>((resolve) =>
-                crop.toBlob(resolve, "image/jpeg", 0.86),
-              );
-              if (blob) {
-                const path = `${imageFolder}/${pageNumber}-${i}.jpg`;
-                const upload = await supabase.storage.from("question-images").upload(path, blob, {
-                  contentType: "image/jpeg",
-                  upsert: true,
-                });
-                if (!upload.error) {
-                  imageUrl = supabase.storage.from("question-images").getPublicUrl(path).data.publicUrl;
-                }
+          const box = pickImageBox(
+            imageBoxes,
+            q.image_region,
+            canvas.width,
+            canvas.height,
+            i,
+            result.questions.length,
+          );
+          if (box) {
+            const blob = await cropBoxToBlob(canvas, box);
+            if (blob) {
+              const path = `${imageFolder}/${pageNumber}-${i}.jpg`;
+              const upload = await supabase.storage.from("question-images").upload(path, blob, {
+                contentType: "image/jpeg",
+                upsert: true,
+              });
+              if (!upload.error) {
+                imageUrl = supabase.storage.from("question-images").getPublicUrl(path)
+                  .data.publicUrl;
               }
             }
           }
@@ -120,8 +271,7 @@ export function PdfImportPanel() {
             image_url: imageUrl,
             key: `${pageNumber}-${i}-${Math.random().toString(36).slice(2, 7)}`,
             page: pageNumber,
-            category_id:
-              (categories ?? []).find((c) => c.slug === q.category_slug)?.id ?? null,
+            category_id: (categories ?? []).find((c) => c.slug === q.category_slug)?.id ?? null,
           };
         }),
       );
@@ -391,7 +541,7 @@ export function PdfImportPanel() {
                   <Trash2 className="h-4 w-4" /> Remover
                 </button>
               </div>
-                            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-3">
                   <textarea
                     value={d.question_text}
@@ -420,7 +570,9 @@ export function PdfImportPanel() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Imagem (URL)</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                        Imagem (URL)
+                      </p>
                       <input
                         value={d.image_url ?? ""}
                         onChange={(e) => patch(d.key, { image_url: e.target.value || null })}
@@ -435,10 +587,7 @@ export function PdfImportPanel() {
                   <div className="grid gap-2">
                     {LETTERS.map((letter) => {
                       const field = `option_${letter.toLowerCase()}` as
-                        | "option_a"
-                        | "option_b"
-                        | "option_c"
-                        | "option_d";
+                        "option_a" | "option_b" | "option_c" | "option_d";
                       return (
                         <label key={letter} className="flex items-center gap-2 text-sm">
                           <input

@@ -1,4 +1,4 @@
-
+ 
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home,
@@ -118,6 +118,7 @@ function MobileMenu({
         side="right"
         className="w-[85vw] max-w-sm overflow-y-auto"
       >
+      
         <SheetHeader>
           <SheetTitle className="font-display">
             Menu
@@ -183,6 +184,7 @@ function MobileMenu({
     </Sheet>
   );
 }
+
 
 export function AppShell({
   children,
@@ -360,8 +362,8 @@ export function AppShell({
         </ul>
       </nav>
 
-      <ChatBot />
+            <ChatBot />
     </div>
   );
 }
-```
+

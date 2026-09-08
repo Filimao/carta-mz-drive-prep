@@ -7,7 +7,8 @@ const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/cha
 const MODEL = "gemini-1.5-flash-latest";
 const MAX_RATE_LIMIT_RETRIES = 4;
 
-const wait = (milliseconds: number) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+const wait = (milliseconds: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 
 const extractedQuestionSchema = z.object({
   question_text: z.string().min(5),
@@ -39,7 +40,7 @@ Regras:
 - Português de Moçambique, sem alterar o sentido original.
 - Se a página não tiver questões, devolve {"questions":[]}.
 - A imagem pode ser uma captura de ecrã comprida com várias questões. Lê cada bloco separadamente, de cima para baixo, sem duplicar questões.
-- Para cada questão, identifica a fotografia/figura/sinal no lado esquerdo. Devolve image_region com coordenadas relativas à imagem completa, entre 0 e 1. Se não existir imagem, devolve null.
+- Para cada questão, identifica a fotografia/figura/sinal no lado esquerdo. Devolve sempre image_region com coordenadas relativas à imagem completa, entre 0 e 1, mesmo que aproximada (a região serve para associar a questão à imagem correcta da página). Só devolve null se tiveres a certeza de que o bloco não tem qualquer imagem.
 - As alternativas podem ser A-C ou A-D. Se uma alternativa não estiver visível, usa exactamente "[Alternativa não apresentada]" e confiança < 0.6; nunca inventes texto.
 - A resposta correcta neste tipo de material costuma estar escrita a verde. Usa essa cor, negrito, sublinhado ou X como evidência; se não for claro, usa confiança < 0.6.
 - Transcreve o texto visível com fidelidade, incluindo números, unidades, pontuação e acentos. Não uses o texto da imagem para criar perguntas que não estejam visíveis.
@@ -48,9 +49,12 @@ Regras:
 - "confidence": 0 a 1, quão fiável foi a leitura desta questão.
 - Nunca inventes questões que não estão na página.`;
 
-async function assertAdmin(supabase: {
-  rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
-}, userId: string) {
+async function assertAdmin(
+  supabase: {
+    rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
+  },
+  userId: string,
+) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (data !== true) throw new Error("Acesso restrito a administradores.");
 }
@@ -58,12 +62,14 @@ async function assertAdmin(supabase: {
 /** Extrai questões de uma única página do PDF (imagem + texto opcional). */
 export const extractQuestionsFromPage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: {
-    imageBase64: string;
-    pageText?: string;
-    page: number;
-    categories: { slug: string; name: string }[];
-  }) => input)
+  .inputValidator(
+    (input: {
+      imageBase64: string;
+      pageText?: string;
+      page: number;
+      categories: { slug: string; name: string }[];
+    }) => input,
+  )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as never, context.userId);
 
@@ -100,18 +106,24 @@ Transcreve exactamente o texto visível. Não confundas o número da questão co
         body: JSON.stringify({
           model: MODEL,
           response_format: { type: "json_object" },
-          messages: [{ role: "system", content: SYSTEM }, { role: "user", content: userContent }],
+          messages: [
+            { role: "system", content: SYSTEM },
+            { role: "user", content: userContent },
+          ],
         }),
       });
       if (response.status !== 429 || attempt === MAX_RATE_LIMIT_RETRIES) break;
       const retryAfter = Number(response.headers.get("retry-after"));
-      await wait(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 5_000 * (attempt + 1));
+      await wait(
+        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 5_000 * (attempt + 1),
+      );
     }
     if (!response) throw new Error("Não foi possível contactar a IA.");
 
     if (!response.ok) {
       const body = await response.text();
-      if (response.status === 429) throw new Error("Muitos pedidos à IA. Aguarda e retoma a importação.");
+      if (response.status === 429)
+        throw new Error("Muitos pedidos à IA. Aguarda e retoma a importação.");
       if (response.status === 402)
         throw new Error("Créditos de IA esgotados. Adiciona créditos para continuar a importação.");
       if (response.status === 403)
@@ -140,18 +152,25 @@ Transcreve exactamente o texto visível. Não confundas o número da questão co
       if (!item || typeof item !== "object") continue;
       const candidate = item as Record<string, unknown>;
       const missingOption = ["option_a", "option_b", "option_c", "option_d"].some(
-        (key) => typeof candidate[key] !== "string" || candidate[key].trim() === "",
+        (key) =>
+          typeof candidate[key] !== "string" ||
+          (candidate[key] as string | undefined)?.trim() === "",
       );
       const normalized = {
         ...candidate,
-        option_a: candidate.option_a || "[Alternativa não apresentada]",
-        option_b: candidate.option_b || "[Alternativa não apresentada]",
-        option_c: candidate.option_c || "[Alternativa não apresentada]",
-        option_d: candidate.option_d || "[Alternativa não apresentada]",
+        option_a: candidate["option_a"] || "[Alternativa não apresentada]",
+        option_b: candidate["option_b"] || "[Alternativa não apresentada]",
+        option_c: candidate["option_c"] || "[Alternativa não apresentada]",
+        option_d: candidate["option_d"] || "[Alternativa não apresentada]",
         confidence: missingOption
-          ? Math.min(typeof candidate.confidence === "number" ? candidate.confidence : 0.5, 0.59)
-          : candidate.confidence,
-        image_region: candidate.image_region ?? null,
+          ? Math.min(
+              typeof candidate["confidence"] === "number"
+                ? (candidate["confidence"] as number)
+                : 0.5,
+              0.59,
+            )
+          : candidate["confidence"],
+        image_region: candidate["image_region"] ?? null,
         image_url: null,
       };
       const result = extractedQuestionSchema.safeParse(normalized);
