@@ -22,31 +22,6 @@ type Draft = ExtractedQuestion & { key: string; page: number; category_id: strin
 
 const LETTERS = ["A", "B", "C", "D"] as const;
 const PAGE_REQUEST_INTERVAL_MS = 12_000;
-<<<<<<< Updated upstream
-=======
-
-const VISUAL_QUESTION_PATTERN =
-  /\b(sinal|sinais|placa|placas|imagem|imagens|figura|figuras|ilustra[çc][ãa]o|fotografia|foto|diagrama|esquema|representad[oa]|mostrad[oa])\b/i;
-
-function getCropBounds(
-  region: NonNullable<ExtractedQuestion["image_region"]>,
-  canvas: HTMLCanvasElement,
-) {
-  // Vision models occasionally place an edge a little outside the page. Clamp
-  // the rectangle before drawing so a valid image is still retained.
-  const left = Math.max(0, Math.min(1, region.x));
-  const top = Math.max(0, Math.min(1, region.y));
-  const right = Math.max(left, Math.min(1, region.x + region.width));
-  const bottom = Math.max(top, Math.min(1, region.y + region.height));
-
-  return {
-    x: Math.floor(left * canvas.width),
-    y: Math.floor(top * canvas.height),
-    width: Math.floor((right - left) * canvas.width),
-    height: Math.floor((bottom - top) * canvas.height),
-  };
-}
->>>>>>> Stashed changes
 
 /** Carrega o pdfjs apenas no browser e configura o worker. */
 async function loadPdfjs() {
@@ -416,43 +391,83 @@ export function PdfImportPanel() {
                   <Trash2 className="h-4 w-4" /> Remover
                 </button>
               </div>
-              <textarea
-                value={d.question_text}
-                onChange={(e) => patch(d.key, { question_text: e.target.value })}
-                rows={2}
-                className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
-              />
-              <div className="grid gap-2 sm:grid-cols-2">
-                {LETTERS.map((letter) => {
-                  const field = `option_${letter.toLowerCase()}` as
-                    | "option_a"
-                    | "option_b"
-                    | "option_c"
-                    | "option_d";
-                  return (
-                    <label key={letter} className="flex items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        name={`correct-${d.key}`}
-                        checked={d.correct_answer === letter}
-                        onChange={() => patch(d.key, { correct_answer: letter })}
-                        aria-label={`Marcar ${letter} como correcta`}
+                            <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-3">
+                  <textarea
+                    value={d.question_text}
+                    onChange={(e) => patch(d.key, { question_text: e.target.value })}
+                    rows={3}
+                    placeholder="Texto da questão"
+                    className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
+                  />
+
+                  {d.image_url ? (
+                    <div className="group relative aspect-video overflow-hidden rounded-xl bg-muted border border-border">
+                      <img
+                        src={d.image_url}
+                        alt="Imagem da questão"
+                        className="h-full w-full object-contain"
                       />
-                      <span className="w-4 font-semibold">{letter}</span>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => patch(d.key, { image_url: null })}
+                          className="rounded-lg bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground"
+                        >
+                          Remover imagem
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Imagem (URL)</p>
                       <input
-                        value={d[field]}
-                        onChange={(e) => patch(d.key, { [field]: e.target.value } as Partial<Draft>)}
-                        className="flex-1 rounded-lg border border-input bg-card px-2 py-1.5 text-sm"
+                        value={d.image_url ?? ""}
+                        onChange={(e) => patch(d.key, { image_url: e.target.value || null })}
+                        placeholder="Sem imagem. Cola um link se necessário..."
+                        className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
                       />
-                    </label>
-                  );
-                })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="grid gap-2">
+                    {LETTERS.map((letter) => {
+                      const field = `option_${letter.toLowerCase()}` as
+                        | "option_a"
+                        | "option_b"
+                        | "option_c"
+                        | "option_d";
+                      return (
+                        <label key={letter} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="radio"
+                            name={`correct-${d.key}`}
+                            checked={d.correct_answer === letter}
+                            onChange={() => patch(d.key, { correct_answer: letter })}
+                            aria-label={`Marcar ${letter} como correcta`}
+                          />
+                          <span className="w-4 font-semibold text-muted-foreground">{letter}</span>
+                          <input
+                            value={d[field]}
+                            onChange={(e) =>
+                              patch(d.key, { [field]: e.target.value } as Partial<Draft>)
+                            }
+                            className="flex-1 rounded-lg border border-input bg-card px-2 py-1.5 text-sm"
+                          />
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
+
               <textarea
                 value={d.explanation}
                 onChange={(e) => patch(d.key, { explanation: e.target.value })}
                 rows={2}
-                placeholder="Explicação"
+                placeholder="Explicação / Justificação"
                 className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
               />
               <div className="grid gap-2 sm:grid-cols-2">
