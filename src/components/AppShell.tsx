@@ -58,17 +58,18 @@ const BOTTOM_NAV = [
 
 function Brand() {
   return (
-    <Link to="/" className="flex items-center gap-2">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground">
+    <Link to="/" className="flex items-center gap-2 group">
+      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary font-display text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
         MZ
       </span>
 
-      <span className="font-display text-base font-semibold">
-        Carta MZ Quiz
+      <span className="font-display text-xl font-bold tracking-tight">
+        Carta MZ<span className="text-primary">Quiz</span>
       </span>
     </Link>
   );
 }
+
 
 function MobileMenu({
   open,
@@ -94,13 +95,13 @@ function MobileMenu({
 
     ...(isAdmin
       ? [
-          { to: "/admin", label: "Admin", icon: ShieldCheck },
-          {
-            to: "/admin/pagamentos",
-            label: "Pagamentos",
-            icon: Receipt,
-          },
-        ]
+        { to: "/admin", label: "Admin", icon: ShieldCheck },
+        {
+          to: "/admin/pagamentos",
+          label: "Pagamentos",
+          icon: Receipt,
+        },
+      ]
       : []),
   ];
 
@@ -140,11 +141,10 @@ function MobileMenu({
                 key={item.to}
                 to={item.to}
                 onClick={() => onOpenChange(false)}
-                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
-                  active
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${active
                     ? "bg-secondary text-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
 
@@ -257,31 +257,62 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Brand />
+        <div className="min-h-screen pb-20 md:pb-0 font-sans selection:bg-primary selection:text-primary-foreground">
+      <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-8">
+            <Brand />
 
-          <nav
-            className="hidden items-center gap-1 md:flex"
-            aria-label="Navegação principal"
-          >
-            {NAV.map((item) => (
+            <nav
+              className="hidden items-center gap-1 lg:flex"
+              aria-label="Navegação principal"
+            >
+              {NAV.slice(0, 5).map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all hover:bg-white/10 ${pathname === item.to
+                      ? "text-primary bg-primary/10"
+                      : "text-foreground/70 hover:text-foreground"
+                    }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 mr-2">
+              <ThemeToggle />
+              <InstallButton className="liquid-button-outline !px-4 !py-2 !text-xs" />
+            </div>
+
+            {session.userId ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/perfil"
+                  className="hidden h-10 w-10 items-center justify-center rounded-full liquid-glass text-foreground hover:bg-white/10 sm:inline-flex"
+                >
+                  <UserRound className="h-4 w-4" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void signOut()}
+                  className="liquid-button-outline !px-4 !py-2 !text-xs hidden sm:inline-flex"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
               <Link
-                key={item.to}
-                to={item.to}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  pathname === item.to
-                    ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                to="/auth"
+                className="liquid-button !px-6 !py-2 !text-sm"
               >
-                {item.label}
+                Entrar
               </Link>
-            ))}
-          </nav>
+            )}
 
-          <div className="flex items-center gap-2">
             <MobileMenu
               open={menuOpen}
               onOpenChange={setMenuOpen}
@@ -290,74 +321,14 @@ export function AppShell({
               isLoggedIn={session.userId != null}
               onSignOut={() => void signOut()}
             />
-
-            <InstallButton className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold sm:inline-flex" />
-
-            <ThemeToggle />
-
-            <Link
-              to="/precos"
-              className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground sm:inline-flex"
-            >
-              Preços
-            </Link>
-
-            {session.isAdmin && (
-              <>
-                <Link
-                  to="/admin"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary sm:inline-flex"
-                >
-                  Admin
-                </Link>
-
-                <Link
-                  to="/admin/pagamentos"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-primary lg:inline-flex"
-                >
-                  Pagamentos
-                </Link>
-              </>
-            )}
-
-            {session.userId && (
-              <Link
-                to="/perfil"
-                aria-label="A minha conta"
-                className="hidden h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary sm:inline-flex"
-              >
-                <UserRound className="h-4 w-4" />
-              </Link>
-            )}
-
-            {session.userId ? (
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="hidden rounded-xl border border-border px-4 py-2 text-sm font-semibold sm:inline-flex"
-              >
-                Sair
-              </button>
-            ) : (
-              <Link
-                to="/auth"
-                className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
-              >
-                Entrar
-              </Link>
-            )}
           </div>
         </div>
-
-        <div
-          className="road-stripes h-[3px] opacity-70"
-          aria-hidden
-        />
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-7xl pt-20">
         {children}
       </main>
+
 
       <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
         <p className="mx-auto max-w-3xl">
@@ -387,11 +358,10 @@ export function AppShell({
               >
                 <Link
                   to={item.to}
-                  className={`flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-3 text-xs font-medium transition-colors ${
-                    active
+                  className={`flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-3 text-xs font-medium transition-colors ${active
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <Icon className="h-5 w-5" />
 
@@ -414,7 +384,7 @@ export function AppShell({
         </ul>
       </nav>
 
-            <ChatBot />
+      <ChatBot />
     </div>
   );
 }

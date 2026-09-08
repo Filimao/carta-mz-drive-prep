@@ -65,116 +65,141 @@ function Simulados() {
     }
   }
 
-  if (started) {
+    if (started) {
     return (
       <AppShell>
-        <QuizEngine
-          mode="simulado"
-          title="Exame simulado"
-          config={{ count: granted, difficulty, source }}
-          {...(timed ? { timeLimitSeconds: granted * 60 } : {})}
-        />
+        <div className="relative -mx-4 -mt-8 min-h-screen pt-20 px-4">
+          <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1454165833767-027ffea9e778?q=80&w=2070')] bg-cover bg-fixed">
+            <div className="absolute inset-0 bg-background/40 backdrop-blur-md" />
+          </div>
+          <QuizEngine
+            mode="simulado"
+            title="Exame simulado"
+            config={{ count: granted, difficulty, source }}
+            {...(timed ? { timeLimitSeconds: granted * 60 } : {})}
+          />
+        </div>
       </AppShell>
     );
   }
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl font-semibold">Exame simulado</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Durante o exame não são mostradas explicações nem respostas. O resultado aparece no fim.
-      </p>
-
-      <div className="surface mt-6 space-y-6 rounded-3xl p-6">
-        <fieldset>
-          <legend className="text-sm font-semibold">Número de perguntas</legend>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {[10, 20, 30, 40, 50].map((n) => {
-              const locked = n > maxAllowed;
-              return (
-                <button
-                  key={n}
-                  type="button"
-                  disabled={locked}
-                  title={locked ? `Disponível em planos superiores (limite: ${maxAllowed})` : undefined}
-                  onClick={() => setCount(n)}
-                  className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                    count === n ? "border-primary bg-primary/10 text-primary" : "border-border"
-                  } ${locked ? "cursor-not-allowed opacity-40" : ""}`}
-                >
-                  {n}
-                </button>
-              );
-            })}
-          </div>
-          {maxAllowed < 50 && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              O plano {plano.status.plan.name} permite simulados até {maxAllowed} questões.{" "}
-              <Link to="/precos" className="font-semibold text-primary">
-                Ver planos
-              </Link>
-            </p>
-          )}
-        </fieldset>
-
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">
-            Dificuldade
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as Difficulty | "todas")}
-              className="mt-2 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm font-normal"
-            >
-              <option value="todas">Todas</option>
-              <option value="facil">Fácil</option>
-              <option value="medio">Médio</option>
-              <option value="dificil">Difícil</option>
-            </select>
-          </label>
-          <label className="text-sm font-semibold">
-            Fonte das questões
-            <select
-              value={source}
-              onChange={(e) => setSource(e.target.value as "todas" | "PDF" | "AUTHORED")}
-              className="mt-2 w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm font-normal"
-            >
-              <option value="todas">Todas</option>
-              <option value="PDF">Materiais fornecidos</option>
-              <option value="AUTHORED">Criadas pela plataforma</option>
-            </select>
-          </label>
+      <div className="relative -mx-4 -mt-8 min-h-screen px-4 pt-24 pb-16">
+        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1454165833767-027ffea9e778?q=80&w=2070')] bg-cover bg-fixed">
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
         </div>
 
-        <label className="flex items-center gap-3 text-sm font-semibold">
-          <input
-            type="checkbox"
-            checked={timed}
-            onChange={(e) => setTimed(e.target.checked)}
-            className="h-4 w-4"
-          />
-          Cronometrado ({count} minutos)
-        </label>
-
-        <div className="rounded-2xl bg-secondary/60 p-4 text-sm text-muted-foreground">
-          <p className="font-semibold text-foreground">Instruções</p>
-          <p className="mt-1">
-            {count} perguntas · {timed ? `${count} minutos` : "sem limite de tempo"} · uma resposta
-            correcta por pergunta. Pode marcar questões para rever mais tarde.
+        <div className="mx-auto max-w-2xl">
+          <h1 className="font-display text-4xl font-bold tracking-tight">Exame simulado</h1>
+          <p className="mt-3 text-lg font-medium text-muted-foreground">
+            Durante o exame não são mostradas explicações nem respostas. O resultado aparece no fim.
           </p>
-        </div>
 
-        <button
-          type="button"
-          disabled={starting}
-          onClick={() => void start()}
-          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 sm:w-auto"
-        >
-          {starting ? "A preparar..." : "Gerar simulado"}
-        </button>
+          <div className="liquid-glass mt-10 space-y-8 p-8">
+            <fieldset>
+              <legend className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Número de perguntas</legend>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {[10, 20, 30, 40, 50].map((n) => {
+                  const locked = n > maxAllowed;
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      disabled={locked}
+                      title={locked ? `Disponível em planos superiores (limite: ${maxAllowed})` : undefined}
+                      onClick={() => setCount(n)}
+                      className={`h-12 min-w-[3rem] rounded-2xl border px-5 text-sm font-bold transition-all ${
+                        count === n 
+                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" 
+                          : "border-white/10 bg-white/5 text-foreground/80 hover:bg-white/10"
+                      } ${locked ? "cursor-not-allowed opacity-30" : ""}`}
+                    >
+                      {n}
+                    </button>
+                  );
+                })}
+              </div>
+              {maxAllowed < 50 && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  O plano <span className="font-bold text-foreground">{plano.status.plan.name}</span> permite simulados até {maxAllowed} questões.{" "}
+                  <Link to="/precos" className="font-bold text-primary hover:underline">
+                    Ver planos
+                  </Link>
+                </p>
+              )}
+            </fieldset>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                  Dificuldade
+                </label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value as Difficulty | "todas")}
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="todas" className="bg-background">Todas</option>
+                  <option value="facil" className="bg-background">Fácil</option>
+                  <option value="medio" className="bg-background">Médio</option>
+                  <option value="dificil" className="bg-background">Difícil</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                  Fonte das questões
+                </label>
+                <select
+                  value={source}
+                  onChange={(e) => setSource(e.target.value as "todas" | "PDF" | "AUTHORED")}
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="todas" className="bg-background">Todas</option>
+                  <option value="PDF" className="bg-background">Materiais fornecidos</option>
+                  <option value="AUTHORED" className="bg-background">Criadas pela plataforma</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 liquid-glass !rounded-2xl p-4 bg-white/5">
+              <input
+                id="timed"
+                type="checkbox"
+                checked={timed}
+                onChange={(e) => setTimed(e.target.checked)}
+                className="h-6 w-6 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary"
+              />
+              <label htmlFor="timed" className="text-base font-semibold cursor-pointer">
+                Cronometrado ({count} minutos)
+              </label>
+            </div>
+
+            <div className="rounded-2xl bg-primary/10 border border-primary/20 p-5 text-sm">
+              <p className="font-bold text-primary uppercase tracking-tight">Instruções</p>
+              <p className="mt-2 text-muted-foreground leading-relaxed">
+                <span className="font-bold text-foreground">{count}</span> perguntas · <span className="font-bold text-foreground">{timed ? `${count} minutos` : "sem limite de tempo"}</span> · uma resposta
+                correcta por pergunta. Pode marcar questões para rever mais tarde.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              disabled={starting}
+              onClick={() => void start()}
+              className="liquid-button w-full !py-4 text-base"
+            >
+              {starting ? "A preparar simulado..." : "Gerar Simulado"}
+            </button>
+          </div>
+        </div>
       </div>
 
       <LimitModal open={limitOpen} onClose={() => setLimitOpen(false)} />
+    </AppShell>
+  );
+}
+
 
     </AppShell>
   );

@@ -177,142 +177,164 @@ function Auth() {
   }
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-md">
-        <h1 className="font-display text-3xl font-semibold">
-          {mode === "login" ? "Entrar" : "Criar conta"}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Pode praticar sem conta. Ao criar conta, o seu progresso passa a ser guardado.
-        </p>
+        <AppShell>
+      <div className="relative -mx-4 -mt-20 min-h-screen flex items-center justify-center px-4 pt-20">
+        {/* Background Image/Overlay */}
+        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1454165833767-027ffea9e778?q=80&w=2070')] bg-cover bg-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        </div>
 
-        <form onSubmit={submit} className="surface mt-6 space-y-4 rounded-3xl p-6" noValidate>
-          {mode === "register" && (
-            <>
-              <Field label="Nome completo" error={touched["name"] ? errors["name"] : null}>
+        <div className="mx-auto w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="font-display text-4xl font-bold text-white tracking-tight">
+              {mode === "login" ? "Bem-vindo de volta" : "Junte-se a nós"}
+            </h1>
+            <p className="mt-3 text-lg font-medium text-white/70">
+              {mode === "login" 
+                ? "Entre para continuar a sua jornada rumo à carta." 
+                : "Crie a sua conta e acompanhe o seu progresso."}
+            </p>
+          </div>
+
+          <form onSubmit={submit} className="liquid-glass p-8 space-y-6" noValidate>
+            {mode === "register" && (
+              <div className="space-y-4">
+                <Field label="Nome completo" error={touched["name"] ? errors["name"] : null}>
+                  <input
+                    value={form.name}
+                    onChange={(e) => set("name", e.target.value)}
+                    onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                    autoComplete="name"
+                    maxLength={120}
+                  />
+                </Field>
+                <Field label="Número de telefone" error={touched["phone"] ? errors["phone"] : null}>
+                  <input
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value.replace(/[^\d]/g, "").slice(0, 9))}
+                    onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                    placeholder="84XXXXXXX"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                  />
+                </Field>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <Field label="E-mail" error={touched["email"] ? errors["email"] : null}>
                 <input
-                  value={form.name}
-                  onChange={(e) => set("name", e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, name: true }))}
-                  className={inputClass}
-                  autoComplete="name"
-                  maxLength={120}
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                  autoComplete="email"
+                  maxLength={255}
                 />
               </Field>
-              <Field label="Número de telefone" error={touched["phone"] ? errors["phone"] : null}>
+
+              <Field label="Password" error={touched["password"] ? errors["password"] : null}>
+                <div className="relative">
+                  <input
+                    type={showPass ? "text" : "password"}
+                    value={form.password}
+                    onChange={(e) => set("password", e.target.value)}
+                    onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass((v) => !v)}
+                    className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 rounded-lg p-2 text-white/50 hover:text-white"
+                  >
+                    {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </Field>
+            </div>
+
+            {mode === "register" && (
+              <Field label="Confirmar password" error={touched["confirm"] ? errors["confirm"] : null}>
                 <input
-                  value={form.phone}
-                  onChange={(e) => set("phone", e.target.value.replace(/[^\d]/g, "").slice(0, 9))}
-                  onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
-                  className={inputClass}
-                  placeholder="84XXXXXXX"
-                  inputMode="numeric"
-                  autoComplete="tel"
+                  type={showPass ? "text" : "password"}
+                  value={form.confirm}
+                  onChange={(e) => set("confirm", e.target.value)}
+                  onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                  autoComplete="new-password"
                 />
               </Field>
-            </>
-          )}
+            )}
 
-          <Field label="E-mail" error={touched["email"] ? errors["email"] : null}>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-              className={inputClass}
-              autoComplete="email"
-              maxLength={255}
-            />
-          </Field>
+            <div className="flex items-center justify-between">
+              {mode === "register" ? (
+                <label className="flex items-start gap-2 text-xs font-medium text-white/60 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={terms}
+                    onChange={(e) => setTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/5 text-primary"
+                  />
+                  <span>Aceito os Termos de Uso</span>
+                </label>
+              ) : (
+                <label className="flex items-center gap-2 text-xs font-medium text-white/60 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={keepSession}
+                    onChange={(e) => setKeepSession(e.target.checked)}
+                    className="h-4 w-4 rounded border-white/20 bg-white/5 text-primary"
+                  />
+                  Manter sessão
+                </label>
+              )}
+              {mode === "login" && (
+                <Link to="/recuperar-password" title="Recuperar password" className="text-xs font-bold text-primary hover:underline">
+                  Esqueceu a senha?
+                </Link>
+              )}
+            </div>
 
-          <Field label="Password" error={touched["password"] ? errors["password"] : null}>
-            <div className="relative">
-              <input
-                type={showPass ? "text" : "password"}
-                value={form.password}
-                onChange={(e) => set("password", e.target.value)}
-                onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                className={`${inputClass} pr-11`}
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-              />
+            <div className="space-y-3 pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="liquid-button w-full !py-3.5 text-base flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+                {mode === "login" ? "Entrar" : "Criar conta"}
+              </button>
+              
               <button
                 type="button"
-                onClick={() => setShowPass((v) => !v)}
-                aria-label={showPass ? "Esconder password" : "Mostrar password"}
-                className="absolute right-2 top-1/2 mt-1 -translate-y-1/2 rounded-lg p-2 text-muted-foreground"
+                onClick={() => void google()}
+                className="liquid-button-outline w-full !py-3.5 text-sm"
               >
-                {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                Continuar com Google
               </button>
             </div>
-          </Field>
 
-          {mode === "register" && (
-            <Field label="Confirmar password" error={touched["confirm"] ? errors["confirm"] : null}>
-              <input
-                type={showPass ? "text" : "password"}
-                value={form.confirm}
-                onChange={(e) => set("confirm", e.target.value)}
-                onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
-                className={inputClass}
-                autoComplete="new-password"
-              />
-            </Field>
-          )}
-
-          {mode === "register" ? (
-            <label className="flex items-start gap-2 text-xs font-medium text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={terms}
-                onChange={(e) => setTerms(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-[var(--primary)]"
-              />
-              <span>Aceito os Termos de Uso e a Política de Privacidade.</span>
-            </label>
-          ) : (
-            <div className="flex items-center justify-between text-xs font-medium">
-              <label className="flex items-center gap-2 text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={keepSession}
-                  onChange={(e) => setKeepSession(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--primary)]"
-                />
-                Manter sessão iniciada
-              </label>
-              <Link to="/recuperar-password" className="font-semibold text-primary">
-                Esqueceste-te da password?
-              </Link>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? "A processar..." : mode === "login" ? "Entrar" : "Criar conta"}
-          </button>
-          <button
-            type="button"
-            onClick={() => void google()}
-            className="w-full rounded-xl border border-border px-5 py-3 text-sm font-semibold"
-          >
-            Continuar com Google
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode(mode === "login" ? "register" : "login");
-              setTouched({});
-            }}
-            className="w-full text-sm font-semibold text-primary"
-          >
-            {mode === "login" ? "Ainda não tenho conta" : "Já tenho conta"}
-          </button>
-        </form>
+            <p className="text-center text-sm font-medium text-white/60">
+              {mode === "login" ? "Não tem uma conta?" : "Já tem uma conta?"}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "login" ? "register" : "login");
+                  setTouched({});
+                }}
+                className="ml-2 font-bold text-primary hover:underline"
+              >
+                {mode === "login" ? "Registe-se" : "Entre aqui"}
+              </button>
+            </p>
+          </form>
+        </div>
       </div>
     </AppShell>
   );
 }
+

@@ -92,23 +92,25 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-  if (isLoading) {
+    if (isLoading) {
     return (
-      <div className="space-y-4" aria-busy="true">
-        <div className="h-4 w-40 animate-pulse rounded bg-muted" />
-        <div className="h-56 animate-pulse rounded-2xl bg-muted" />
+      <div className="space-y-6 py-12 text-center" aria-busy="true">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="font-display text-xl font-bold animate-pulse">Carregando questões...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="surface rounded-2xl p-6 text-center">
-        <p className="font-semibold">Não foi possível carregar as questões.</p>
+      <div className="liquid-glass rounded-3xl p-12 text-center max-w-lg mx-auto">
+        <XCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
+        <p className="font-display text-xl font-bold">Oops! Algo correu mal.</p>
+        <p className="mt-2 text-muted-foreground">Não foi possível carregar as questões. Verifique a sua ligação.</p>
         <button
           type="button"
           onClick={() => void refetch()}
-          className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          className="liquid-button mt-6"
         >
           Tentar novamente
         </button>
@@ -118,14 +120,15 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
 
   if (questions.length === 0) {
     return (
-      <div className="surface rounded-2xl p-8 text-center">
-        <p className="font-display text-lg font-semibold">Sem questões para estes filtros</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Ajuste a categoria, a dificuldade ou responda a mais questões para criar histórico.
+      <div className="liquid-glass rounded-3xl p-12 text-center max-w-lg mx-auto">
+        <Lightbulb className="mx-auto h-12 w-12 text-primary mb-4" />
+        <p className="font-display text-xl font-bold">Sem questões encontradas</p>
+        <p className="mt-2 text-muted-foreground">
+          Ajuste os filtros ou responda a mais questões para ver histórico aqui.
         </p>
         <Link
           to="/categorias"
-          className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          className="liquid-button mt-6"
         >
           Ver categorias
         </Link>
@@ -145,31 +148,48 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
             ? "Continue a praticar, já domina uma boa parte."
             : "Reforce os temas base e volte a tentar.";
     return (
-      <div className="space-y-6">
-        <div className="surface rounded-3xl p-8 text-center">
-          <p className="text-sm font-medium text-muted-foreground">{title} concluído</p>
-          <p className="mt-2 font-display text-6xl font-bold text-primary">{percent}%</p>
-          <p className="mt-2 font-medium">{verdict}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Acertou {score} de {questions.length} questões · {answered} respondidas ·{" "}
-            {Math.floor(elapsed / 60)}m {elapsed % 60}s
-          </p>
+      <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in zoom-in duration-500">
+        <div className="liquid-glass p-12 text-center relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+          
+          <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">{title} concluído</p>
+          <div className="relative inline-block">
+            <span className="font-display text-8xl font-black text-white drop-shadow-2xl">
+              {percent}%
+            </span>
+            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full -z-10" />
+          </div>
+          <p className="mt-6 font-display text-2xl font-bold text-white">{verdict}</p>
+          <div className="mt-6 flex items-center justify-center gap-6 text-sm font-medium text-white/70">
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-success" /> {score} Certas
+            </span>
+            <span className="flex items-center gap-2">
+              <XCircle className="h-4 w-4 text-destructive" /> {answered - score} Erradas
+            </span>
+            <span className="flex items-center gap-2">
+              <Timer className="h-4 w-4 text-primary" /> {Math.floor(elapsed / 60)}m {elapsed % 60}s
+            </span>
+          </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="surface rounded-2xl p-4 text-center">
-            <p className="text-2xl font-semibold text-success">{score}</p>
-            <p className="text-xs text-muted-foreground">Correctas</p>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
+            <p className="text-3xl font-black text-success">{score}</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Correctas</p>
           </div>
-          <div className="surface rounded-2xl p-4 text-center">
-            <p className="text-2xl font-semibold text-destructive">{answered - score}</p>
-            <p className="text-xs text-muted-foreground">Erradas</p>
+          <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
+            <p className="text-3xl font-black text-destructive">{answered - score}</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Erradas</p>
           </div>
-          <div className="surface rounded-2xl p-4 text-center">
-            <p className="text-2xl font-semibold">{questions.length - answered}</p>
-            <p className="text-xs text-muted-foreground">Não respondidas</p>
+          <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
+            <p className="text-3xl font-black text-white">{questions.length - answered}</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Saltadas</p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3">
+
+        <div className="flex flex-wrap justify-center gap-4">
           <button
             type="button"
             onClick={() => {
@@ -181,18 +201,18 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
               setFinished(false);
               void refetch();
             }}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            className="liquid-button min-w-[160px]"
           >
-            <RotateCcw className="h-4 w-4" /> Refazer
+            <RotateCcw className="h-5 w-5" /> Refazer Teste
           </button>
           <Link
             to="/erros"
-            className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold"
+            className="liquid-button-outline min-w-[160px]"
           >
-            Praticar erros
+            Praticar Erros
           </Link>
-          <Link to="/" className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold">
-            Voltar ao início
+          <Link to="/" className="liquid-button-outline min-w-[160px]">
+            Início
           </Link>
         </div>
       </div>
@@ -205,18 +225,18 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
   const correct = current.correct_answer as Letter;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="font-display text-lg font-semibold">{title}</p>
-          <p className="text-sm text-muted-foreground">
-            Questão {index + 1} de {questions.length}
+          <h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
+          <p className="text-sm font-bold text-white/50 uppercase tracking-widest">
+            Questão <span className="text-primary">{index + 1}</span> de {questions.length}
           </p>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex items-center gap-3">
           {remaining !== null && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 font-medium">
-              <Timer className="h-4 w-4" />
+            <span className="inline-flex items-center gap-2 rounded-full liquid-glass !rounded-full px-4 py-2 text-sm font-bold">
+              <Timer className={`h-4 w-4 ${remaining < 60 ? 'text-destructive animate-pulse' : 'text-primary'}`} />
               {String(Math.floor(remaining / 60)).padStart(2, "0")}:
               {String(remaining % 60).padStart(2, "0")}
             </span>
@@ -224,105 +244,119 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
           <button
             type="button"
             onClick={() => setFavorites(toggleFavorite(current.id))}
-            aria-label={isFavorite ? "Remover dos favoritos" : "Marcar questão"}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full liquid-glass !rounded-full transition-transform active:scale-90"
           >
             <Star
-              className={`h-4 w-4 ${isFavorite ? "fill-warning text-warning" : "text-muted-foreground"}`}
+              className={`h-5 w-5 ${isFavorite ? "fill-warning text-warning" : "text-white/40"}`}
             />
           </button>
         </div>
       </div>
 
-      <div className="h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={index + 1} aria-valuemin={1} aria-valuemax={questions.length}>
+      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full bg-primary transition-all duration-500"
+          className="h-full bg-primary shadow-[0_0_15px_oklch(var(--primary)/0.5)] transition-all duration-500 ease-out"
           style={{ width: `${((index + (revealed ? 1 : 0)) / questions.length) * 100}%` }}
         />
       </div>
 
-      <article className="surface rounded-3xl p-5 sm:p-7">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full bg-secondary px-2.5 py-1 font-medium">
+      <article className="liquid-glass p-6 sm:p-10">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
             {DIFFICULTY_LABEL[current.difficulty]}
           </span>
-          <span className="rounded-full bg-secondary px-2.5 py-1 font-medium text-muted-foreground">
-            {current.source === "PDF"
-              ? "Questão proveniente dos materiais fornecidos"
-              : "Questão de prática criada pela plataforma"}
+          <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/40">
+            {current.source === "PDF" ? "Oficial" : "Prática"}
           </span>
         </div>
 
-        <h2 className="mt-4 font-display text-xl leading-snug font-semibold">
+        <h3 className="font-display text-2xl leading-tight font-bold text-white mb-8">
           {current.question_text}
-        </h2>
+        </h3>
 
         {current.image_url && (
-          <img
-            src={current.image_url}
-            alt="Imagem associada à questão"
-            className="mt-4 max-h-64 w-full rounded-xl border border-border object-contain bg-white"
-          />
+          <div className="mb-8 rounded-2xl overflow-hidden border border-white/10 bg-black/20 group">
+            <img
+              src={current.image_url}
+              alt="Contexto visual da questão"
+              className="max-h-[400px] w-full object-contain p-2 group-hover:scale-[1.02] transition-transform duration-500"
+            />
+          </div>
         )}
 
-        <ul className="mt-5 space-y-3">
+        <div className="grid gap-4">
           {LETTERS.map((letter) => {
             const chosen = selected === letter;
             const showCorrect = revealed && letter === correct;
             const showWrong = revealed && chosen && letter !== correct;
+            
+            let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
+            if (showCorrect) statusClass = "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
+            else if (showWrong) statusClass = "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
+            else if (chosen) statusClass = "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
+
             return (
-              <li key={letter}>
-                <button
-                  type="button"
-                  disabled={revealed}
-                  onClick={() => setSelected(letter)}
-                  className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left transition-all ${
-                    showCorrect
-                      ? "border-success bg-success/10"
-                      : showWrong
-                        ? "border-destructive bg-destructive/10"
-                        : chosen
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50 hover:bg-secondary"
-                  }`}
-                >
-                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-current text-xs font-bold">
-                    {letter}
-                  </span>
-                  <span className="text-sm leading-relaxed">{optionText(current, letter)}</span>
-                </button>
-              </li>
+              <button
+                key={letter}
+                type="button"
+                disabled={revealed}
+                onClick={() => setSelected(letter)}
+                className={`group flex w-full items-center gap-5 rounded-2xl border p-5 text-left transition-all duration-300 ${statusClass}`}
+              >
+                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border text-lg font-black transition-colors ${
+                  chosen || showCorrect || showWrong ? 'border-transparent bg-white/20' : 'border-white/20'
+                }`}>
+                  {letter}
+                </span>
+                <span className="text-base font-medium leading-relaxed">{optionText(current, letter)}</span>
+              </button>
             );
           })}
-        </ul>
+        </div>
 
         {revealed && !examMode && (
-          <div className="mt-5 space-y-3 rounded-2xl bg-secondary/60 p-4">
-            <p
-              className={`inline-flex items-center gap-2 font-semibold ${
-                selected === correct ? "text-success" : "text-destructive"
-              }`}
-            >
-              {selected === correct ? (
-                <>
-                  <CheckCircle2 className="h-5 w-5" /> Resposta correcta!
-                </>
-              ) : (
-                <>
-                  <XCircle className="h-5 w-5" /> Resposta incorrecta — a correcta é {correct}
-                </>
-              )}
-            </p>
-            <p className="text-sm leading-relaxed text-muted-foreground">{current.explanation}</p>
-            {current.tip && (
-              <p className="inline-flex items-start gap-2 text-sm font-medium">
-                <Lightbulb className="mt-0.5 h-4 w-4 text-warning" /> {current.tip}
-              </p>
-            )}
+          <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
+            <div className={`rounded-3xl p-8 ${selected === correct ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+              <div className="flex items-center gap-3 mb-4">
+                {selected === correct ? (
+                  <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-success" />
+                  </div>
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                    <XCircle className="h-6 w-6 text-destructive" />
+                  </div>
+                )}
+                <div>
+                  <p className="font-display text-xl font-bold">
+                    {selected === correct ? "Resposta Correcta!" : "Resposta Incorrecta"}
+                  </p>
+                  {selected !== correct && (
+                    <p className="text-sm font-medium opacity-70">A opção correcta era a <span className="font-bold text-success">{correct}</span></p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
+                  {current.explanation}
+                </p>
+                
+                {current.tip && (
+                  <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
+                    <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">Dica de Especialista</p>
+                      <p className="text-sm font-medium text-white/90">{current.tip}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-4 pt-6 border-t border-white/10">
           {!revealed ? (
             <button
               type="button"
@@ -341,9 +375,9 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                   setRevealed(true);
                 }
               }}
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+              className="liquid-button flex-1 min-w-[200px]"
             >
-              {examMode ? "Confirmar e seguir" : "Responder"}
+              {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
             </button>
           ) : (
             <button
@@ -357,20 +391,21 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                 setSelected(null);
                 setRevealed(false);
               }}
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+              className="liquid-button flex-1 min-w-[200px]"
             >
-              {index + 1 >= questions.length ? "Ver resultado" : "Próxima questão"}
+              {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
             </button>
           )}
           <button
             type="button"
             onClick={() => setFinished(true)}
-            className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold"
+            className="liquid-button-outline px-8"
           >
-            Terminar
+            Desistir
           </button>
         </div>
       </article>
     </div>
   );
 }
+
