@@ -4,7 +4,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const MODEL = "gemini-1.5-flash-latest";
+// gemini-1.5-flash-latest foi desligado pela Google; usar um modelo Flash estável.
+const MODEL = "gemini-3.5-flash";
 const MAX_RATE_LIMIT_RETRIES = 4;
 
 const wait = (milliseconds: number) =>
