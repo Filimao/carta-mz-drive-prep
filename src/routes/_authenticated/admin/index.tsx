@@ -434,12 +434,10 @@ function QuestionCard({
           onClick={() => {
             const categoryName = categories.find((c) => c.id === question.category_id)?.name;
             const prompt = buildRealisticImagePrompt(question.question_text, categoryName);
-            const encoded = encodeURIComponent(prompt);
-            window.open(`https://labs.google/fx/tool/image?utm_source=clipboard&utm_medium=organic&utm_campaign=card-imagefx-desktop&text=${encoded}`, "_blank");
             navigator.clipboard.writeText(prompt).then(() => {
-              toast.success("Prompt copiado para a área de transferência.");
+              toast.success("Prompt copiado. Cole no Google Flow, DALL-E, Midjourney ou outra ferramenta de IA.");
             }).catch(() => {
-              toast.message("Prompt gerado. Usa o texto para gerar a imagem no ImageFX.");
+              toast.message("Prompt gerado. Copie e use na ferramenta de imagens que preferir.");
             });
           }}
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
