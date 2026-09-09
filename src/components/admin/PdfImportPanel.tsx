@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Save,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -586,6 +587,24 @@ export function PdfImportPanel() {
                       />
                     </div>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const raw = d.question_text.trim();
+                      const prompt = `Fotografia realista, estilo foto de exame oficial de carta de condução de Moçambique, sem texto overlays, sem cartoons, sem efeitos de IA. Cenário: condução em estrada de Moçambique, veículo ligeiro, condições de trânsito reais. Iluminação natural, detalhes de sinalização e de tráfego. Questão: ${raw}`;
+                      const encoded = encodeURIComponent(prompt);
+                      window.open(`https://labs.google/fx/tool/image?utm_source=clipboard&utm_medium=organic&utm_campaign=card-imagefx-desktop&text=${encoded}`, "_blank");
+                      navigator.clipboard.writeText(prompt).then(() => {
+                        toast.success("Prompt copiado para a área de transferência.");
+                      }).catch(() => {
+                        toast.message("Prompt gerado. Usa o texto para gerar a imagem no ImageFX.");
+                      });
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                    Gerar imagem com IA
+                  </button>
                 </div>
 
                 <div className="space-y-3">
