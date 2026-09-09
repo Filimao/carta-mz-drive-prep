@@ -15,6 +15,7 @@ import {
   type Question,
   type QuizConfig,
 } from "@/lib/quiz";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const LETTERS: Letter[] = ["A", "B", "C", "D"];
 
@@ -52,6 +53,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
   const [finished, setFinished] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [imageTab, setImageTab] = useState<"question" | "image">("question");
 
   useEffect(() => setFavorites(readLocal().favorites), []);
 
@@ -76,6 +78,10 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
   useEffect(() => {
     if (remaining === 0 && !finished && questions.length > 0) setFinished(true);
   }, [remaining, finished, questions.length]);
+
+  useEffect(() => {
+    if (revealed) setImageTab("question");
+  }, [revealed]);
 
   useEffect(() => {
     if (!finished || questions.length === 0) return;
@@ -261,149 +267,294 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
       </div>
 
       <article className="liquid-glass p-6 sm:p-10">
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-            {DIFFICULTY_LABEL[current.difficulty]}
-          </span>
-          <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/40">
-            {current.source === "PDF" ? "Oficial" : "Prática"}
-          </span>
-        </div>
-
-        <h3 className="font-display text-2xl leading-tight font-bold text-white mb-8">
-          {current.question_text}
-        </h3>
-
-        {current.image_url && (
-          <div className="mb-8 rounded-2xl overflow-hidden border border-white/10 bg-black/20 group">
-            <img
-              src={current.image_url}
-              alt="Contexto visual da questão"
-              className="max-h-[400px] w-full object-contain p-2 group-hover:scale-[1.02] transition-transform duration-500"
-            />
-          </div>
-        )}
-
-        <div className="grid gap-4">
-          {LETTERS.map((letter) => {
-            const chosen = selected === letter;
-            const showCorrect = revealed && letter === correct;
-            const showWrong = revealed && chosen && letter !== correct;
-            
-            let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
-            if (showCorrect) statusClass = "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
-            else if (showWrong) statusClass = "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
-            else if (chosen) statusClass = "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
-
-            return (
-              <button
-                key={letter}
-                type="button"
-                disabled={revealed}
-                onClick={() => setSelected(letter)}
-                className={`group flex w-full items-center gap-5 rounded-2xl border p-5 text-left transition-all duration-300 ${statusClass}`}
-              >
-                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border text-lg font-black transition-colors ${
-                  chosen || showCorrect || showWrong ? 'border-transparent bg-white/20' : 'border-white/20'
-                }`}>
-                  {letter}
+        {current.image_url ? (
+          <Tabs value={imageTab} onValueChange={(v) => setImageTab(v as "question" | "image")}>
+            <TabsList className="mb-6">
+              <TabsTrigger value="question">Questão</TabsTrigger>
+              <TabsTrigger value="image">Imagem</TabsTrigger>
+            </TabsList>
+            <TabsContent value="question">
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                  {DIFFICULTY_LABEL[current.difficulty]}
                 </span>
-                <span className="text-base font-medium leading-relaxed">{optionText(current, letter)}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {revealed && !examMode && (
-          <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
-            <div className={`rounded-3xl p-8 ${selected === correct ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
-              <div className="flex items-center gap-3 mb-4">
-                {selected === correct ? (
-                  <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-success" />
-                  </div>
-                ) : (
-                  <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
-                    <XCircle className="h-6 w-6 text-destructive" />
-                  </div>
-                )}
-                <div>
-                  <p className="font-display text-xl font-bold">
-                    {selected === correct ? "Resposta Correcta!" : "Resposta Incorrecta"}
-                  </p>
-                  {selected !== correct && (
-                    <p className="text-sm font-medium opacity-70">A opção correcta era a <span className="font-bold text-success">{correct}</span></p>
-                  )}
-                </div>
+                <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                  {current.source === "PDF" ? "Oficial" : "Prática"}
+                </span>
               </div>
-              
-              <div className="space-y-4">
-                <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
-                  {current.explanation}
-                </p>
-                
-                {current.tip && (
-                  <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
-                    <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">Dica de Especialista</p>
-                      <p className="text-sm font-medium text-white/90">{current.tip}</p>
+
+              <h3 className="font-display text-2xl leading-tight font-bold text-white mb-8">
+                {current.question_text}
+              </h3>
+
+              <div className="grid gap-4">
+                {LETTERS.map((letter) => {
+                  const chosen = selected === letter;
+                  const showCorrect = revealed && letter === correct;
+                  const showWrong = revealed && chosen && letter !== correct;
+                  
+                  let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
+                  if (showCorrect) statusClass = "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
+                  else if (showWrong) statusClass = "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
+                  else if (chosen) statusClass = "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
+
+                  return (
+                    <button
+                      key={letter}
+                      type="button"
+                      disabled={revealed}
+                      onClick={() => setSelected(letter)}
+                      className={`group flex w-full items-center gap-5 rounded-2xl border p-5 text-left transition-all duration-300 ${statusClass}`}
+                    >
+                      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border text-lg font-black transition-colors ${
+                        chosen || showCorrect || showWrong ? 'border-transparent bg-white/20' : 'border-white/20'
+                      }`}>
+                        {letter}
+                      </span>
+                      <span className="text-base font-medium leading-relaxed">{optionText(current, letter)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {revealed && !examMode && (
+                <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
+                  <div className={`rounded-3xl p-8 ${selected === correct ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+                    <div className="flex items-center gap-3 mb-4">
+                      {selected === correct ? (
+                        <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
+                          <CheckCircle2 className="h-6 w-6 text-success" />
+                        </div>
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                          <XCircle className="h-6 w-6 text-destructive" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-display text-xl font-bold">
+                          {selected === correct ? "Resposta Correcta!" : "Resposta Incorrecta"}
+                        </p>
+                        {selected !== correct && (
+                          <p className="text-sm font-medium opacity-70">A opção correcta era a <span className="font-bold text-success">{correct}</span></p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
+                        {current.explanation}
+                      </p>
+                      
+                      {current.tip && (
+                        <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
+                          <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">Dica de Especialista</p>
+                            <p className="text-sm font-medium text-white/90">{current.tip}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                </div>
+              )}
 
-        <div className="mt-10 flex flex-wrap gap-4 pt-6 border-t border-white/10">
-          {!revealed ? (
-            <button
-              type="button"
-              disabled={!selected}
-              onClick={() => {
-                if (!selected) return;
-                setAnswers((prev) => ({ ...prev, [current.id]: selected }));
-                recordAnswer(current.id, selected === correct);
-                if (examMode) {
-                  if (index + 1 >= questions.length) setFinished(true);
-                  else {
+              <div className="mt-10 flex flex-wrap gap-4 pt-6 border-t border-white/10">
+                {!revealed ? (
+                  <button
+                    type="button"
+                    disabled={!selected}
+                    onClick={() => {
+                      if (!selected) return;
+                      setAnswers((prev) => ({ ...prev, [current.id]: selected }));
+                      recordAnswer(current.id, selected === correct);
+                      if (examMode) {
+                        if (index + 1 >= questions.length) setFinished(true);
+                        else {
+                          setIndex(index + 1);
+                          setSelected(null);
+                        }
+                      } else {
+                        setRevealed(true);
+                      }
+                    }}
+                    className="liquid-button flex-1 min-w-[200px]"
+                  >
+                    {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (index + 1 >= questions.length) {
+                        setFinished(true);
+                        return;
+                      }
+                      setIndex(index + 1);
+                      setSelected(null);
+                      setRevealed(false);
+                    }}
+                    className="liquid-button flex-1 min-w-[200px]"
+                  >
+                    {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setFinished(true)}
+                  className="liquid-button-outline px-8"
+                >
+                  Desistir
+                </button>
+              </div>
+            </TabsContent>
+            <TabsContent value="image">
+              <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+                <img
+                  src={current.image_url}
+                  alt="Contexto visual da questão"
+                  className="max-h-[70vh] w-full object-contain"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                {DIFFICULTY_LABEL[current.difficulty]}
+              </span>
+              <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                {current.source === "PDF" ? "Oficial" : "Prática"}
+              </span>
+            </div>
+
+            <h3 className="font-display text-2xl leading-tight font-bold text-white mb-8">
+              {current.question_text}
+            </h3>
+
+            <div className="grid gap-4">
+              {LETTERS.map((letter) => {
+                const chosen = selected === letter;
+                const showCorrect = revealed && letter === correct;
+                const showWrong = revealed && chosen && letter !== correct;
+                
+                let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
+                if (showCorrect) statusClass = "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
+                else if (showWrong) statusClass = "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
+                else if (chosen) statusClass = "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
+
+                return (
+                  <button
+                    key={letter}
+                    type="button"
+                    disabled={revealed}
+                    onClick={() => setSelected(letter)}
+                    className={`group flex w-full items-center gap-5 rounded-2xl border p-5 text-left transition-all duration-300 ${statusClass}`}
+                  >
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border text-lg font-black transition-colors ${
+                      chosen || showCorrect || showWrong ? 'border-transparent bg-white/20' : 'border-white/20'
+                    }`}>
+                      {letter}
+                    </span>
+                    <span className="text-base font-medium leading-relaxed">{optionText(current, letter)}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {revealed && !examMode && (
+              <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
+                <div className={`rounded-3xl p-8 ${selected === correct ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    {selected === correct ? (
+                      <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
+                        <CheckCircle2 className="h-6 w-6 text-success" />
+                      </div>
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                        <XCircle className="h-6 w-6 text-destructive" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-display text-xl font-bold">
+                        {selected === correct ? "Resposta Correcta!" : "Resposta Incorrecta"}
+                      </p>
+                      {selected !== correct && (
+                        <p className="text-sm font-medium opacity-70">A opção correcta era a <span className="font-bold text-success">{correct}</span></p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
+                      {current.explanation}
+                    </p>
+                    
+                    {current.tip && (
+                      <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
+                        <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">Dica de Especialista</p>
+                          <p className="text-sm font-medium text-white/90">{current.tip}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-10 flex flex-wrap gap-4 pt-6 border-t border-white/10">
+              {!revealed ? (
+                <button
+                  type="button"
+                  disabled={!selected}
+                  onClick={() => {
+                    if (!selected) return;
+                    setAnswers((prev) => ({ ...prev, [current.id]: selected }));
+                    recordAnswer(current.id, selected === correct);
+                    if (examMode) {
+                      if (index + 1 >= questions.length) setFinished(true);
+                      else {
+                        setIndex(index + 1);
+                        setSelected(null);
+                      }
+                    } else {
+                      setRevealed(true);
+                    }
+                  }}
+                  className="liquid-button flex-1 min-w-[200px]"
+                >
+                  {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (index + 1 >= questions.length) {
+                      setFinished(true);
+                      return;
+                    }
                     setIndex(index + 1);
                     setSelected(null);
-                  }
-                } else {
-                  setRevealed(true);
-                }
-              }}
-              className="liquid-button flex-1 min-w-[200px]"
-            >
-              {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                if (index + 1 >= questions.length) {
-                  setFinished(true);
-                  return;
-                }
-                setIndex(index + 1);
-                setSelected(null);
-                setRevealed(false);
-              }}
-              className="liquid-button flex-1 min-w-[200px]"
-            >
-              {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setFinished(true)}
-            className="liquid-button-outline px-8"
-          >
-            Desistir
-          </button>
-        </div>
+                    setRevealed(false);
+                  }}
+                  className="liquid-button flex-1 min-w-[200px]"
+                >
+                  {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setFinished(true)}
+                className="liquid-button-outline px-8"
+              >
+                Desistir
+              </button>
+            </div>
+          </>
+        )}
       </article>
     </div>
   );

@@ -218,8 +218,8 @@ export function PdfImportPanel() {
       const doc = docRef.current;
       if (!doc) throw new Error("PDF não carregado.");
       const page = await doc.getPage(pageNumber);
-      // Higher resolution preserves small letters and the green answer marker.
-      const viewport = page.getViewport({ scale: 3 });
+      // Aumenta a resolução para preservar letras pequenas e o marcador verde da resposta.
+      const viewport = page.getViewport({ scale: 4 });
       const canvas = document.createElement("canvas");
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
@@ -233,9 +233,9 @@ export function PdfImportPanel() {
         .join(" ")
         .trim();
 
-      // Posições reais das imagens embebidas na página (muchos mais fiáveis do
+      // Posições reais das imagens embebidas na página (mucho mais fiáveis do
       // que as coordenadas estimadas pela IA).
-      const imageBoxes = await extractPageImageBoxes(page, viewport, 3);
+      const imageBoxes = await extractPageImageBoxes(page, viewport, 4);
 
       const result = await extractQuestionsFromPage({
         data: { imageBase64, pageText, page: pageNumber, categories: catList },
@@ -552,21 +552,26 @@ export function PdfImportPanel() {
                   />
 
                   {d.image_url ? (
-                    <div className="group relative aspect-video overflow-hidden rounded-xl bg-muted border border-border">
-                      <img
-                        src={d.image_url}
-                        alt="Imagem da questão"
-                        className="h-full w-full object-contain"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button
-                          type="button"
-                          onClick={() => patch(d.key, { image_url: null })}
-                          className="rounded-lg bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground"
-                        >
-                          Remover imagem
-                        </button>
+                    <div className="space-y-2">
+                      <div className="group relative aspect-video overflow-hidden rounded-xl bg-muted border border-border">
+                        <img
+                          src={d.image_url}
+                          alt="Imagem da questão"
+                          className="h-full w-full object-contain"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button
+                            type="button"
+                            onClick={() => patch(d.key, { image_url: null })}
+                            className="rounded-lg bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground"
+                          >
+                            Remover imagem
+                          </button>
+                        </div>
                       </div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                        Imagem extraída do PDF
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2">

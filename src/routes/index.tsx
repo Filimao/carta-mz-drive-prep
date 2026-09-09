@@ -58,12 +58,7 @@ function Index() {
 
   return (
         <AppShell>
-      <section className="relative -mx-4 -mt-8 min-h-[85vh] overflow-hidden px-4 pt-14 pb-16 sm:px-8">
-        {/* Background Image/Overlay */}
-        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1920&q=80&fm=webp')] bg-cover bg-center bg-no-repeat">
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
-
+      <section className="relative -mx-4 -mt-8 min-h-[85vh] overflow-hidden px-4 pt-14 pb-16 sm:px-8 bg-[var(--hero-bg)]">
         <div className="mx-auto max-w-5xl">
           <div className="liquid-glass animate-fade-in-up p-8 md:p-12 lg:w-2/3">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-white uppercase">
@@ -76,8 +71,7 @@ function Index() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-              Pratique questões, descubra os seus pontos fracos e faça simulados completos para chegar
-              ao exame mais preparado e confiante.
+              Pratique questões, faça simulados e acompanha o teu progresso para o exame oficial da carta de condução.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
