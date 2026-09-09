@@ -99,12 +99,12 @@ async function extractPageImageBoxes(
         const width = Math.max(...xs) - x;
         const height = Math.max(...ys) - y;
         // Ignora imagens minúsculas (padrões/logos de 1-2px repetidos).
-        if (width > 24 * scale && height > 24 * scale) {
+        if (width > 16 * scale && height > 16 * scale) {
           boxes.push({ x, y, width, height });
         }
       }
     }
-    return boxes.sort((a, b) => a.y - b.y);
+    return mergeImageBoxes(boxes.sort((a, b) => a.y - b.y || a.x - b.x));
   } catch {
     return [];
   }
