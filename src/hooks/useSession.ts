@@ -42,6 +42,12 @@ export function useSession(): SessionInfo {
         supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
       if (!active) return;
+      console.log("[useSession roles]", {
+        userId: user.id,
+        email: user.email,
+        roles: (rolesRes.data ?? []).map((r) => r.role),
+        rolesError: rolesRes.error?.message,
+      });
       const expired =
         profileRes.data?.plan_expires_at != null &&
         new Date(profileRes.data.plan_expires_at).getTime() < Date.now();

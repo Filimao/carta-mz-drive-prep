@@ -249,6 +249,15 @@ export function AppShell({
 
   const session = useSession();
 
+  useEffect(() => {
+    console.log("[AppShell session]", {
+      loading: session.loading,
+      userId: session.userId,
+      email: session.email,
+      isAdmin: session.isAdmin,
+    });
+  }, [session]);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   async function signOut() {
