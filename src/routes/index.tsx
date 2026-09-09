@@ -60,12 +60,12 @@ function Index() {
         <AppShell>
       <section className="relative -mx-4 -mt-8 min-h-[85vh] overflow-hidden px-4 pt-14 pb-16 sm:px-8 bg-[var(--hero-bg)]">
         <div className="mx-auto max-w-5xl">
-          <div className="liquid-glass animate-fade-in-up p-8 md:p-12 lg:w-2/3">
+          <div className="liquid-glass animate-fade-in-up p-6 md:p-10 lg:w-2/3">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-white uppercase">
               APRENDE. PRATICA. PASSA.
             </span>
             
-            <h1 className="mt-8 font-display text-5xl font-bold leading-tight text-white sm:text-7xl">
+            <h1 className="mt-6 font-display text-4xl font-bold leading-tight text-white sm:text-5xl md:text-7xl">
               Preparado para <br />
               <span style={{ color: '#2d5bd7' }}>passar no exame?</span>
             </h1>
@@ -89,17 +89,17 @@ function Index() {
 
           <div className="mt-12 lg:mt-24">
             <div className="liquid-glass flex flex-wrap items-center gap-6 p-6">
-              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
                 <span className="text-xs font-bold text-white/60 uppercase">Categoria</span>
                 <span className="text-lg font-semibold text-white">Ligeiros</span>
               </div>
               <div className="h-10 w-px bg-white/10 hidden md:block" />
-              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
                 <span className="text-xs font-bold text-white/60 uppercase">Tipo</span>
                 <span className="text-lg font-semibold text-white">Simulado</span>
               </div>
               <div className="h-10 w-px bg-white/10 hidden md:block" />
-              <div className="flex flex-1 flex-col gap-1 min-w-[150px]">
+              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
                 <span className="text-xs font-bold text-white/60 uppercase">Dificuldade</span>
                 <span className="text-lg font-semibold text-white">Intermédio</span>
               </div>

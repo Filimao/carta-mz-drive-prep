@@ -111,7 +111,7 @@ function MobileMenu({
         <button
           type="button"
           aria-label="Abrir menu"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -267,7 +267,7 @@ export function AppShell({
 
   return (
         <div className="min-h-screen pb-20 md:pb-0 font-sans selection:bg-primary selection:text-primary-foreground">
-      <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+      <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-8">
             <Brand />
@@ -352,7 +352,7 @@ export function AppShell({
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden pb-[env(safe-area-inset-bottom)]"
         aria-label="Navegação inferior"
       >
         <ul className="flex items-center justify-between gap-1 px-2">

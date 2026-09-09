@@ -289,3 +289,22 @@
   }
 }
 
+
+/* Mobile UX improvements */
+html, body {
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+@utility touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

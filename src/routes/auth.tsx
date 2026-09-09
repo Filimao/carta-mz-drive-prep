@@ -249,7 +249,7 @@ function Auth() {
                   <button
                     type="button"
                     onClick={() => setShowPass((v) => !v)}
-                    className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 rounded-lg p-2 text-white/50 hover:text-white"
+                    className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-white/50 hover:text-white"
                   >
                     {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>

@@ -231,7 +231,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
   const correct = current.correct_answer as Letter;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 overflow-x-hidden">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
@@ -378,7 +378,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                         setRevealed(true);
                       }
                     }}
-                    className="liquid-button flex-1 min-w-[200px]"
+                    className="liquid-button w-full sm:flex-1 min-w-0"
                   >
                     {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
                   </button>
@@ -394,7 +394,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                       setSelected(null);
                       setRevealed(false);
                     }}
-                    className="liquid-button flex-1 min-w-[200px]"
+                    className="liquid-button w-full sm:flex-1 min-w-0"
                   >
                     {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
                   </button>
@@ -402,7 +402,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                 <button
                   type="button"
                   onClick={() => setFinished(true)}
-                  className="liquid-button-outline px-8"
+                  className="liquid-button-outline w-full sm:px-8"
                 >
                   Desistir
                 </button>
@@ -524,7 +524,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                       setRevealed(true);
                     }
                   }}
-                  className="liquid-button flex-1 min-w-[200px]"
+                  className="liquid-button w-full sm:flex-1 min-w-0"
                 >
                   {examMode ? "Confirmar e Próxima" : "Verificar Resposta"}
                 </button>
@@ -540,7 +540,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                     setSelected(null);
                     setRevealed(false);
                   }}
-                  className="liquid-button flex-1 min-w-[200px]"
+                  className="liquid-button w-full sm:flex-1 min-w-0"
                 >
                   {index + 1 >= questions.length ? "Ver Resultados Finais" : "Seguinte Questão"}
                 </button>
@@ -548,7 +548,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
               <button
                 type="button"
                 onClick={() => setFinished(true)}
-                className="liquid-button-outline px-8"
+                className="liquid-button-outline w-full sm:px-8"
               >
                 Desistir
               </button>

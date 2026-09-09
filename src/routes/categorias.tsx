@@ -115,7 +115,7 @@ function Categorias() {
                     <button
                       type="button"
                       onClick={() => setActive({ id: cat.id, name: cat.name })}
-                      className="text-sm font-black text-primary group-hover:underline"
+                      className="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-black text-primary-foreground shadow-lg shadow-primary/20 transition-all active:scale-95"
                     >
                       ESTUDAR AGORA
                     </button>
