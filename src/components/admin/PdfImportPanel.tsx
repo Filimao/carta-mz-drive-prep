@@ -24,6 +24,12 @@ type Draft = ExtractedQuestion & { key: string; page: number; category_id: strin
 const LETTERS = ["A", "B", "C", "D"] as const;
 const PAGE_REQUEST_INTERVAL_MS = 12_000;
 
+export function buildRealisticImagePrompt(questionText: string, categoryName?: string | null) {
+  const topic = categoryName ? ` sobre ${categoryName.toLowerCase()}` : "";
+  const trimmed = questionText.replace(/\s+/g, " ").trim();
+  return `Fotografia realista, estilo foto oficial de exame de carta de condução de Moçambique, sem texto overlays, sem cartoons, sem efeitos de IA. Cenário de condução em estrada moçambicana, veículo ligeiro, condições de trânsito reais. Iluminação natural, detalhes de sinalização e de tráfego locais. Sem placas de texto longo ilegíveis. Questão${topic}: "${trimmed}"`;
+}
+
 /** Carrega o pdfjs apenas no browser e configura o worker. */
 async function loadPdfjs() {
   const pdfjs = await import("pdfjs-dist");
@@ -590,8 +596,7 @@ export function PdfImportPanel() {
                   <button
                     type="button"
                     onClick={() => {
-                      const raw = d.question_text.trim();
-                      const prompt = `Fotografia realista, estilo foto de exame oficial de carta de condução de Moçambique, sem texto overlays, sem cartoons, sem efeitos de IA. Cenário: condução em estrada de Moçambique, veículo ligeiro, condições de trânsito reais. Iluminação natural, detalhes de sinalização e de tráfego. Questão: ${raw}`;
+                      const prompt = buildRealisticImagePrompt(d.question_text, categories?.find((c) => c.id === d.category_id)?.name);
                       const encoded = encodeURIComponent(prompt);
                       window.open(`https://labs.google/fx/tool/image?utm_source=clipboard&utm_medium=organic&utm_campaign=card-imagefx-desktop&text=${encoded}`, "_blank");
                       navigator.clipboard.writeText(prompt).then(() => {

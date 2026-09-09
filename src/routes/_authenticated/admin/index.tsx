@@ -8,12 +8,13 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { PdfImportPanel } from "@/components/admin/PdfImportPanel";
+import { PdfImportPanel, buildRealisticImagePrompt } from "@/components/admin/PdfImportPanel";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_ORDER, PLANS, type PlanTier } from "@/lib/plans";
@@ -428,6 +429,24 @@ function QuestionCard({
             className="max-h-48 w-full rounded-xl border border-border bg-white object-contain"
           />
         )}
+        <button
+          type="button"
+          onClick={() => {
+            const categoryName = categories.find((c) => c.id === question.category_id)?.name;
+            const prompt = buildRealisticImagePrompt(question.question_text, categoryName);
+            const encoded = encodeURIComponent(prompt);
+            window.open(`https://labs.google/fx/tool/image?utm_source=clipboard&utm_medium=organic&utm_campaign=card-imagefx-desktop&text=${encoded}`, "_blank");
+            navigator.clipboard.writeText(prompt).then(() => {
+              toast.success("Prompt copiado para a área de transferência.");
+            }).catch(() => {
+              toast.message("Prompt gerado. Usa o texto para gerar a imagem no ImageFX.");
+            });
+          }}
+          className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
+        >
+          <Wand2 className="h-4 w-4" />
+          Gerar imagem com IA
+        </button>
         <div className="grid gap-2 sm:grid-cols-2">
           {field("option_a", "Opção A")}
           {field("option_b", "Opção B")}
