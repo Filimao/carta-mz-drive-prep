@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExtractedQuestion } from "@/lib/pdf-import.functions";
 import { extractQuestionsFromPage, saveImportedQuestions } from "@/lib/pdf-import.functions";
+import { ImagePromptHelper } from "./ImagePromptHelper";
 import { fetchCategories } from "@/lib/quiz";
 
 type Draft = ExtractedQuestion & { key: string; page: number; category_id: string | null };
@@ -608,6 +609,7 @@ export function PdfImportPanel() {
                     <Wand2 className="h-4 w-4" />
                     Gerar imagem com IA
                   </button>
+                  <ImagePromptHelper questionText={d.question_text} categoryName={categories?.find((c) => c.id === d.category_id)?.name} />
                 </div>
 
                 <div className="space-y-3">

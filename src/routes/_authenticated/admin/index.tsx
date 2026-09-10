@@ -8,13 +8,12 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
-  Wand2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { PdfImportPanel, buildRealisticImagePrompt } from "@/components/admin/PdfImportPanel";
+import { PdfImportPanel } from "@/components/admin/PdfImportPanel";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_ORDER, PLANS, type PlanTier } from "@/lib/plans";
@@ -429,22 +428,10 @@ function QuestionCard({
             className="max-h-48 w-full rounded-xl border border-border bg-white object-contain"
           />
         )}
-        <button
-          type="button"
-          onClick={() => {
-            const categoryName = categories.find((c) => c.id === question.category_id)?.name;
-            const prompt = buildRealisticImagePrompt(question.question_text, categoryName);
-            navigator.clipboard.writeText(prompt).then(() => {
-              toast.success("Prompt copiado. Cole no Google Flow, DALL-E, Midjourney ou outra ferramenta de IA.");
-            }).catch(() => {
-              toast.message("Prompt gerado. Copie e use na ferramenta de imagens que preferir.");
-            });
-          }}
-          className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
-        >
-          <Wand2 className="h-4 w-4" />
-          Gerar imagem com IA
-        </button>
+        <ImagePromptHelper
+          questionText={question.question_text}
+          categoryName={categories.find((c) => c.id === question.category_id)?.name}
+        />
         <div className="grid gap-2 sm:grid-cols-2">
           {field("option_a", "Opção A")}
           {field("option_b", "Opção B")}
