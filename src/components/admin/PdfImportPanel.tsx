@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Save,
   Trash2,
+  Upload,
   Wand2,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
@@ -25,10 +26,21 @@ type Draft = ExtractedQuestion & { key: string; page: number; category_id: strin
 const LETTERS = ["A", "B", "C", "D"] as const;
 const PAGE_REQUEST_INTERVAL_MS = 12_000;
 
-export function buildRealisticImagePrompt(questionText: string, categoryName?: string | null) {
-  const topic = categoryName ? ` sobre ${categoryName.toLowerCase()}` : "";
-  const trimmed = questionText.replace(/\s+/g, " ").trim();
-  return `Fotografia realista, estilo foto oficial de exame de carta de condução de Moçambique, sem texto overlays, sem cartoons, sem efeitos de IA. Cenário de condução em estrada moçambicana, veículo ligeiro, condições de trânsito reais. Iluminação natural, detalhes de sinalização e de tráfego locais. Sem placas de texto longo ilegíveis. Questão${topic}: "${trimmed}"`;
+export async function uploadQuestionImage(file: File): Promise<string | null> {
+  const { data: auth } = await supabase.auth.getUser();
+  const userId = auth.user?.id;
+  if (!userId) return null;
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+  const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const upload = await supabase.storage.from("question-images").upload(path, file, {
+    contentType: file.type || "image/jpeg",
+    upsert: true,
+  });
+
+  if (upload.error) return null;
+
+  return supabase.storage.from("question-images").getPublicUrl(path).data.publicUrl;
 }
 
 /** Carrega o pdfjs apenas no browser e configura o worker. */
@@ -197,6 +209,24 @@ export function PdfImportPanel() {
   >("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+
+  const handleImageUpload = async (key: string, file: File) => {
+    setUploadingKey(key);
+    try {
+      const url = await uploadQuestionImage(file);
+      if (url) {
+        patch(key, { image_url: url });
+        toast.success("Imagem enviada com sucesso.");
+      } else {
+        toast.error("Falha ao enviar imagem.");
+      }
+    } catch {
+      toast.error("Falha ao enviar imagem.");
+    } finally {
+      setUploadingKey(null);
+    }
+  };
 
   const pausedRef = useRef(false);
   const docRef = useRef<Awaited<
@@ -609,6 +639,23 @@ export function PdfImportPanel() {
                     <Wand2 className="h-4 w-4" />
                     Gerar imagem com IA
                   </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id={`upload-${d.key}`}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(d.key, file);
+                    }}
+                  />
+                  <label
+                    htmlFor={`upload-${d.key}`}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {uploadingKey === d.key ? "A enviar..." : "Enviar imagem"}
+                  </label>
                   <ImagePromptHelper questionText={d.question_text} categoryName={categories?.find((c) => c.id === d.category_id)?.name} />
                 </div>
 

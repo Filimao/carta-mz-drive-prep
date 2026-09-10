@@ -8,6 +8,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -73,6 +74,25 @@ const TABS: [Tab, string][] = [
 function Admin() {
   const session = useSession();
   const [tab, setTab] = useState<Tab>("resumo");
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+
+  const handleImageUpload = async (questionId: string, file: File) => {
+    setUploadingId(questionId);
+    try {
+      const url = await uploadQuestionImage(file);
+      if (url) {
+        toast.success("Imagem enviada com sucesso.");
+        // Refresh questions list
+        window.location.reload();
+      } else {
+        toast.error("Falha ao enviar imagem.");
+      }
+    } catch {
+      toast.error("Falha ao enviar imagem.");
+    } finally {
+      setUploadingId(null);
+    }
+  };
 
   if (session.loading) {
     return (
@@ -428,6 +448,23 @@ function QuestionCard({
             className="max-h-48 w-full rounded-xl border border-border bg-white object-contain"
           />
         )}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          id={`admin-upload-${question.id}`}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleImageUpload(question.id, file);
+          }}
+        />
+        <label
+          htmlFor={`admin-upload-${question.id}`}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
+        >
+          <Upload className="h-4 w-4" />
+          {uploadingId === question.id ? "A enviar..." : "Enviar imagem"}
+        </label>
         <ImagePromptHelper
           questionText={question.question_text}
           categoryName={categories.find((c) => c.id === question.category_id)?.name}
