@@ -46,20 +46,24 @@ interface RawStatus {
 
 /** Reads the plan from the server (expiry-aware, cannot be faked on the client). */
 export async function fetchPlanStatus(): Promise<PlanStatus> {
-  const { data: auth } = await supabase.auth.getSession();
-  if (!auth.session) return GUEST_STATUS;
-  const { data, error } = await supabase.rpc("my_plan_status");
-  if (error) throw error;
-  const raw = (data ?? {}) as RawStatus;
-  return {
-    authenticated: raw.authenticated ?? true,
-    tier: (raw.plan as PlanTier) ?? "free",
-    plan: planOf(raw.plan),
-    expiresAt: raw.expires_at ?? null,
-    expired: raw.expired ?? false,
-    sessionsUsedToday: raw.sessions_used_today ?? 0,
-    paymentPending: raw.payment_pending ?? false,
-  };
+  try {
+    const { data: auth } = await supabase.auth.getSession();
+    if (!auth.session) return GUEST_STATUS;
+    const { data, error } = await supabase.rpc("my_plan_status");
+    if (error) throw error;
+    const raw = (data ?? {}) as RawStatus;
+    return {
+      authenticated: raw.authenticated ?? true,
+      tier: (raw.plan as PlanTier) ?? "free",
+      plan: planOf(raw.plan),
+      expiresAt: raw.expires_at ?? null,
+      expired: raw.expired ?? false,
+      sessionsUsedToday: raw.sessions_used_today ?? 0,
+      paymentPending: raw.payment_pending ?? false,
+    };
+  } catch {
+    return GUEST_STATUS;
+  }
 }
 
 export interface SessionGrant {
@@ -110,27 +114,40 @@ export async function requestSession(
     };
   }
 
-  const { data, error } = await supabase.rpc("start_study_session", {
-    _mode: mode,
-    _requested: requested,
-  });
-  if (error) throw error;
-  const raw = (data ?? {}) as {
-    allowed?: boolean;
-    reason?: "daily_limit";
-    plan?: string;
-    max_questions?: number;
-    granted_questions?: number;
-    sessions_used?: number;
-    sessions_limit?: number | null;
-  };
-  return {
-    allowed: raw.allowed ?? false,
-    ...(raw.reason ? { reason: raw.reason } : {}),
-    tier: (raw.plan as PlanTier) ?? "free",
-    maxQuestions: raw.max_questions ?? 15,
-    grantedQuestions: raw.granted_questions ?? 0,
-    sessionsUsed: raw.sessions_used ?? 0,
-    sessionsLimit: raw.sessions_limit ?? null,
-  };
+  try {
+    const { data, error } = await supabase.rpc("start_study_session", {
+      _mode: mode,
+      _requested: requested,
+    });
+    if (error) throw error;
+    const raw = (data ?? {}) as {
+      allowed?: boolean;
+      reason?: "daily_limit";
+      plan?: string;
+      max_questions?: number;
+      granted_questions?: number;
+      sessions_used?: number;
+      sessions_limit?: number | null;
+    };
+    return {
+      allowed: raw.allowed ?? false,
+      ...(raw.reason ? { reason: raw.reason } : {}),
+      tier: (raw.plan as PlanTier) ?? "free",
+      maxQuestions: raw.max_questions ?? 15,
+      grantedQuestions: raw.granted_questions ?? 0,
+      sessionsUsed: raw.sessions_used ?? 0,
+      sessionsLimit: raw.sessions_limit ?? null,
+    };
+  } catch (error) {
+    return {
+      allowed: false,
+      reason: "daily_limit",
+      tier: "free",
+      maxQuestions: 15,
+      grantedQuestions: 0,
+      sessionsUsed: 0,
+      sessionsLimit: null,
+      guest: !!error,
+    } as SessionGrant & { guest?: boolean };
+  }
 }

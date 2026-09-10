@@ -128,19 +128,23 @@ export function shuffleOptions(q: Question): Question {
 }
 
 export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]> {
-  let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
+  try {
+    let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
 
-  if (config.ids && config.ids.length > 0) query = query.in("id", config.ids);
-  if (config.categoryId) query = query.eq("category_id", config.categoryId);
-  if (config.difficulty && config.difficulty !== "todas")
-    query = query.eq("difficulty", config.difficulty);
-  if (config.source && config.source !== "todas") query = query.eq("source", config.source);
+    if (config.ids && config.ids.length > 0) query = query.in("id", config.ids);
+    if (config.categoryId) query = query.eq("category_id", config.categoryId);
+    if (config.difficulty && config.difficulty !== "todas")
+      query = query.eq("difficulty", config.difficulty);
+    if (config.source && config.source !== "todas") query = query.eq("source", config.source);
 
-  const { data, error } = await query.limit(600);
-  if (error) throw error;
-  return shuffle((data ?? []) as Question[])
-    .slice(0, config.count)
-    .map(shuffleOptions);
+    const { data, error } = await query.limit(600);
+    if (error) throw error;
+    return shuffle((data ?? []) as Question[])
+      .slice(0, config.count)
+      .map(shuffleOptions);
+  } catch {
+    return [];
+  }
 }
 
 export async function searchQuestions(term: string): Promise<Question[]> {
