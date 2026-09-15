@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExtractedQuestion } from "@/lib/pdf-import.functions";
 import { extractQuestionsFromPage, saveImportedQuestions } from "@/lib/pdf-import.functions";
-import { ImagePromptHelper } from "./ImagePromptHelper";
+import { ImagePromptHelper, buildRealisticImagePrompt } from "./ImagePromptHelper";
 import { fetchCategories } from "@/lib/quiz";
 
 type Draft = ExtractedQuestion & { key: string; page: number; category_id: string | null };
@@ -584,9 +584,9 @@ export function PdfImportPanel() {
                   <textarea
                     value={d.question_text}
                     onChange={(e) => patch(d.key, { question_text: e.target.value })}
-                    rows={3}
+                    rows={2}
                     placeholder="Texto da questão"
-                    className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-input bg-card px-3 py-1.5 text-xs"
                   />
 
                   {d.image_url ? (
@@ -693,7 +693,7 @@ export function PdfImportPanel() {
                 onChange={(e) => patch(d.key, { explanation: e.target.value })}
                 rows={2}
                 placeholder="Explicação / Justificação"
-                className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-card px-3 py-1.5 text-xs"
               />
               <div className="grid gap-2 sm:grid-cols-2">
                 <select

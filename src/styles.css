@@ -45,54 +45,55 @@
 }
 
 :root {
-  --radius: 0.9rem;
-  --background: oklch(0.985 0.005 250);
-  --foreground: oklch(0.22 0.05 258);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.05 258);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.05 258);
-  --primary: oklch(0.5 0.19 254);
-  --primary-foreground: oklch(0.99 0.005 250);
-  --secondary: oklch(0.95 0.015 250);
-  --secondary-foreground: oklch(0.28 0.06 258);
-  --muted: oklch(0.955 0.01 250);
-  --muted-foreground: oklch(0.52 0.03 256);
-  --accent: oklch(0.62 0.19 250);
-  --accent-foreground: oklch(0.99 0.005 250);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.99 0.005 250);
-  --success: oklch(0.62 0.16 155);
-  --success-foreground: oklch(0.99 0.005 250);
-  --warning: oklch(0.78 0.15 80);
-  --warning-foreground: oklch(0.24 0.05 258);
-  --border: oklch(0.9 0.015 252);
-  --input: oklch(0.9 0.015 252);
-  --ring: oklch(0.62 0.19 250);
-  --chart-1: oklch(0.5 0.19 254);
-  --chart-2: oklch(0.62 0.16 155);
-  --chart-3: oklch(0.78 0.15 80);
-  --chart-4: oklch(0.58 0.22 27);
-  --chart-5: oklch(0.62 0.19 250);
-    --glass-bg: oklch(1 0 0 / 0.15);
-  --glass-border: oklch(1 0 0 / 0.2);
+    --radius: 0.9rem;
+  --background: #020617;
+  --foreground: oklch(0.985 0.005 250);
+  --card: oklch(0.12 0.035 258);
+  --card-foreground: oklch(0.985 0.005 250);
+  --popover: oklch(0.12 0.035 258);
+  --popover-foreground: oklch(0.985 0.005 250);
+  --primary: oklch(0.65 0.22 250);
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.18 0.04 250);
+  --secondary-foreground: oklch(0.985 0.005 250);
+  --muted: oklch(0.15 0.03 250);
+  --muted-foreground: oklch(0.7 0.04 250);
+  --accent: oklch(0.7 0.2 245);
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: #ffffff;
+  --success: oklch(0.7 0.2 150);
+  --success-foreground: #ffffff;
+  --warning: oklch(0.8 0.18 80);
+  --warning-foreground: oklch(0.12 0.035 258);
+  --border: oklch(0.7 0.2 245 / 0.2);
+  --input: oklch(0.7 0.2 245 / 0.2);
+  --ring: oklch(0.7 0.2 245);
+  --chart-1: oklch(0.65 0.22 250);
+  --chart-2: oklch(0.7 0.2 150);
+  --chart-3: oklch(0.8 0.18 80);
+  --chart-4: oklch(0.6 0.2 25);
+  --chart-5: oklch(0.7 0.2 245);
+  --glass-bg: oklch(0 0 0 / 0.3);
+  --glass-border: oklch(0.7 0.2 245 / 0.35);
   --glass-blur: 24px;
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), inset 0 0 0 1px oklch(1 0 0 / 0.1);
-  --page-bg-1: oklch(0.62 0.19 250 / 0.22);
-  --page-bg-2: oklch(0.5 0.19 254 / 0.16);
-  --page-bg-3: oklch(0.78 0.15 80 / 0.12);
-  --liquid-accent: oklch(0.7 0.2 245);
-  --hero-bg: #101a2e;
-  --hero-accent: #1b3a8a;
-  --hero-highlight: #2d5bd7;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 0 1px oklch(1 0 0 / 0.1);
+  --page-bg-1: #020617;
+  --page-bg-2: oklch(0.15 0.1 250 / 0.8);
+  --page-bg-3: oklch(0.25 0.2 240 / 0.4);
+  --liquid-accent: oklch(0.65 0.22 250);
+  --neon-blue: oklch(0.7 0.2 245);
 }
 
 .dark, .midnight {
-  --glass-bg: oklch(0 0 0 / 0.25);
-  --glass-border: oklch(1 0 0 / 0.1);
+  --background: #020617;
+  --glass-bg: oklch(0 0 0 / 0.35);
+  --glass-border: oklch(0.7 0.2 245 / 0.4);
   --glass-blur: 32px;
-  --liquid-accent: oklch(0.66 0.19 252);
+  --primary: oklch(0.65 0.22 250);
 }
+
+
 
 
 
@@ -175,14 +176,17 @@
   }
   body {
     background-color: var(--color-background);
-    background-image: radial-gradient(1100px 620px at 8% -8%, var(--page-bg-1), transparent 62%),
-      radial-gradient(900px 520px at 96% 4%, var(--page-bg-2), transparent 58%),
-      radial-gradient(800px 600px at 40% 108%, var(--page-bg-3), transparent 60%);
+    background-image: 
+      radial-gradient(circle at 0% 0%, oklch(0.25 0.15 250 / 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, oklch(0.2 0.1 240 / 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, oklch(0.25 0.15 250 / 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, oklch(0.2 0.1 240 / 0.3) 0%, transparent 50%);
     background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
   }
+
   h1,
   h2,
   h3,
@@ -226,30 +230,62 @@
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-radius: 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    border-color: var(--neon-blue);
+    background: oklch(0 0 0 / 0.4);
+  }
 }
 
 @utility liquid-button {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition-all duration-300 active:scale-95;
   background: var(--liquid-accent);
   color: white;
-  box-shadow: 0 4px 15px oklch(var(--liquid-accent) / 0.3);
+  box-shadow: 0 0 20px oklch(var(--liquid-accent) / 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px oklch(var(--liquid-accent) / 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 35px oklch(var(--liquid-accent) / 0.6);
   }
 }
 
 @utility liquid-button-outline {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all duration-300;
-  background: oklch(1 0 0 / 0.05);
-  border: 1px solid oklch(1 0 0 / 0.2);
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition-all duration-300 border border-white/20 active:scale-95;
+  background: oklch(1 0 0 / 0.03);
   backdrop-filter: blur(10px);
   color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   &:hover {
     background: oklch(1 0 0 / 0.1);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px oklch(var(--neon-blue) / 0.4);
     transform: translateY(-2px);
   }
 }
+
+@utility liquid-input {
+  @apply w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-white placeholder:text-white/30 focus:ring-2 focus:ring-primary/40 outline-none transition-all duration-300;
+  backdrop-filter: blur(12px);
+  &:focus {
+    border-color: var(--neon-blue);
+    background: oklch(0 0 0 / 0.4);
+    box-shadow: 0 0 15px oklch(var(--neon-blue) / 0.2);
+  }
+}
+
+
+@utility neon-text {
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px oklch(var(--neon-blue) / 0.5);
+}
+
+@utility neon-border {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px oklch(var(--neon-blue) / 0.3);
+}
+
 
 @keyframes fadeInUp {
   from {

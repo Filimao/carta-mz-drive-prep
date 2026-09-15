@@ -92,7 +92,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-    if (isLoading) {
+  if (isLoading) {
     return (
       <div className="space-y-6 py-12 text-center" aria-busy="true">
         <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -106,12 +106,10 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
       <div className="liquid-glass rounded-3xl p-12 text-center max-w-lg mx-auto">
         <XCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
         <p className="font-display text-xl font-bold">Oops! Algo correu mal.</p>
-        <p className="mt-2 text-muted-foreground">Não foi possível carregar as questões. Verifique a sua ligação.</p>
-        <button
-          type="button"
-          onClick={() => void refetch()}
-          className="liquid-button mt-6"
-        >
+        <p className="mt-2 text-muted-foreground">
+          Não foi possível carregar as questões. Verifique a sua ligação.
+        </p>
+        <button type="button" onClick={() => void refetch()} className="liquid-button mt-6">
           Tentar novamente
         </button>
       </div>
@@ -126,10 +124,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         <p className="mt-2 text-muted-foreground">
           Ajuste os filtros ou responda a mais questões para ver histórico aqui.
         </p>
-        <Link
-          to="/categorias"
-          className="liquid-button mt-6"
-        >
+        <Link to="/categorias" className="liquid-button mt-6">
           Ver categorias
         </Link>
       </div>
@@ -152,8 +147,10 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         <div className="liquid-glass p-12 text-center relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
-          
-          <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">{title} concluído</p>
+
+          <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">
+            {title} concluído
+          </p>
           <div className="relative inline-block">
             <span className="font-display text-8xl font-black text-white drop-shadow-2xl">
               {percent}%
@@ -177,15 +174,21 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
             <p className="text-3xl font-black text-success">{score}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Correctas</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">
+              Correctas
+            </p>
           </div>
           <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
             <p className="text-3xl font-black text-destructive">{answered - score}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Erradas</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">
+              Erradas
+            </p>
           </div>
           <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
             <p className="text-3xl font-black text-white">{questions.length - answered}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Saltadas</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">
+              Saltadas
+            </p>
           </div>
         </div>
 
@@ -205,10 +208,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
           >
             <RotateCcw className="h-5 w-5" /> Refazer Teste
           </button>
-          <Link
-            to="/erros"
-            className="liquid-button-outline min-w-[160px]"
-          >
+          <Link to="/erros" className="liquid-button-outline min-w-[160px]">
             Praticar Erros
           </Link>
           <Link to="/" className="liquid-button-outline min-w-[160px]">
@@ -236,7 +236,9 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         <div className="flex items-center gap-3">
           {remaining !== null && (
             <span className="inline-flex items-center gap-2 rounded-full liquid-glass !rounded-full px-4 py-2 text-sm font-bold">
-              <Timer className={`h-4 w-4 ${remaining < 60 ? 'text-destructive animate-pulse' : 'text-primary'}`} />
+              <Timer
+                className={`h-4 w-4 ${remaining < 60 ? "text-destructive animate-pulse" : "text-primary"}`}
+              />
               {String(Math.floor(remaining / 60)).padStart(2, "0")}:
               {String(remaining % 60).padStart(2, "0")}
             </span>
@@ -260,40 +262,46 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         />
       </div>
 
-      <article className="liquid-glass p-6 sm:p-10">
+      <article className="liquid-glass p-4 sm:p-6">
         {current.image_url && (
-          <div className="mb-6 rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+          <div className="mb-4 rounded-xl overflow-hidden border border-white/10 bg-black/20">
             <img
               src={current.image_url}
               alt="Contexto visual da questão"
-              className="max-h-[60vh] sm:max-h-[70vh] w-full object-contain"
+              className="max-h-[50vh] sm:max-h-[55vh] w-full object-contain"
             />
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary">
             {DIFFICULTY_LABEL[current.difficulty]}
           </span>
-          <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/40">
+          <span className="rounded-full bg-white/5 border border-white/10 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white/40">
             {current.source === "PDF" ? "Oficial" : "Prática"}
           </span>
         </div>
 
-        <h3 className="font-display text-2xl leading-tight font-bold text-white mb-8">
+        <h3 className="font-display text-lg leading-snug font-bold text-white mb-5">
           {current.question_text}
         </h3>
 
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {LETTERS.map((letter) => {
             const chosen = selected === letter;
             const showCorrect = revealed && letter === correct;
             const showWrong = revealed && chosen && letter !== correct;
-            
+
             let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
-            if (showCorrect) statusClass = "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
-            else if (showWrong) statusClass = "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
-            else if (chosen) statusClass = "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
+            if (showCorrect)
+              statusClass =
+                "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
+            else if (showWrong)
+              statusClass =
+                "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
+            else if (chosen)
+              statusClass =
+                "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
 
             return (
               <button
@@ -301,14 +309,20 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                 type="button"
                 disabled={revealed}
                 onClick={() => setSelected(letter)}
-                className={`group flex w-full items-center gap-5 rounded-2xl border p-5 text-left transition-all duration-300 ${statusClass}`}
+                className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all duration-300 ${statusClass}`}
               >
-                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border text-lg font-black transition-colors ${
-                  chosen || showCorrect || showWrong ? 'border-transparent bg-white/20' : 'border-white/20'
-                }`}>
+                <span
+                  className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-sm font-black transition-colors ${
+                    chosen || showCorrect || showWrong
+                      ? "border-transparent bg-white/20"
+                      : "border-white/20"
+                  }`}
+                >
                   {letter}
                 </span>
-                <span className="text-base font-medium leading-relaxed">{optionText(current, letter)}</span>
+                <span className="text-sm font-medium leading-relaxed">
+                  {optionText(current, letter)}
+                </span>
               </button>
             );
           })}
@@ -316,7 +330,9 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
 
         {revealed && !examMode && (
           <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
-            <div className={`rounded-3xl p-8 ${selected === correct ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
+            <div
+              className={`rounded-3xl p-8 ${selected === correct ? "bg-success/10 border border-success/20" : "bg-destructive/10 border border-destructive/20"}`}
+            >
               <div className="flex items-center gap-3 mb-4">
                 {selected === correct ? (
                   <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
@@ -332,21 +348,26 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
                     {selected === correct ? "Resposta Correcta!" : "Resposta Incorrecta"}
                   </p>
                   {selected !== correct && (
-                    <p className="text-sm font-medium opacity-70">A opção correcta era a <span className="font-bold text-success">{correct}</span></p>
+                    <p className="text-sm font-medium opacity-70">
+                      A opção correcta era a{" "}
+                      <span className="font-bold text-success">{correct}</span>
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
                   {current.explanation}
                 </p>
-                
+
                 {current.tip && (
                   <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
                     <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">Dica de Especialista</p>
+                      <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">
+                        Dica de Especialista
+                      </p>
                       <p className="text-sm font-medium text-white/90">{current.tip}</p>
                     </div>
                   </div>
@@ -408,4 +429,3 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
     </div>
   );
 }
-

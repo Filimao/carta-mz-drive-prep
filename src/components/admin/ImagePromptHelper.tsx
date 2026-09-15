@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Wand2 } from "lucide-react";
 
-export function buildRealisticImagePrompt(questionText: string, categoryName?: string | null) {
+export function buildRealisticImagePrompt(questionText: string, categoryName?: string | null | undefined) {
   const topic = categoryName ? ` sobre ${categoryName.toLowerCase()}` : "";
   const trimmed = questionText.replace(/\s+/g, " ").trim();
   return `Fotografia realista, estilo foto oficial de exame de carta de condução de Moçambique, sem texto overlays, sem cartoons, sem efeitos de IA. Cenário de condução em estrada moçambicana, veículo ligeiro, condições de trânsito reais. Iluminação natural, detalhes de sinalização e de tráfego locais. Sem placas de texto longo ilegíveis. Questão${topic}: "${trimmed}"`;

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { PdfImportPanel } from "@/components/admin/PdfImportPanel";
+import { SymbolsPanel } from "@/components/admin/SymbolsPanel";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_ORDER, PLANS, type PlanTier } from "@/lib/plans";
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: Admin,
 });
 
-type Tab = "resumo" | "revisao" | "importar" | "nova" | "utilizadores";
+type Tab = "resumo" | "revisao" | "importar" | "nova" | "simbolos" | "utilizadores";
 
 interface AdminQuestion {
   id: string;
@@ -68,6 +69,7 @@ const TABS: [Tab, string][] = [
   ["revisao", "Questões"],
   ["importar", "Importar PDF"],
   ["nova", "Nova questão"],
+  ["simbolos", "Símbolos"],
   ["utilizadores", "Utilizadores"],
 ];
 
@@ -148,6 +150,7 @@ function Admin() {
       {tab === "revisao" && <ReviewPanel />}
       {tab === "importar" && <PdfImportPanel />}
       {tab === "nova" && <NewQuestionPanel />}
+      {tab === "simbolos" && <SymbolsPanel />}
       {tab === "utilizadores" && <UsersPanel />}
     </AppShell>
   );
@@ -177,11 +180,17 @@ function OverviewPanel() {
               .eq("needs_review", true),
           ),
           count(() =>
-            supabase.from("questions").select("id", { count: "exact", head: true }).eq("source", "PDF"),
+            supabase
+              .from("questions")
+              .select("id", { count: "exact", head: true })
+              .eq("source", "PDF"),
           ),
           count(() => supabase.from("profiles").select("id", { count: "exact", head: true })),
           count(() =>
-            supabase.from("profiles").select("id", { count: "exact", head: true }).eq("plan", "pro"),
+            supabase
+              .from("profiles")
+              .select("id", { count: "exact", head: true })
+              .eq("plan", "pro"),
           ),
           count(() =>
             supabase
@@ -405,12 +414,12 @@ function QuestionCard({
   const [form, setForm] = useState(question);
 
   const field = (key: keyof AdminQuestion, label: string) => (
-    <label className="block text-xs font-semibold text-muted-foreground">
+    <label className="block text-[10px] font-semibold text-muted-foreground">
       {label}
       <input
         value={String(form[key] ?? "")}
         onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-        className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
+        className="mt-1 w-full rounded-lg border border-input bg-card px-2 py-1.5 text-xs font-normal text-foreground"
       />
     </label>
   );
@@ -440,87 +449,101 @@ function QuestionCard({
       </div>
 
       <div className="mt-3 space-y-2">
-        {field("question_text", "Pergunta")}
-        {question.image_url && (
-          <img
-            src={question.image_url}
-            alt="Imagem da questão"
-            className="max-h-48 w-full rounded-xl border border-border bg-white object-contain"
-          />
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          id={`admin-upload-${question.id}`}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleImageUpload(question.id, file);
-          }}
-        />
-        <label
-          htmlFor={`admin-upload-${question.id}`}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary"
-        >
-          <Upload className="h-4 w-4" />
-          {uploadingId === question.id ? "A enviar..." : "Enviar imagem"}
-        </label>
-        <ImagePromptHelper
-          questionText={question.question_text}
-          categoryName={categories.find((c) => c.id === question.category_id)?.name}
-        />
         <div className="grid gap-2 sm:grid-cols-2">
-          {field("option_a", "Opção A")}
-          {field("option_b", "Opção B")}
-          {field("option_c", "Opção C")}
-          {field("option_d", "Opção D")}
-        </div>
-        {field("explanation", "Explicação")}
-        {field("tip", "Dica")}
-        <div className="grid gap-2 sm:grid-cols-3">
-          <label className="block text-xs font-semibold text-muted-foreground">
-            Resposta correcta
-            <select
-              value={form.correct_answer}
-              onChange={(e) => setForm({ ...form, correct_answer: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
-            >
-              {["A", "B", "C", "D"].map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
+          {field("question_text", "Pergunta")}
+          {question.image_url && (
+            <img
+              src={question.image_url}
+              alt="Imagem da questão"
+              className="max-h-32 w-full rounded-lg border border-border bg-white object-contain"
+            />
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            id={`admin-upload-${question.id}`}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageUpload(question.id, file);
+            }}
+          />
+          <label
+            htmlFor={`admin-upload-${question.id}`}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[10px] font-semibold transition-colors hover:bg-secondary"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {uploadingId === question.id ? "A enviar..." : "Enviar imagem"}
           </label>
-          <label className="block text-xs font-semibold text-muted-foreground">
-            Dificuldade
-            <select
-              value={form.difficulty}
-              onChange={(e) =>
-                setForm({ ...form, difficulty: e.target.value as AdminQuestion["difficulty"] })
-              }
-              className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
-            >
-              <option value="facil">Fácil</option>
-              <option value="medio">Médio</option>
-              <option value="dificil">Difícil</option>
-            </select>
-          </label>
-          <label className="block text-xs font-semibold text-muted-foreground">
-            Categoria
-            <select
-              value={form.category_id ?? ""}
-              onChange={(e) => setForm({ ...form, category_id: e.target.value || null })}
-              className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
-            >
-              <option value="">Sem categoria</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ImagePromptHelper
+            questionText={question.question_text}
+            categoryName={categories.find((c) => c.id === question.category_id)?.name}
+          />
+          <div className="grid gap-2 sm:grid-cols-2">
+            {field("option_a", "A")}
+            {field("option_b", "B")}
+            {field("option_c", "C")}
+            {field("option_d", "D")}
+          </div>
+          <textarea
+            value={form.explanation ?? ""}
+            onChange={(e) => setForm({ ...form, explanation: e.target.value })}
+            rows={2}
+            placeholder="Explicação"
+            className="w-full rounded-lg border border-input bg-card px-2 py-1.5 text-xs font-normal text-foreground"
+          />
+          <textarea
+            value={form.tip ?? ""}
+            onChange={(e) => setForm({ ...form, tip: e.target.value })}
+            rows={2}
+            placeholder="Dica (opcional)"
+            className="w-full rounded-lg border border-input bg-card px-2 py-1.5 text-xs font-normal text-foreground"
+          />
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="block text-xs font-semibold text-muted-foreground">
+              Resposta correcta
+              <select
+                value={form.correct_answer}
+                onChange={(e) => setForm({ ...form, correct_answer: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
+              >
+                {["A", "B", "C", "D"].map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-xs font-semibold text-muted-foreground">
+              Dificuldade
+              <select
+                value={form.difficulty}
+                onChange={(e) =>
+                  setForm({ ...form, difficulty: e.target.value as AdminQuestion["difficulty"] })
+                }
+                className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
+              >
+                <option value="facil">Fácil</option>
+                <option value="medio">Médio</option>
+                <option value="dificil">Difícil</option>
+              </select>
+            </label>
+            <label className="block text-xs font-semibold text-muted-foreground">
+              Categoria
+              <select
+                value={form.category_id ?? ""}
+                onChange={(e) => setForm({ ...form, category_id: e.target.value || null })}
+                className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
+              >
+                <option value="">Sem categoria</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -550,9 +573,7 @@ function QuestionCard({
         </button>
         <button
           type="button"
-          onClick={() =>
-            void onUpdate(question.id, { is_published: !question.is_published })
-          }
+          onClick={() => void onUpdate(question.id, { is_published: !question.is_published })}
           className="rounded-xl border border-border px-4 py-2 text-sm font-semibold"
         >
           {question.is_published ? "Despublicar" : "Publicar"}
@@ -599,7 +620,9 @@ function NewQuestionPanel() {
 
   const valid =
     form.question_text.trim().length > 10 &&
-    [form.option_a, form.option_b, form.option_c, form.option_d].every((o) => o.trim().length > 0) &&
+    [form.option_a, form.option_b, form.option_c, form.option_d].every(
+      (o) => o.trim().length > 0,
+    ) &&
     form.explanation.trim().length > 5;
 
   async function save() {
@@ -632,25 +655,25 @@ function NewQuestionPanel() {
   }
 
   const input = (key: keyof typeof EMPTY_NEW, label: string) => (
-    <label className="block text-xs font-semibold text-muted-foreground">
+    <label className="block text-[10px] font-semibold text-muted-foreground">
       {label}
       <input
         value={String(form[key] ?? "")}
         onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-        className="mt-1 w-full rounded-lg border border-input bg-card px-2.5 py-2 text-sm font-normal text-foreground"
+        className="mt-1 w-full rounded-lg border border-input bg-card px-2 py-1.5 text-xs font-normal text-foreground"
       />
     </label>
   );
 
   return (
-    <div className="surface mt-6 space-y-3 rounded-2xl p-5">
-      <h2 className="font-display text-lg font-semibold">Criar questão</h2>
+    <div className="surface mt-6 space-y-3 rounded-2xl p-4">
+      <h2 className="font-display text-base font-semibold">Criar questão</h2>
       {input("question_text", "Pergunta")}
       <div className="grid gap-2 sm:grid-cols-2">
-        {input("option_a", "Opção A")}
-        {input("option_b", "Opção B")}
-        {input("option_c", "Opção C")}
-        {input("option_d", "Opção D")}
+        {input("option_a", "A")}
+        {input("option_b", "B")}
+        {input("option_c", "C")}
+        {input("option_d", "D")}
       </div>
       {input("explanation", "Explicação")}
       {input("tip", "Dica (opcional)")}
@@ -744,7 +767,10 @@ function UsersPanel() {
   const { data: admins } = useQuery({
     queryKey: ["admin-roles"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
       if (error) throw error;
       return new Set((data ?? []).map((r) => r.user_id));
     },
@@ -763,8 +789,7 @@ function UsersPanel() {
 
   async function setPlan(id: string, plan: PlanTier) {
     setBusy(id);
-    const expires =
-      plan === "free" ? null : new Date(Date.now() + 30 * 864e5).toISOString();
+    const expires = plan === "free" ? null : new Date(Date.now() + 30 * 864e5).toISOString();
     const { error } = await supabase
       .from("profiles")
       .update({ plan, plan_expires_at: expires })
@@ -776,7 +801,9 @@ function UsersPanel() {
     }
     await qc.invalidateQueries({ queryKey: ["admin-profiles"] });
     toast.success(
-      plan === "free" ? "Utilizador voltou ao plano Free." : `Plano ${PLANS[plan].name} activo por 30 dias.`,
+      plan === "free"
+        ? "Utilizador voltou ao plano Free."
+        : `Plano ${PLANS[plan].name} activo por 30 dias.`,
     );
   }
 
