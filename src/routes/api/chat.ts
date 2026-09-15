@@ -33,6 +33,34 @@ function serverSupabase() {
   });
 }
 
+function serverSupabaseForAuth() {
+  const url = process.env["SUPABASE_URL"] ?? process.env["VITE_SUPABASE_URL"];
+  const key =
+    process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) throw new Error("Supabase não configurado");
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+/**
+ * Validates the caller's Supabase session from the Authorization header.
+ * Returns the user id, or null when the request is unauthenticated.
+ */
+async function authenticateRequest(request: Request): Promise<string | null> {
+  const authHeader = request.headers.get("authorization") ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  if (!token) return null;
+  try {
+    const supabase = serverSupabaseForAuth();
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error || !data.user) return null;
+    return data.user.id;
+  } catch {
+    return null;
+  }
+}
+
 const QUESTION_COLUMNS =
   "question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty";
 
@@ -40,7 +68,15 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env["GEMINI_API_KEY"] ?? process.env["Gemini_API_Key"];
+        const userId = await authenticateRequest(request);
+        if (!userId) {
+          return new Response(
+            JSON.stringify({ error: "Sessão inválida. Inicie sessão para usar o assistente." }),
+            { status: 401, headers: { "content-type": "application/json" } },
+          );
+        }
+
+        const apiKey = process.env["GEMINI_API_KEY"];
         if (!apiKey) {
           return new Response(JSON.stringify({ error: "Assistente não configurado." }), {
             status: 500,

@@ -68,7 +68,7 @@ export async function fetchPlanStatus(): Promise<PlanStatus> {
 
 export interface SessionGrant {
   allowed: boolean;
-  reason?: "daily_limit";
+  reason?: "daily_limit" | "error";
   tier: PlanTier;
   maxQuestions: number;
   grantedQuestions: number;
@@ -139,15 +139,16 @@ export async function requestSession(
       sessionsLimit: raw.sessions_limit ?? null,
     };
   } catch (error) {
+    console.error("[plan-access] start_study_session falhou:", error);
     return {
       allowed: false,
-      reason: "daily_limit",
+      reason: "error" as const,
       tier: "free",
       maxQuestions: 15,
       grantedQuestions: 0,
       sessionsUsed: 0,
       sessionsLimit: null,
-      guest: !!error,
+      guest: false,
     } as SessionGrant & { guest?: boolean };
   }
 }

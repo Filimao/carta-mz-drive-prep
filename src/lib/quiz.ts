@@ -99,6 +99,17 @@ const SELECT_COLUMNS =
 
 const LETTER_KEYS: Letter[] = ["A", "B", "C", "D"];
 
+/** Returns the text of the option identified by the given letter. */
+export function getOptionText(q: Question, letter: Letter): string {
+  return letter === "A"
+    ? q.option_a
+    : letter === "B"
+      ? q.option_b
+      : letter === "C"
+        ? q.option_c
+        : q.option_d;
+}
+
 /**
  * Randomiza a posição das alternativas de cada questão e recalcula a letra
  * correcta, para que a resposta certa não fique sempre na mesma opção.
@@ -106,14 +117,7 @@ const LETTER_KEYS: Letter[] = ["A", "B", "C", "D"];
 export function shuffleOptions(q: Question): Question {
   const entries = LETTER_KEYS.map((letter) => ({
     letter,
-    text:
-      letter === "A"
-        ? q.option_a
-        : letter === "B"
-          ? q.option_b
-          : letter === "C"
-            ? q.option_c
-            : q.option_d,
+    text: getOptionText(q, letter),
   }));
   const shuffled = shuffle(entries);
   const correctIndex = shuffled.findIndex((e) => e.letter === q.correct_answer);
@@ -128,23 +132,19 @@ export function shuffleOptions(q: Question): Question {
 }
 
 export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]> {
-  try {
-    let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
+  let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
 
-    if (config.ids && config.ids.length > 0) query = query.in("id", config.ids);
-    if (config.categoryId) query = query.eq("category_id", config.categoryId);
-    if (config.difficulty && config.difficulty !== "todas")
-      query = query.eq("difficulty", config.difficulty);
-    if (config.source && config.source !== "todas") query = query.eq("source", config.source);
+  if (config.ids && config.ids.length > 0) query = query.in("id", config.ids);
+  if (config.categoryId) query = query.eq("category_id", config.categoryId);
+  if (config.difficulty && config.difficulty !== "todas")
+    query = query.eq("difficulty", config.difficulty);
+  if (config.source && config.source !== "todas") query = query.eq("source", config.source);
 
-    const { data, error } = await query.limit(600);
-    if (error) throw error;
-    return shuffle((data ?? []) as Question[])
-      .slice(0, config.count)
-      .map(shuffleOptions);
-  } catch {
-    return [];
-  }
+  const { data, error } = await query.limit(600);
+  if (error) throw error;
+  return shuffle((data ?? []) as Question[])
+    .slice(0, config.count)
+    .map(shuffleOptions);
 }
 
 export async function searchQuestions(term: string): Promise<Question[]> {
@@ -193,6 +193,14 @@ export function writeLocal(next: LocalState) {
   window.localStorage.setItem(KEY, JSON.stringify(next));
 }
 
+/** Formats a date as YYYY-MM-DD in local time (not UTC). */
+export function toLocalDateKey(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export function recordAnswer(questionId: string, correct: boolean) {
   const state = readLocal();
   state.answers = [
@@ -200,7 +208,7 @@ export function recordAnswer(questionId: string, correct: boolean) {
     { questionId, correct, at: new Date().toISOString() },
   ];
   state.xp += correct ? 10 : 0;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toLocalDateKey();
   if (!state.days.includes(today)) state.days.push(today);
   writeLocal(state);
 }
@@ -231,7 +239,7 @@ export function streakDays(days: string[]): number {
   let streak = 0;
   const cursor = new Date();
   for (;;) {
-    const key = cursor.toISOString().slice(0, 10);
+    const key = toLocalDateKey(cursor);
     if (!set.has(key)) break;
     streak += 1;
     cursor.setDate(cursor.getDate() - 1);
@@ -251,7 +259,7 @@ export async function persistSession(payload: {
   const user = auth.user;
   if (!user) return;
   const score = payload.total > 0 ? (payload.correct / payload.total) * 100 : 0;
-  await supabase.from("quiz_sessions").insert({
+  const { error } = await supabase.from("quiz_sessions").insert({
     user_id: user.id,
     mode: payload.mode,
     total_questions: payload.total,
@@ -262,4 +270,7 @@ export async function persistSession(payload: {
     seconds_spent: payload.seconds,
     completed_at: new Date().toISOString(),
   });
+  if (error) {
+    console.error("[quiz] Falha ao guardar sessão no servidor:", error.message);
+  }
 }
