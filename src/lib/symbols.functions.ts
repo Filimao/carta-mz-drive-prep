@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const MODEL = "gemini-3.5-flash";
+const MODEL = "gemini-1.5-flash";
 
 const SYSTEM = `És um especialista em sinalização de trânsito de Moçambique.
 
