@@ -138,6 +138,27 @@ function intersectionArea(a: ImageBox, b: ImageBox): number {
 }
 
 /**
+ * Mescla caixas de imagem que se sobrepõem, expandindo o limitante
+ * ao longo do eixo y (as questões vêm de cima para baixo).
+ */
+function mergeImageBoxes(boxes: ImageBox[]): ImageBox[] {
+  const result: ImageBox[] = [];
+  for (const box of boxes) {
+    const last = result[result.length - 1];
+    if (last && intersectionArea(box, last) > 0) {
+      const x = Math.min(last.x, box.x);
+      const y = Math.min(last.y, box.y);
+      const width = Math.max(last.x + last.width, box.x + box.width) - x;
+      const height = Math.max(last.y + last.height, box.y + box.height) - y;
+      result[result.length - 1] = { x, y, width, height };
+    } else {
+      result.push(box);
+    }
+  }
+  return result;
+}
+
+/**
  * Escolhe a melhor imagem embebida para a região indicada pela IA.
  * Se a IA não indicar região e houver tantas imagens como questões, usa a
  * ordem vertical (as questões e as imagens vêm ambas de cima para baixo).
@@ -656,7 +677,7 @@ export function PdfImportPanel() {
                     <Upload className="h-4 w-4" />
                     {uploadingKey === d.key ? "A enviar..." : "Enviar imagem"}
                   </label>
-                  <ImagePromptHelper questionText={d.question_text} categoryName={categories?.find((c) => c.id === d.category_id)?.name} />
+                  <ImagePromptHelper questionText={d.question_text} categoryName={categories?.find((c) => c.id === d.category_id)?.name ?? null} />
                 </div>
 
                 <div className="space-y-3">

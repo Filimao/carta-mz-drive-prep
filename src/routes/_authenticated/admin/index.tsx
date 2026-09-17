@@ -14,7 +14,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { PdfImportPanel } from "@/components/admin/PdfImportPanel";
+import { PdfImportPanel, uploadQuestionImage } from "@/components/admin/PdfImportPanel";
+import { ImagePromptHelper } from "@/components/admin/ImagePromptHelper";
 import { SymbolsPanel } from "@/components/admin/SymbolsPanel";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,25 +77,6 @@ const TABS: [Tab, string][] = [
 function Admin() {
   const session = useSession();
   const [tab, setTab] = useState<Tab>("resumo");
-  const [uploadingId, setUploadingId] = useState<string | null>(null);
-
-  const handleImageUpload = async (questionId: string, file: File) => {
-    setUploadingId(questionId);
-    try {
-      const url = await uploadQuestionImage(file);
-      if (url) {
-        toast.success("Imagem enviada com sucesso.");
-        // Refresh questions list
-        window.location.reload();
-      } else {
-        toast.error("Falha ao enviar imagem.");
-      }
-    } catch {
-      toast.error("Falha ao enviar imagem.");
-    } finally {
-      setUploadingId(null);
-    }
-  };
 
   if (session.loading) {
     return (
@@ -411,6 +393,7 @@ function QuestionCard({
   onUpdate: (id: string, patch: Partial<AdminQuestion>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }) {
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState(question);
 
   const field = (key: keyof AdminQuestion, label: string) => (
@@ -423,6 +406,23 @@ function QuestionCard({
       />
     </label>
   );
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const url = await uploadQuestionImage(file);
+      if (url) {
+        toast.success("Imagem enviada com sucesso.");
+        await onUpdate(question.id, { image_url: url });
+      } else {
+        toast.error("Falha ao enviar imagem.");
+      }
+    } catch {
+      toast.error("Falha ao enviar imagem.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="surface rounded-2xl p-5">
@@ -463,9 +463,9 @@ function QuestionCard({
             accept="image/*"
             className="hidden"
             id={`admin-upload-${question.id}`}
-            onChange={(e) => {
+              onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) handleImageUpload(question.id, file);
+              if (file) void handleImageUpload(file);
             }}
           />
           <label
@@ -473,11 +473,11 @@ function QuestionCard({
             className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[10px] font-semibold transition-colors hover:bg-secondary"
           >
             <Upload className="h-3.5 w-3.5" />
-            {uploadingId === question.id ? "A enviar..." : "Enviar imagem"}
+            {uploading ? "A enviar..." : "Enviar imagem"}
           </label>
           <ImagePromptHelper
             questionText={question.question_text}
-            categoryName={categories.find((c) => c.id === question.category_id)?.name}
+            categoryName={categories.find((c) => c.id === question.category_id)?.name ?? null}
           />
           <div className="grid gap-2 sm:grid-cols-2">
             {field("option_a", "A")}

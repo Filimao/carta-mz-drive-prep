@@ -45,7 +45,7 @@ export function SymbolsPanel() {
               c: string,
               o: { ascending: boolean },
             ) => {
-              limit: (n: number) => { then: (r: { data?: unknown; error?: unknown }) => unknown };
+              limit: (n: number) => Promise<{ data?: unknown; error?: unknown }>;
             };
           };
         };
@@ -72,8 +72,7 @@ export function SymbolsPanel() {
     setGenerating(true);
     try {
       const result = (await generateSymbols({
-        category_slug: activeCat === "todos" ? null : activeCat,
-        count: 8,
+        data: { category_slug: activeCat === "todos" ? null : activeCat, count: 8 },
       })) as { symbols?: GeneratedSymbol[] };
       const symbols = result.symbols ?? [];
       const withPromises = symbols.map(async (s) => {
@@ -81,8 +80,7 @@ export function SymbolsPanel() {
         let imagePrompt = "";
         try {
           const img = (await generateSymbolImagePrompt({
-            symbol_name: s.name,
-            category_name: cat?.name ?? null,
+            data: { symbol_name: s.name, category_name: cat?.name ?? null },
           })) as { prompt: string };
           imagePrompt = img.prompt;
         } catch {
@@ -112,7 +110,7 @@ export function SymbolsPanel() {
       }));
       const sb = supabase as unknown as {
         from: (t: string) => {
-          insert: (r: unknown[]) => { then: (res: { error?: unknown }) => { then: () => void } };
+          insert: (r: unknown[]) => Promise<{ error?: unknown }>;
         };
       };
       const { error } = await sb.from("symbols").insert(rows);
@@ -132,7 +130,7 @@ export function SymbolsPanel() {
           eq: (
             c: string,
             v: unknown,
-          ) => { then: (res: { error?: unknown }) => { then: () => void } };
+          ) => Promise<{ error?: unknown }>;
         };
       };
     };

@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
@@ -28,10 +27,10 @@ export interface AIGeneratedSymbol {
 export const generateSymbols = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    z.object({
-      category_slug: z.string().nullable().default(null),
-      count: z.number().min(1).max(20).default(8),
-    }),
+    (input: {
+      category_slug: string | null;
+      count: number;
+    }) => input,
   )
   .handler(async ({ data, context }) => {
     const apiKey = process.env["GEMINI_API_KEY"] ?? process.env["Gemini_API_Key"];
@@ -85,20 +84,22 @@ Devolve apenas o JSON.`;
     }
 
     const symbols = (parsed as { symbols?: AIGeneratedSymbol[] }).symbols ?? [];
-    return symbols.map((s) => ({
-      name: s.name,
-      description: s.description,
-      categorySlug: s.category_slug,
-    }));
+    return {
+      symbols: symbols.map((s) => ({
+        name: s.name,
+        description: s.description,
+        categorySlug: s.category_slug,
+      })),
+    };
   });
 
 export const generateSymbolImagePrompt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    z.object({
-      symbol_name: z.string().min(1),
-      category_name: z.string().nullable().default(null),
-    }),
+    (input: {
+      symbol_name: string;
+      category_name: string | null;
+    }) => input,
   )
   .handler(async ({ data }) => {
     const apiKey = process.env["GEMINI_API_KEY"] ?? process.env["Gemini_API_Key"];
