@@ -80,13 +80,20 @@ export function QuizQuestion({
 
       <article className="liquid-glass p-4 sm:p-6">
         {current.image_url && (
-          <div className="mb-4 rounded-xl overflow-hidden border-white/10 bg-black/20">
+          <a
+            href={current.image_url}
+            target="_blank"
+            rel="noreferrer"
+            title="Abrir imagem em tamanho real"
+            className="mb-5 block rounded-2xl overflow-hidden border border-border bg-muted ring-1 ring-primary/20 shadow-lg"
+          >
             <img
               src={current.image_url}
               alt="Contexto visual da questão"
-              className="max-h-[50vh] sm:max-h-[55vh] w-full object-contain"
+              loading="eager"
+              className="block w-full h-auto min-h-[200px] max-h-[65vh] object-contain"
             />
-          </div>
+          </a>
         )}
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
