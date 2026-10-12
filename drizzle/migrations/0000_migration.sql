@@ -1,0 +1,3 @@
+create policy "admins upload question images" on storage.objects for insert to authenticated with check (bucket_id = 'question-images' and public.has_role(auth.uid(), 'admin'::app_role));
+create policy "admins delete question images" on storage.objects for delete to authenticated using (bucket_id = 'question-images' and public.has_role(auth.uid(), 'admin'::app_role));
+create policy "public read question images" on storage.objects for select using (bucket_id = 'question-images');
