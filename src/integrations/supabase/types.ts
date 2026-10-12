@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
@@ -273,6 +273,7 @@ export type Database = {
           difficulty: Database["public"]["Enums"]["difficulty_level"]
           explanation: string
           id: string
+          image_region: Json | null
           image_url: string | null
           import_id: string | null
           is_published: boolean
@@ -296,6 +297,7 @@ export type Database = {
           difficulty?: Database["public"]["Enums"]["difficulty_level"]
           explanation?: string
           id?: string
+          image_region?: Json | null
           image_url?: string | null
           import_id?: string | null
           is_published?: boolean
@@ -319,6 +321,7 @@ export type Database = {
           difficulty?: Database["public"]["Enums"]["difficulty_level"]
           explanation?: string
           id?: string
+          image_region?: Json | null
           image_url?: string | null
           import_id?: string | null
           is_published?: boolean
