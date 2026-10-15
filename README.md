@@ -1,51 +1,85 @@
-# 🇲🇿 CartaMZ — Plataforma de Preparação para o Exame de Condução em Moçambique
+# 🇲🇿 CartaMZ — Preparação para o Exame Teórico de Condução em Moçambique
 
-O **CartaMZ** é uma plataforma digital desenvolvida para ajudar os candidatos à carta de condução em Moçambique a prepararem-se de forma prática, interativa e eficiente para os exames teóricos de condução.
+Plataforma web em português para ajudar candidatos à carta de condução em Moçambique a estudar e a praticar o exame teórico, com questionários por tema, simulados com temporizador e acompanhamento do progresso.
 
-A plataforma disponibiliza um ambiente de aprendizagem moderno, com questionários interativos, simulados de exame, organização de conteúdos por categorias e ferramentas de prática que permitem aos utilizadores testar os seus conhecimentos, identificar dificuldades e acompanhar a sua evolução durante a preparação.
+🔗 **Demo online:** [carta-mz-drive-prep-wuqw.vercel.app](https://carta-mz-drive-prep-wuqw.vercel.app)
 
-## 🎯 Objetivo do Projeto
 
-O principal objetivo do CartaMZ é tornar o estudo para o exame teórico de condução mais acessível, organizado e eficiente, através da tecnologia, oferecendo aos candidatos uma ferramenta de apoio à aprendizagem adaptada ao contexto moçambicano.
+## 🎯 Objetivo
 
-## ✨ Principais Funcionalidades
+Tornar o estudo para o exame teórico de condução mais acessível e organizado, com uma ferramenta pensada para o contexto moçambicano: conteúdos locais, interface em português e uso confortável no telemóvel.
 
-- **Questionários interativos:** prática com perguntas sobre regras de trânsito, sinalização rodoviária e segurança na condução.
-- **Simulados de exame:** realização de testes com temporizador e cálculo da pontuação.
-- **Aprendizagem por categorias:** organização das perguntas por temas para facilitar o estudo.
-- **Acompanhamento do progresso:** ferramentas para avaliar o desempenho e identificar áreas que precisam de mais atenção.
-- **Autenticação de utilizadores:** criação de contas e acesso personalizado.
-- **Planos de utilização:** estrutura de planos Free, Pro e Premium, com diferentes limites e possibilidades de acesso.
-- **Interface responsiva:** experiência adaptada a computadores, tablets e dispositivos móveis.
-- **Experiência mobile:** desenvolvimento orientado para uma utilização prática em dispositivos móveis.
-- **Gestão de conteúdos:** ferramentas de administração para importar e organizar perguntas a partir de documentos PDF, com apoio de tecnologias de reconhecimento de texto (OCR).
+## ✨ Funcionalidades
+
+- **Questionários por tema:** perguntas sobre regras de trânsito, sinalização e segurança, organizadas por categorias.
+- **Simulados de exame:** testes com temporizador e cálculo da pontuação.
+- **Progresso:** estatísticas de desempenho para identificar os temas que precisam de mais prática.
+- **Contas de utilizador:** registo, autenticação e acesso personalizado.
+- **Planos:** estrutura de planos Free, Pro e Premium, com limites de acesso diferentes.
+- **Painel de administração:** importação e organização de perguntas a partir de PDFs, com apoio de OCR e IA.
+- **Design responsivo:** pensado primeiro para telemóvel e adaptado a tablets e computadores.
 
 ## 🛠️ Tecnologias
 
-O projeto utiliza tecnologias modernas de desenvolvimento web, incluindo:
+| Área | Ferramentas |
+|------|-------------|
+| Interface | React, TypeScript, Tailwind CSS, shadcn/ui |
+| Aplicação | TanStack Start, TanStack Router, TanStack Query |
+| Backend e dados | Supabase (autenticação e PostgreSQL), Drizzle |
+| Validação e gráficos | Zod, Recharts |
+| Testes | Vitest |
+| Publicação | Vercel |
 
-- **React e TypeScript** — construção da interface e implementação da lógica da aplicação.
-- **Tailwind CSS** — estilização e criação de uma interface responsiva.
-- **Supabase** — suporte a funcionalidades de autenticação e armazenamento de dados.
-- **TanStack Start** — estrutura para funcionalidades de aplicação e processamento no servidor.
-- **Inteligência Artificial e OCR** — apoio à extração, leitura e correção de perguntas provenientes de documentos.
+## 🚀 Como correr localmente
 
-*Nota: a lista deve ser ajustada conforme as dependências e os serviços efetivamente configurados na versão atual do projeto.*
+Requisitos: Node.js 18+ (ou Bun) e um projeto no [Supabase](https://supabase.com).
 
-## 🇲🇿 Foco em Moçambique
+```bash
+# 1. Clonar o repositório
+git clone https://github.com/Filimao/carta-mz-drive-prep.git
+cd carta-mz-drive-prep
 
-O CartaMZ foi concebido tendo em conta as necessidades dos candidatos à carta de condução em Moçambique, com conteúdos orientados para o contexto local e uma interface em português.
+# 2. Instalar as dependências
+npm install
 
-A plataforma procura contribuir para uma preparação mais acessível e consistente, incentivando o conhecimento das regras de trânsito e a adoção de comportamentos responsáveis na estrada.
+# 3. Criar o ficheiro .env na raiz do projeto (veja abaixo)
 
-##  Visão do Projeto
+# 4. Iniciar em modo de desenvolvimento
+npm run dev
+```
 
-Construir uma plataforma de referência para a preparação teórica de candidatos à carta de condução em Moçambique, combinando educação, tecnologia e acessibilidade numa experiência digital moderna.
+Variáveis de ambiente do ficheiro `.env`:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+```
+
+> O ficheiro `.env` não deve ser enviado para o GitHub. Use sempre apenas a chave pública (`anon` / publishable) do Supabase no código do cliente e nunca coloque chaves secretas.
+
+Outros comandos:
+
+```bash
+npm run build   # gerar a versão de produção
+npm run test    # correr os testes (Vitest)
+npm run lint    # verificar o código
+```
+
+## 📌 Estado do projeto
+
+Em desenvolvimento. Próximos passos previstos:
+
+- Mais perguntas e novas categorias de estudo.
+- Melhorias no modo de estudo offline.
+- Revisão dos erros por tema após cada simulado.
 
 ## ⚠️ Aviso
 
-O CartaMZ é uma plataforma independente de apoio ao estudo. Não representa nem substitui os serviços, os exames oficiais ou os materiais publicados pelas autoridades competentes de trânsito em Moçambique. Os utilizadores devem confirmar as informações através de fontes oficiais.
+O CartaMZ é uma plataforma independente de apoio ao estudo. Não representa nem substitui os serviços, os exames oficiais ou os materiais publicados pelas autoridades de trânsito de Moçambique. Confirme sempre as informações em fontes oficiais.
 
----
+## 👤 Autor
 
-**CartaMZ — Estude melhor. Pratique mais. Prepare-se para a estrada.** 🇲🇿
+**Filimão Feliz Mondlane** — Full-Stack Developer, Maputo, Moçambique
+[GitHub](https://github.com/Filimao) · [LinkedIn](https://linkedin.com/in/filimaomondlane)
