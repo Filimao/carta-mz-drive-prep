@@ -1,0 +1,1 @@
+DELETE FROM public.questions WHERE id = (SELECT id FROM public.questions WHERE source_document='Teste_19.pdf' AND source_page=9 ORDER BY created_at DESC LIMIT 1);
