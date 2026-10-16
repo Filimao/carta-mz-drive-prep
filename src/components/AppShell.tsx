@@ -20,11 +20,18 @@ import {
   Receipt,
   LogIn,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Sheet,
@@ -111,7 +118,7 @@ function MobileMenu({
         <button
           type="button"
           aria-label="Abrir menu"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -280,7 +287,7 @@ export function AppShell({
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all hover:bg-white/10 ${pathname === item.to
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition-all hover:bg-white/10 xl:px-4 ${pathname === item.to
                       ? "text-primary bg-primary/10"
                       : "text-foreground/70 hover:text-foreground"
                     }`}
@@ -288,6 +295,32 @@ export function AppShell({
                   {item.label}
                 </Link>
               ))}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-foreground/70 hover:bg-white/10 hover:text-foreground">
+                  Mais <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  {[
+                    ...NAV.slice(5),
+                    { to: "/precos", label: "Preços", icon: Tag },
+                    ...(session.isAdmin
+                      ? [
+                          { to: "/admin", label: "Admin", icon: ShieldCheck },
+                          { to: "/admin/pagamentos", label: "Pagamentos", icon: Receipt },
+                        ]
+                      : []),
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link to={item.to} className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" /> {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
           </div>
 
