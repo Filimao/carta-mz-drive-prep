@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { QuizQuestion } from "@/components/quiz/QuizQuestion";
+import { haptics } from "@/lib/feedback";
 import {
   fetchQuizQuestions,
   persistSession,
@@ -21,9 +22,11 @@ export interface QuizEngineProps {
   mode: "pratica" | "simulado" | "tempo" | "erros" | "favoritos" | "aleatorio";
   title: string;
   timeLimitSeconds?: number;
+  /** Official exam rule: more than this many wrong answers ends the exam as "Não Apto". */
+  maxErrors?: number;
 }
 
-export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngineProps) {
+export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }: QuizEngineProps) {
   const examMode = mode === "simulado";
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["quiz", mode, config],
@@ -139,6 +142,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
         total={questions.length}
         elapsed={elapsed}
         onRestart={restart}
+        maxErrors={maxErrors}
       />
     );
   }
@@ -147,8 +151,21 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds }: QuizEngine
 
   const confirmAnswer = () => {
     if (!selected) return;
-    setAnswers((prev) => ({ ...prev, [current.id]: selected }));
-    recordAnswer(current.id, selected === (current.correct_answer as Letter));
+    const isCorrect = selected === (current.correct_answer as Letter);
+    const nextAnswers = { ...answers, [current.id]: selected };
+    setAnswers(nextAnswers);
+    recordAnswer(current.id, isCorrect);
+    if (isCorrect) haptics.correct();
+    else haptics.wrong();
+    if (maxErrors !== undefined) {
+      const wrong = questions.filter(
+        (q) => nextAnswers[q.id] && nextAnswers[q.id] !== q.correct_answer,
+      ).length;
+      if (wrong > maxErrors) {
+        setFinished(true);
+        return;
+      }
+    }
     if (examMode) {
       if (index + 1 >= questions.length) setFinished(true);
       else {

@@ -20,11 +20,18 @@ import {
   Receipt,
   LogIn,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { ChatBot } from "@/components/ChatBot";
 import { InstallButton } from "@/components/PwaInstall";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Sheet,
@@ -58,12 +65,12 @@ const BOTTOM_NAV = [
 
 function Brand() {
   return (
-    <Link to="/" className="flex items-center gap-2 group">
-      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary font-display text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
+    <Link to="/" className="flex min-w-0 items-center gap-2 group">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary font-display text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
         MZ
       </span>
 
-      <span className="font-display text-xl font-bold tracking-tight">
+      <span className="truncate font-display text-lg sm:text-xl font-bold tracking-tight">
         Carta MZ<span className="text-primary">Quiz</span>
       </span>
     </Link>
@@ -111,7 +118,7 @@ function MobileMenu({
         <button
           type="button"
           aria-label="Abrir menu"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-foreground md:hidden"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -249,14 +256,6 @@ export function AppShell({
 
   const session = useSession();
 
-  useEffect(() => {
-    console.log("[AppShell session]", {
-      loading: session.loading,
-      userId: session.userId,
-      email: session.email,
-      isAdmin: session.isAdmin,
-    });
-  }, [session]);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -266,10 +265,10 @@ export function AppShell({
   }
 
   return (
-        <div className="min-h-screen pb-20 md:pb-0 font-sans selection:bg-primary selection:text-primary-foreground">
+        <div className="min-h-screen pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0 font-sans selection:bg-primary selection:text-primary-foreground">
       <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)]">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-8">
+        <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-4 xl:gap-8">
             <Brand />
 
             <nav
@@ -280,7 +279,7 @@ export function AppShell({
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all hover:bg-white/10 ${pathname === item.to
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition-all hover:bg-white/10 xl:px-4 ${pathname === item.to
                       ? "text-primary bg-primary/10"
                       : "text-foreground/70 hover:text-foreground"
                     }`}
@@ -288,10 +287,36 @@ export function AppShell({
                   {item.label}
                 </Link>
               ))}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-foreground/70 hover:bg-white/10 hover:text-foreground">
+                  Mais <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  {[
+                    ...NAV.slice(5),
+                    { to: "/precos", label: "Preços", icon: Tag },
+                    ...(session.isAdmin
+                      ? [
+                          { to: "/admin", label: "Admin", icon: ShieldCheck },
+                          { to: "/admin/pagamentos", label: "Pagamentos", icon: Receipt },
+                        ]
+                      : []),
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link to={item.to} className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" /> {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2 mr-2">
               <ThemeToggle />
               <InstallButton className="liquid-button-outline !px-4 !py-2 !text-xs" />
@@ -334,7 +359,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl pt-20">
+      <main className="mx-auto max-w-7xl px-3 pt-[calc(4rem+env(safe-area-inset-top))] sm:px-4 sm:pt-20 overflow-x-hidden">
         {children}
       </main>
 
@@ -367,7 +392,7 @@ export function AppShell({
               >
                 <Link
                   to={item.to}
-                  className={`flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-3 text-xs font-medium transition-colors ${active
+                  className={`flex min-h-14 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium transition-colors ${active
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
                     }`}
@@ -384,7 +409,7 @@ export function AppShell({
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="flex w-full flex-col items-center gap-1 py-2.5 text-[11px] font-medium text-muted-foreground"
+              className="flex min-h-14 w-full flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium text-muted-foreground"
             >
               <Menu className="h-5 w-5" />
               Menu

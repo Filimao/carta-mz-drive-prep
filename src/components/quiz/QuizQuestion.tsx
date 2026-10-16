@@ -1,4 +1,8 @@
-import { CheckCircle2, XCircle, Star, Lightbulb, Timer } from "lucide-react";
+import { CheckCircle2, XCircle, Star, Lightbulb, Timer, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { ZoomableImage } from "@/components/quiz/ZoomableImage";
+import { canSpeak, haptics, speak, stopSpeaking } from "@/lib/feedback";
 
 import { DIFFICULTY_LABEL, getOptionText, type Letter, type Question } from "@/lib/quiz";
 
@@ -39,28 +43,61 @@ export function QuizQuestion({
 }: QuizQuestionProps) {
   const correct = current.correct_answer as Letter;
   const isLast = index + 1 >= total;
+  const [speaking, setSpeaking] = useState(false);
+  const [ttsOk, setTtsOk] = useState(false);
+  useEffect(() => setTtsOk(canSpeak()), []);
+  useEffect(() => {
+    stopSpeaking();
+    setSpeaking(false);
+  }, [current.id]);
+  useEffect(() => () => stopSpeaking(), []);
+  const critical = remaining !== null && remaining <= 180;
+  const toggleSpeak = () => {
+    if (speaking) {
+      stopSpeaking();
+      setSpeaking(false);
+      return;
+    }
+    const text = [
+      current.question_text,
+      ...LETTERS.map((l) => `Opção ${l}: ${getOptionText(current, l)}`),
+    ].join(". ");
+    setSpeaking(true);
+    speak(text, () => setSpeaking(false));
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 overflow-x-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="min-w-0">
+          <h2 className="truncate font-display text-xl sm:text-2xl font-bold tracking-tight">{title}</h2>
           <p className="text-sm font-bold text-white/50 uppercase tracking-widest">
             Questão <span className="text-primary">{index + 1}</span> de {total}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           {remaining !== null && (
-            <span className="inline-flex items-center gap-2 rounded-full liquid-glass !rounded-full px-4 py-2 text-sm font-bold">
+            <span className={`inline-flex items-center gap-2 rounded-full liquid-glass !rounded-full px-3 py-2 text-sm font-bold tabular-nums ${critical ? "text-destructive ring-2 ring-destructive/60 animate-pulse" : ""}`}>
               <Timer
-                className={`h-4 w-4 ${remaining < 60 ? "text-destructive animate-pulse" : "text-primary"}`}
+                className={`h-4 w-4 ${critical ? "text-destructive" : "text-primary"}`}
               />
               {String(Math.floor(remaining / 60)).padStart(2, "0")}:
               {String(remaining % 60).padStart(2, "0")}
             </span>
           )}
+          {ttsOk && (
+            <button
+              type="button"
+              onClick={toggleSpeak}
+              aria-label={speaking ? "Parar leitura" : "Ouvir questão"}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full liquid-glass !rounded-full transition-transform active:scale-90"
+            >
+              {speaking ? <VolumeX className="h-5 w-5 text-primary" /> : <Volume2 className="h-5 w-5" />}
+            </button>
+          )}
           <button
             type="button"
+            aria-label="Favorito"
             onClick={onToggleFavorite}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full liquid-glass !rounded-full transition-transform active:scale-90"
           >
@@ -80,13 +117,7 @@ export function QuizQuestion({
 
       <article className="liquid-glass p-4 sm:p-6">
         {current.image_url && (
-          <div className="mb-4 rounded-xl overflow-hidden border-white/10 bg-black/20">
-            <img
-              src={current.image_url}
-              alt="Contexto visual da questão"
-              className="max-h-[50vh] sm:max-h-[55vh] w-full object-contain"
-            />
-          </div>
+          <ZoomableImage src={current.image_url} alt="Contexto visual da questão" />
         )}
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -98,7 +129,7 @@ export function QuizQuestion({
           </span>
         </div>
 
-        <h3 className="font-display text-lg leading-snug font-bold text-white mb-5">
+        <h3 className="font-display text-base sm:text-lg leading-snug font-bold text-white mb-5 break-words">
           {current.question_text}
         </h3>
 
@@ -124,7 +155,10 @@ export function QuizQuestion({
                 key={letter}
                 type="button"
                 disabled={revealed}
-                onClick={() => onSelect(letter)}
+                onClick={() => {
+                  haptics.select();
+                  onSelect(letter);
+                }}
                 className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all duration-300 ${statusClass}`}
               >
                 <span
@@ -145,9 +179,9 @@ export function QuizQuestion({
         </div>
 
         {revealed && !examMode && (
-          <div className="mt-10 animate-in slide-in-from-top-4 duration-500">
+          <div className="mt-6 sm:mt-10 animate-in slide-in-from-top-4 duration-500">
             <div
-              className={`rounded-3xl p-8 ${selected === correct ? "bg-success/10 border-success/20" : "bg-destructive/10 border-destructive/20"}`}
+              className={`rounded-3xl p-4 sm:p-8 ${selected === correct ? "bg-success/10 border-success/20" : "bg-destructive/10 border-destructive/20"}`}
             >
               <div className="flex items-center gap-3 mb-4">
                 {selected === correct ? (
@@ -193,7 +227,7 @@ export function QuizQuestion({
           </div>
         )}
 
-        <div className="mt-10 flex-wrap gap-4 pt-6 border-t border-white/10">
+        <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/10">
           {!revealed ? (
             <button
               type="button"

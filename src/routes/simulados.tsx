@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -30,6 +31,8 @@ export const Route = createFileRoute("/simulados")({
   component: Simulados,
 });
 
+const INATRO = { questions: 25, minutes: 30, maxErrors: 3 } as const;
+
 function Simulados() {
   const plano = usePlano();
   const maxAllowed = plano.status.plan.maxExamQuestions;
@@ -42,16 +45,19 @@ function Simulados() {
   const [granted, setGranted] = useState(count);
   const [limitOpen, setLimitOpen] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [official, setOfficial] = useState(false);
 
-  async function start() {
+  async function start(isOfficial = false) {
     setStarting(true);
+    setOfficial(isOfficial);
+    const wanted = isOfficial ? INATRO.questions : count;
     try {
-      const grant = await requestSession("simulado", count);
+      const grant = await requestSession("simulado", wanted);
       if (!grant.allowed) {
         setLimitOpen(true);
         return;
       }
-      if (grant.grantedQuestions < count) {
+      if (grant.grantedQuestions < wanted) {
         toast.info(
           `O teu plano permite simulados até ${grant.maxQuestions} questões. Vamos usar ${grant.grantedQuestions}.`,
         );
@@ -74,9 +80,13 @@ function Simulados() {
           </div>
           <QuizEngine
             mode="simulado"
-            title="Exame simulado"
-            config={{ count: granted, difficulty, source }}
-            {...(timed ? { timeLimitSeconds: granted * 60 } : {})}
+            title={official ? "Exame oficial INATRO" : "Exame simulado"}
+            config={official ? { count: granted } : { count: granted, difficulty, source }}
+            {...(official
+              ? { timeLimitSeconds: INATRO.minutes * 60, maxErrors: INATRO.maxErrors }
+              : timed
+                ? { timeLimitSeconds: granted * 60 }
+                : {})}
           />
         </div>
       </AppShell>
@@ -91,12 +101,34 @@ function Simulados() {
         </div>
 
         <div className="mx-auto max-w-2xl">
-          <h1 className="font-display text-4xl font-bold tracking-tight">Exame simulado</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">Exame simulado</h1>
           <p className="mt-3 text-lg font-medium text-muted-foreground">
             Durante o exame não são mostradas explicações nem respostas. O resultado aparece no fim.
           </p>
 
-          <div className="liquid-glass mt-10 space-y-8 p-8">
+          <div className="liquid-glass mt-8 p-5 sm:p-8 border border-primary/30">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="h-8 w-8 shrink-0 text-primary" />
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-bold">Exame oficial INATRO</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {INATRO.questions} perguntas · {INATRO.minutes} minutos · máximo {INATRO.maxErrors} erros.
+                  Ao {INATRO.maxErrors + 1}.º erro o exame termina como "Não apto", tal como no centro de exames.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={starting}
+              onClick={() => void start(true)}
+              className="liquid-button mt-5 w-full !py-4 text-base"
+            >
+              {starting && official ? "A preparar exame..." : "Iniciar exame oficial"}
+            </button>
+          </div>
+
+          <h2 className="mt-10 font-display text-lg font-bold">Simulado personalizado</h2>
+          <div className="liquid-glass mt-4 space-y-8 p-5 sm:p-8">
             <fieldset>
               <legend className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Número de perguntas</legend>
               <div className="mt-4 flex flex-wrap gap-3">
@@ -186,7 +218,7 @@ function Simulados() {
             <button
               type="button"
               disabled={starting}
-              onClick={() => void start()}
+              onClick={() => void start(false)}
               className="liquid-button w-full !py-4 text-base"
             >
               {starting ? "A preparar simulado..." : "Gerar Simulado"}
