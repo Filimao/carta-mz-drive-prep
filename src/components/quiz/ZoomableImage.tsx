@@ -30,7 +30,7 @@ export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
     (e.target as Element).setPointerCapture(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()];
+      const [a, b] = [...pointers.current.values()] as [{ x: number; y: number }, { x: number; y: number }];
       pinchStart.current = { dist: Math.hypot(a.x - b.x, a.y - b.y), scale };
     } else {
       const now = Date.now();
@@ -46,7 +46,7 @@ export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
     if (!prev) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 2 && pinchStart.current) {
-      const [a, b] = [...pointers.current.values()];
+      const [a, b] = [...pointers.current.values()] as [{ x: number; y: number }, { x: number; y: number }];
       const dist = Math.hypot(a.x - b.x, a.y - b.y);
       setScale(clamp((pinchStart.current.scale * dist) / pinchStart.current.dist));
     } else if (scale > 1) {

@@ -9,7 +9,7 @@ export interface QuizResultsProps {
   total: number;
   elapsed: number;
   onRestart: () => void;
-  maxErrors?: number;
+  maxErrors?: number | undefined;
 }
 
 export function QuizResults({
