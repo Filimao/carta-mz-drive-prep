@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PLANS, planOf, type PlanDefinition, type PlanTier } from "@/lib/plans";
+import { loadPack, validPack } from "@/lib/offline-store";
 
 export const PAYMENT_NUMBERS = {
   mpesa: "879132543",
@@ -49,6 +50,11 @@ export async function fetchPlanStatus(): Promise<PlanStatus> {
   try {
     const { data: auth } = await supabase.auth.getSession();
     if (!auth.session) return GUEST_STATUS;
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      const pack = await loadPack(auth.session.user.id);
+      if (!validPack(pack)) return GUEST_STATUS;
+      return { authenticated: true, tier: "premium", plan: PLANS.premium, expiresAt: pack.expiresAt, expired: false, sessionsUsedToday: 0, paymentPending: false };
+    }
     const { data, error } = await supabase.rpc("my_plan_status");
     if (error) throw error;
     const raw = (data ?? {}) as RawStatus;
@@ -86,6 +92,11 @@ export async function requestSession(
   requested: number,
 ): Promise<SessionGrant & { guest?: boolean }> {
   const { data: auth } = await supabase.auth.getSession();
+  if (typeof navigator !== "undefined" && !navigator.onLine && auth.session) {
+    const pack = await loadPack(auth.session.user.id);
+    const allowed = validPack(pack);
+    return { allowed, ...(allowed ? {} : { reason: "error" as const }), tier: "premium", maxQuestions: 100, grantedQuestions: allowed ? Math.min(100, Math.max(1, requested)) : 0, sessionsUsed: 0, sessionsLimit: null };
+  }
   if (!auth.session) {
     const { canStartSession, countSessionStart, sessionsToday } = await import("@/lib/plans");
     const free = PLANS.free;

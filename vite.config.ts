@@ -60,7 +60,7 @@ export default defineConfig({
           ]
         },
         workbox: {
-          navigateFallback: undefined,
+          navigateFallback: null,
           globPatterns: ["**/*.{js,css,png,jpg,svg,woff2}"],
           runtimeCaching: [
             {

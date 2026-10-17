@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle, Star, Lightbulb, Timer, Volume2, VolumeX } from "lucide-react";
+import { CheckCircle2, XCircle, Star, Lightbulb, Timer, Volume2, VolumeX, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { ZoomableImage } from "@/components/quiz/ZoomableImage";
@@ -125,8 +125,9 @@ export function QuizQuestion({
             {DIFFICULTY_LABEL[current.difficulty]}
           </span>
           <span className="rounded-full bg-white/5 border-white/10 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white/40">
-            {current.source === "PDF" ? "Oficial" : "Prática"}
+            {current.source === "PDF" ? "PDF" : "Prática"}
           </span>
+          {current.is_verified && <span className="inline-flex items-center gap-1 text-xs text-success"><CheckCircle2 className="h-3.5 w-3.5" />Verificada</span>}
         </div>
 
         <h3 className="font-display text-base sm:text-lg leading-snug font-bold text-white mb-5 break-words">
@@ -210,6 +211,7 @@ export function QuizQuestion({
                 <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
                   {current.explanation}
                 </p>
+                {current.legal_reference && <p className="flex items-start gap-2 text-sm text-muted-foreground"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />{current.legal_reference}</p>}
 
                 {current.tip && (
                   <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
