@@ -24,6 +24,7 @@ import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-passwo
 import { Route as RedefinirPasswordRouteImport } from './routes/redefinir-password'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SimuladosRouteImport } from './routes/simulados'
+import { Route as SinaisRouteImport } from './routes/sinais'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -103,6 +104,11 @@ const SimuladosRoute = SimuladosRouteImport.update({
   path: '/simulados',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SinaisRoute = SinaisRouteImport.update({
+  id: '/sinais',
+  path: '/sinais',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/sinais': typeof SinaisRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/sinais': typeof SinaisRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/simulados': typeof SimuladosRoute
+  '/sinais': typeof SinaisRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
+    | '/sinais'
     | '/perfil'
     | '/api/chat'
     | '/admin/pagamentos'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
+    | '/sinais'
     | '/perfil'
     | '/api/chat'
     | '/admin/pagamentos'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/redefinir-password'
     | '/redefinir-senha'
     | '/simulados'
+    | '/sinais'
     | '/_authenticated/perfil'
     | '/api/chat'
     | '/_authenticated/admin/pagamentos'
@@ -267,6 +279,7 @@ export interface RootRouteChildren {
   RedefinirPasswordRoute: typeof RedefinirPasswordRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SimuladosRoute: typeof SimuladosRoute
+  SinaisRoute: typeof SinaisRoute
   ApiChatRoute: typeof ApiChatRoute
 }
 
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimuladosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sinais': {
+      id: '/sinais'
+      path: '/sinais'
+      fullPath: '/sinais'
+      preLoaderRoute: typeof SinaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -439,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirPasswordRoute: RedefinirPasswordRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SimuladosRoute: SimuladosRoute,
+  SinaisRoute: SinaisRoute,
   ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport

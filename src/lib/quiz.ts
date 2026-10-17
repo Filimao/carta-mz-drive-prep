@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { loadPack, validPack, queueSession, queuedSessions, removeQueuedSession } from "@/lib/offline-store";
 
 export type Difficulty = "facil" | "medio" | "dificil";
 export type Letter = "A" | "B" | "C" | "D";
@@ -18,6 +19,8 @@ export interface Question {
   source_document: string | null;
   category_id: string | null;
   image_url: string | null;
+  legal_reference?: string | null;
+  is_verified?: boolean;
 }
 
 export interface Category {
@@ -95,7 +98,7 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 const SELECT_COLUMNS =
-  "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id,image_url";
+  "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id,image_url,legal_reference,is_verified";
 
 const LETTER_KEYS: Letter[] = ["A", "B", "C", "D"];
 
@@ -132,6 +135,17 @@ export function shuffleOptions(q: Question): Question {
 }
 
 export async function fetchQuizQuestions(config: QuizConfig): Promise<Question[]> {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    const { data } = await supabase.auth.getSession();
+    const pack = data.session ? await loadPack(data.session.user.id) : undefined;
+    if (!validPack(pack)) throw new Error("Sem questões offline disponíveis para esta conta.");
+    return shuffle(pack.questions.filter((q) =>
+      (!config.ids?.length || config.ids.includes(q.id)) &&
+      (!config.categoryId || q.category_id === config.categoryId) &&
+      (!config.difficulty || config.difficulty === "todas" || q.difficulty === config.difficulty) &&
+      (!config.source || config.source === "todas" || q.source === config.source)
+    )).slice(0, Math.min(config.count, 100)).map(shuffleOptions);
+  }
   let query = supabase.from("questions").select(SELECT_COLUMNS).eq("is_published", true);
 
   if (config.ids && config.ids.length > 0) query = query.in("id", config.ids);
@@ -255,11 +269,12 @@ export async function persistSession(payload: {
   skipped: number;
   seconds: number;
 }) {
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
+  const { data: auth } = await supabase.auth.getSession();
+  const user = auth.session?.user;
   if (!user) return;
   const score = payload.total > 0 ? (payload.correct / payload.total) * 100 : 0;
-  const { error } = await supabase.from("quiz_sessions").insert({
+  const row = {
+    id: crypto.randomUUID(),
     user_id: user.id,
     mode: payload.mode,
     total_questions: payload.total,
@@ -269,8 +284,19 @@ export async function persistSession(payload: {
     score_percent: Number(score.toFixed(2)),
     seconds_spent: payload.seconds,
     completed_at: new Date().toISOString(),
-  });
-  if (error) {
-    console.error("[quiz] Falha ao guardar sessão no servidor:", error.message);
+  };
+  await queueSession(row);
+  if (navigator.onLine) await flushPendingSessions();
+}
+
+export async function flushPendingSessions() {
+  if (typeof navigator === "undefined" || !navigator.onLine) return;
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) return;
+  for (const row of await queuedSessions()) {
+    if (row.user_id !== data.session.user.id) continue;
+    const { error } = await supabase.from("quiz_sessions").upsert(row, { onConflict: "id", ignoreDuplicates: true });
+    if (error) break;
+    await removeQueuedSession(row.id);
   }
 }

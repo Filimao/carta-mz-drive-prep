@@ -1,0 +1,1 @@
+ALTER TABLE public.questions ADD COLUMN IF NOT EXISTS legal_reference text; COMMENT ON COLUMN public.questions.legal_reference IS 'Optional legal citation entered and verified by an administrator; never inferred by AI.';

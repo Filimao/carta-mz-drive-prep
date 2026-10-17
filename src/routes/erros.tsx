@@ -8,6 +8,8 @@ import { readLocal } from "@/lib/quiz";
 export const Route = createFileRoute("/erros")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Treinar os meus erros — Carta MZ Quiz" },
       {
         name: "description",

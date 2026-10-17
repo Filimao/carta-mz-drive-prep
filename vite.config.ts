@@ -17,6 +17,8 @@ export default defineConfig({
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
+        injectRegister: null,
+        devOptions: { enabled: false },
         manifest: {
           name: "Carta MZ Quiz",
           short_name: "Carta MZ",
@@ -58,8 +60,24 @@ export default defineConfig({
           ]
         },
         workbox: {
-          navigateFallback: "/index.html",
+          navigateFallback: null,
+          globPatterns: ["**/*.{js,css,png,jpg,svg,woff2}"],
           runtimeCaching: [
+            {
+              urlPattern: ({ request, url }) => request.mode === "navigate" && !url.pathname.startsWith("/~oauth") && !url.pathname.startsWith("/api") && !url.pathname.startsWith("/_serverFn"),
+              handler: "NetworkFirst",
+              options: { cacheName: "carta-mz-pages", networkTimeoutSeconds: 4, expiration: { maxEntries: 30 } },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === self.location.origin && /\/assets\/.*-[\w-]+\.(js|css)$/.test(url.pathname),
+              handler: "CacheFirst",
+              options: { cacheName: "carta-mz-assets", expiration: { maxEntries: 250 } },
+            },
+            {
+              urlPattern: ({ url }) => url.pathname.includes("/storage/v1/object/public/question-images/"),
+              handler: "CacheFirst",
+              options: { cacheName: "carta-mz-question-images-v1", expiration: { maxEntries: 2500 } },
+            },
             {
               urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
               handler: "CacheFirst",

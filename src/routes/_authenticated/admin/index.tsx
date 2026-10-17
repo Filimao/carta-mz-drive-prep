@@ -17,6 +17,7 @@ import { AppShell } from "@/components/AppShell";
 import { PdfImportPanel, uploadQuestionImage } from "@/components/admin/PdfImportPanel";
 import { ImagePromptHelper } from "@/components/admin/ImagePromptHelper";
 import { SymbolsPanel } from "@/components/admin/SymbolsPanel";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLAN_ORDER, PLANS, type PlanTier } from "@/lib/plans";
@@ -63,6 +64,7 @@ interface AdminQuestion {
   needs_review: boolean;
   is_published: boolean;
   is_verified: boolean;
+  legal_reference: string | null;
 }
 
 const TABS: [Tab, string][] = [
@@ -218,7 +220,7 @@ function OverviewPanel() {
 
 /* ---------------- Questões ---------------- */
 
-type QFilter = "revisao" | "todas" | "despublicadas";
+type QFilter = "revisao" | "todas" | "despublicadas" | "verificadas" | "nao_verificadas";
 
 function ReviewPanel() {
   const qc = useQueryClient();
@@ -232,12 +234,14 @@ function ReviewPanel() {
       let q = supabase
         .from("questions")
         .select(
-          "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,category_id,difficulty,source_document,source_page,image_url,needs_review,is_published,is_verified",
+          "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,category_id,difficulty,source_document,source_page,image_url,needs_review,is_published,is_verified,legal_reference",
         )
         .order("created_at", { ascending: false })
         .limit(80);
       if (filter === "revisao") q = q.eq("needs_review", true);
       if (filter === "despublicadas") q = q.eq("is_published", false);
+      if (filter === "verificadas") q = q.eq("is_verified", true);
+      if (filter === "nao_verificadas") q = q.eq("is_verified", false);
       if (term.trim()) q = q.ilike("question_text", `%${term.trim()}%`);
       const { data, error } = await q;
       if (error) throw error;
@@ -315,10 +319,12 @@ function ReviewPanel() {
           [
             ["revisao", "Para revisão"],
             ["despublicadas", "Despublicadas"],
+            ["verificadas", "Verificadas"],
+            ["nao_verificadas", "Não verificadas"],
             ["todas", "Todas"],
           ] as [QFilter, string][]
         ).map(([key, label]) => (
-          <button
+          <Button
             key={key}
             type="button"
             onClick={() => setFilter(key)}
@@ -327,7 +333,7 @@ function ReviewPanel() {
             }`}
           >
             {label}
-          </button>
+          </Button>
         ))}
         <label className="relative ml-auto w-full sm:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -499,6 +505,7 @@ function QuestionCard({
             placeholder="Dica (opcional)"
             className="w-full rounded-lg border border-input bg-card px-2 py-1.5 text-xs font-normal text-foreground"
           />
+          {field("legal_reference", "Referência legal confirmada (diploma e artigo)")}
           <div className="grid gap-2 sm:grid-cols-3">
             <label className="block text-xs font-semibold text-muted-foreground">
               Resposta correcta
@@ -558,6 +565,7 @@ function QuestionCard({
               option_c: form.option_c,
               option_d: form.option_d,
               explanation: form.explanation,
+              legal_reference: form.legal_reference?.trim() || null,
               tip: form.tip,
               category_id: form.category_id,
               difficulty: form.difficulty,

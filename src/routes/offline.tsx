@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CloudDownload, Loader2, WifiOff } from "lucide-react";
+import { CloudDownload, Loader2, WifiOff, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -8,6 +8,10 @@ import { ExpiredBanner, UpgradeRequired } from "@/components/PlanGate";
 import { InstallButton } from "@/components/PwaInstall";
 import { usePlano } from "@/hooks/usePlano";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { QuizEngine } from "@/components/QuizEngine";
+import { loadPack, savePack, validPack, OFFLINE_IMAGE_CACHE } from "@/lib/offline-store";
+import { flushPendingSessions, type Question } from "@/lib/quiz";
 
 export const Route = createFileRoute("/offline")({
   head: () => ({
@@ -27,8 +31,6 @@ export const Route = createFileRoute("/offline")({
   component: Offline,
 });
 
-const CACHE_KEY = "carta-mz-offline-questions-v1";
-
 function Offline() {
   const plano = usePlano();
   const allowed = plano.status.plan.offline && !plano.status.expired;
@@ -36,6 +38,9 @@ function Offline() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [online, setOnline] = useState(true);
+  const [images, setImages] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     setOnline(navigator.onLine);
@@ -43,16 +48,11 @@ function Offline() {
     const off = () => setOnline(false);
     window.addEventListener("online", on);
     window.addEventListener("offline", off);
-    try {
-      const raw = window.localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as { savedAt: string; questions: unknown[] };
-        setCount(parsed.questions.length);
-        setSavedAt(parsed.savedAt);
-      }
-    } catch {
-      /* ignore */
-    }
+    void supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const pack = await loadPack(data.session.user.id);
+      if (validPack(pack)) { setCount(pack.questions.length); setSavedAt(pack.savedAt); setImages(pack.images); }
+    }).catch(() => {});
     return () => {
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
@@ -61,28 +61,37 @@ function Offline() {
 
   async function sync() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("questions")
-      .select(
-        "id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,category_id",
-      )
-      .eq("is_published", true)
-      .limit(2000);
-    setLoading(false);
-    if (error || !data) {
-      toast.error("Não foi possível descarregar as questões.");
-      return;
-    }
-    const payload = { savedAt: new Date().toISOString(), questions: data };
+    setProgress(0);
     try {
-      window.localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-    } catch {
-      toast.error("Sem espaço no dispositivo para guardar as questões.");
-      return;
+      const { data: auth } = await supabase.auth.getSession();
+      if (!auth.session || !allowed || !plano.status.expiresAt) throw new Error("É necessário um plano Premium activo.");
+      const questions: Question[] = [];
+      for (let offset = 0; ; offset += 500) {
+        const { data, error } = await supabase.from("questions").select("id,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,tip,difficulty,source,source_document,category_id,image_url,legal_reference,is_verified").eq("is_published", true).order("id").range(offset, offset + 499);
+        if (error) throw error;
+        questions.push(...(data ?? []) as Question[]);
+        if ((data?.length ?? 0) < 500) break;
+      }
+      const urls = [...new Set(questions.flatMap((q) => q.image_url ? [q.image_url] : []))];
+      const cache = await caches.open(OFFLINE_IMAGE_CACHE);
+      let downloaded = 0;
+      for (const url of urls) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Uma fotografia não pôde ser descarregada. Tenta sincronizar novamente.");
+        await cache.put(url, response);
+        downloaded += 1;
+        setProgress(Math.round(downloaded / urls.length * 100));
+      }
+      const pack = { userId: auth.session.user.id, expiresAt: plano.status.expiresAt, savedAt: new Date().toISOString(), questions, images: downloaded };
+      await savePack(pack);
+      await flushPendingSessions();
+      setCount(questions.length); setImages(downloaded); setSavedAt(pack.savedAt); setProgress(100);
+      toast.success(`${questions.length} questões e ${downloaded} fotografias guardadas.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível guardar as questões neste dispositivo.");
+    } finally {
+      setLoading(false);
     }
-    setCount(data.length);
-    setSavedAt(payload.savedAt);
-    toast.success(`${data.length} questões guardadas no dispositivo. Continua assim!`);
   }
 
   if (plano.loading) {
@@ -102,6 +111,8 @@ function Offline() {
     );
   }
 
+  if (started) return <AppShell><Button variant="outline" className="mb-5" onClick={() => setStarted(false)}>Voltar</Button><QuizEngine mode="pratica" title="Prática offline" config={{ count: Math.min(count, 100) }} /></AppShell>;
+
   return (
     <AppShell>
       <h1 className="font-display text-3xl font-semibold">Modo offline</h1>
@@ -119,11 +130,11 @@ function Offline() {
         </p>
         <p className="text-sm text-muted-foreground">
           {count > 0
-            ? `${count} questões guardadas${savedAt ? ` · última sincronização ${new Date(savedAt).toLocaleString("pt-PT")}` : ""}.`
+            ? `${count} questões · ${images} fotografias${savedAt ? ` · última sincronização ${new Date(savedAt).toLocaleString("pt-PT")}` : ""}.`
             : "Ainda não há questões guardadas neste dispositivo."}
         </p>
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
             disabled={loading || !online}
             onClick={() => void sync()}
@@ -131,9 +142,11 @@ function Offline() {
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudDownload className="h-4 w-4" />}
             {count > 0 ? "Sincronizar agora" : "Descarregar questões"}
-          </button>
+          </Button>
+          {count > 0 && <Button variant="outline" onClick={() => setStarted(true)}><Play />Começar a estudar</Button>}
           <InstallButton />
         </div>
+        {loading && <p role="status" className="text-sm text-muted-foreground">A guardar fotografias: {progress}%</p>}
         {!online && (
           <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
             <WifiOff className="h-3.5 w-3.5" /> Sem internet: usa as questões já guardadas.

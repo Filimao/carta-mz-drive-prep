@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { AppShell } from "@/components/AppShell";
+import { readiness } from "@/lib/readiness";
 import { levelFor, readLocal, streakDays, type LocalState } from "@/lib/quiz";
 
 export const Route = createFileRoute("/progresso")({
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/progresso")({
         property: "og:description",
         content: "Estatísticas de desempenho e evolução ao longo dos dias.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Progresso,
@@ -45,6 +48,7 @@ function Progresso() {
   );
   const minutes = Math.round(state.sessions.reduce((acc, s) => acc + s.seconds, 0) / 60);
   const level = levelFor(state.xp);
+  const preparation = readiness(state.sessions);
   const chart = state.sessions.slice(-10).map((s, i) => ({
     name: `#${i + 1}`,
     resultado: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
@@ -64,6 +68,13 @@ function Progresso() {
   return (
     <AppShell>
       <h1 className="font-display text-3xl font-semibold">O meu progresso</h1>
+
+      <section className="mt-6 border-b border-border pb-6">
+        <h2 className="font-display text-lg font-semibold">Índice de preparação</h2>
+        <p className="mt-2 font-display text-4xl font-bold text-primary">{preparation.index === null ? "—" : `${preparation.index}%`}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{preparation.exams ? `${preparation.passed} de ${preparation.exams} simulados de 25 questões com até 3 erros.` : "Ainda não há simulados de 25 questões concluídos."}</p>
+        <p className="mt-1 text-xs text-muted-foreground">Desempenho nos últimos 10 simulados; não é uma garantia de aprovação no exame.</p>
+      </section>
 
       <div className="surface mt-6 rounded-3xl p-6">
         <p className="text-sm text-muted-foreground">Nível actual</p>

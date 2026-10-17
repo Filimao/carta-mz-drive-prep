@@ -278,6 +278,7 @@ export type Database = {
           import_id: string | null
           is_published: boolean
           is_verified: boolean
+          legal_reference: string | null
           needs_review: boolean
           option_a: string
           option_b: string
@@ -302,6 +303,7 @@ export type Database = {
           import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
+          legal_reference?: string | null
           needs_review?: boolean
           option_a: string
           option_b: string
@@ -326,6 +328,7 @@ export type Database = {
           import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
+          legal_reference?: string | null
           needs_review?: boolean
           option_a?: string
           option_b?: string
@@ -572,6 +575,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      symbols: {
+        Row: {
+          ai_generated: boolean
+          category_id: string | null
+          created_at: string
+          description: string
+          id: string
+          image_prompt: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          ai_generated?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_prompt?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          ai_generated?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_prompt?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symbols_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_badges: {
         Row: {

@@ -12,26 +12,16 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { registerSW } from "virtual:pwa-register";
+import { registerAppWorker } from "@/lib/pwa";
+import { flushPendingSessions } from "@/lib/quiz";
 
 function useServiceWorkerRegistration() {
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    
-    registerSW({
-      onNeedRefresh() {
-        console.log("[PWA] Nova versão disponível!");
-      },
-      onOfflineReady() {
-        console.log("[PWA] Carta MZ Quiz disponível offline!");
-      },
-      onRegistered(registration) {
-        console.log("[PWA] Service Worker registado com sucesso", registration);
-      },
-      onRegisterError(error) {
-        console.error("[PWA] Erro ao registar Service Worker:", error);
-      },
-    });
+    void registerAppWorker().catch(console.error);
+    const sync = () => { void flushPendingSessions().catch(console.error); };
+    sync();
+    window.addEventListener("online", sync);
+    return () => window.removeEventListener("online", sync);
   }, []);
 }
 

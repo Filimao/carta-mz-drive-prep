@@ -15,6 +15,8 @@ import { fetchCategories, type Difficulty } from "@/lib/quiz";
 export const Route = createFileRoute("/praticar")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Modo Prática — Carta MZ Quiz" },
       {
         name: "description",
