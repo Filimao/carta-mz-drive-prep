@@ -21,6 +21,7 @@ import {
   LogIn,
   LogOut,
   ChevronDown,
+  Signpost,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -49,6 +50,7 @@ const NAV = [
   { to: "/praticar", label: "Praticar", icon: Dumbbell },
   { to: "/simulados", label: "Simulados", icon: ClipboardList },
   { to: "/categorias", label: "Categorias", icon: LayoutGrid },
+  { to: "/sinais", label: "Sinais", icon: Signpost },
   { to: "/erros", label: "Erros", icon: XCircle },
   { to: "/favoritos", label: "Favoritos", icon: Star },
   { to: "/progresso", label: "Progresso", icon: BarChart3 },

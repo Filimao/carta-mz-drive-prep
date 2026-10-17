@@ -66,7 +66,7 @@ export function SymbolsPanel() {
   }, []);
 
   const filtered =
-    activeCat === "todos" ? stored : stored.filter((s) => s.category_id === activeCat);
+    activeCat === "todos" ? stored : stored.filter((s) => s.category_id === categories?.find((c) => c.slug === activeCat)?.id);
 
   async function generateAI() {
     setGenerating(true);
@@ -104,7 +104,7 @@ export function SymbolsPanel() {
       const rows = generated.map((s) => ({
         name: s.name,
         description: s.description,
-        category_id: s.categorySlug,
+        category_id: categories?.find((c) => c.slug === s.categorySlug)?.id ?? null,
         image_prompt: s.imagePrompt ?? "",
         ai_generated: true,
       }));

@@ -11,6 +11,8 @@ import { countQuestions, fetchCategories } from "@/lib/quiz";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Carta MZ Quiz — Simulados da Carta de Condução em Moçambique" },
       {
         name: "description",

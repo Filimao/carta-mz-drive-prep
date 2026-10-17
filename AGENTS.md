@@ -13,3 +13,4 @@
 - Register the generated PWA worker through src/lib/pwa.ts only, excluding development and preview contexts, to prevent stale preview caches.
 - Display exam preparation as a recent-simulation performance index, never as a calibrated probability of passing.
 - Legal citations are optional administrator-confirmed question data; never generate legal article numbers automatically.
+- The learner signs catalog combines bundled standard diagrams with active public symbols; persist category UUIDs rather than slugs.

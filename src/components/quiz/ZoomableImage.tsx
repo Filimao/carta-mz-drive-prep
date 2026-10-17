@@ -1,5 +1,6 @@
 import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
-import { useRef, useState, type PointerEvent, type WheelEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type WheelEvent } from "react";
+import { OFFLINE_IMAGE_CACHE } from "@/lib/offline-store";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -8,6 +9,23 @@ const MAX = 5;
 const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v));
 
 export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
+  const [cachedSrc, setCachedSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl: string | undefined;
+    setCachedSrc(null);
+    if (!navigator.onLine && "caches" in window) {
+      void caches.open(OFFLINE_IMAGE_CACHE).then((cache) => cache.match(src)).then(async (response) => {
+        if (!response || cancelled) return;
+        const blob = await response.blob();
+        if (cancelled) return;
+        objectUrl = URL.createObjectURL(blob);
+        setCachedSrc(objectUrl);
+      }).catch(() => {});
+    }
+    return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [src]);
+  const displaySrc = cachedSrc ?? src;
   const [open, setOpen] = useState(false);
   const [scale, setScale] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -67,7 +85,7 @@ export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
         className="group relative mb-4 block w-full overflow-hidden rounded-xl border border-white/10 bg-black/20"
         aria-label="Ampliar imagem"
       >
-        <img src={src} alt={alt} className="max-h-[45vh] w-full object-contain sm:max-h-[55vh]" />
+        <img src={displaySrc} alt={alt} className="max-h-[45vh] w-full object-contain sm:max-h-[55vh]" />
         <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-background/80 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
           <Maximize2 className="h-3.5 w-3.5" /> Ampliar
         </span>
@@ -91,7 +109,7 @@ export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
             onWheel={onWheel}
           >
             <img
-              src={src}
+              src={displaySrc}
               alt={alt}
               draggable={false}
               className="max-h-full max-w-full select-none object-contain transition-transform duration-75"
