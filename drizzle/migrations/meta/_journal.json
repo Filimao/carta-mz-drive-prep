@@ -15,6 +15,13 @@
       "when": 1792061952992,
       "tag": "0001_remove_duplicate_teste19",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792229407004,
+      "tag": "0002_question_legal_reference",
+      "breakpoints": true
     }
   ]
 }

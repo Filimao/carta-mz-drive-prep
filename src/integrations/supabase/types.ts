@@ -278,6 +278,7 @@ export type Database = {
           import_id: string | null
           is_published: boolean
           is_verified: boolean
+          legal_reference: string | null
           needs_review: boolean
           option_a: string
           option_b: string
@@ -302,6 +303,7 @@ export type Database = {
           import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
+          legal_reference?: string | null
           needs_review?: boolean
           option_a: string
           option_b: string
@@ -326,6 +328,7 @@ export type Database = {
           import_id?: string | null
           is_published?: boolean
           is_verified?: boolean
+          legal_reference?: string | null
           needs_review?: boolean
           option_a?: string
           option_b?: string
