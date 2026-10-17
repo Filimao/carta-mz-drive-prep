@@ -576,6 +576,53 @@ export type Database = {
         }
         Relationships: []
       }
+      symbols: {
+        Row: {
+          ai_generated: boolean
+          category_id: string | null
+          created_at: string
+          description: string
+          id: string
+          image_prompt: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          ai_generated?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_prompt?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          ai_generated?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_prompt?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symbols_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           badge_code: string

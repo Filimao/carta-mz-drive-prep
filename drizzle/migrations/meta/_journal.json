@@ -22,6 +22,13 @@
       "when": 1792229407004,
       "tag": "0002_question_legal_reference",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792229515202,
+      "tag": "0003_traffic_symbols_catalog",
+      "breakpoints": true
     }
   ]
 }
