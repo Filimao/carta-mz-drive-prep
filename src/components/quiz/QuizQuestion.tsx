@@ -23,6 +23,7 @@ export interface QuizQuestionProps {
   onNext: () => void;
   onGiveUp: () => void;
   onToggleFavorite: () => void;
+  allowFavorite?: boolean;
 }
 
 export function QuizQuestion({
@@ -40,6 +41,7 @@ export function QuizQuestion({
   onNext,
   onGiveUp,
   onToggleFavorite,
+  allowFavorite = true,
 }: QuizQuestionProps) {
   const correct = current.correct_answer as Letter;
   const isLast = index + 1 >= total;
@@ -95,7 +97,7 @@ export function QuizQuestion({
               {speaking ? <VolumeX className="h-5 w-5 text-primary" /> : <Volume2 className="h-5 w-5" />}
             </button>
           )}
-          <button
+          {allowFavorite && <button
             type="button"
             aria-label="Favorito"
             onClick={onToggleFavorite}
@@ -104,7 +106,7 @@ export function QuizQuestion({
             <Star
               className={`h-5 w-5 ${isFavorite ? "fill-warning text-warning" : "text-white/40"}`}
             />
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -211,7 +213,7 @@ export function QuizQuestion({
                 <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
                   {current.explanation}
                 </p>
-                {current.legal_reference && <p className="flex items-start gap-2 text-sm text-muted-foreground"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />{current.legal_reference}</p>}
+                {current.is_verified && current.legal_reference && <p className="flex items-start gap-2 text-sm text-muted-foreground"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />{current.legal_reference}</p>}
 
                 {current.tip && (
                   <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">

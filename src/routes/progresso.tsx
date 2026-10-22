@@ -1,8 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { AppShell } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
 import { readiness } from "@/lib/readiness";
 import { levelFor, readLocal, streakDays, type LocalState } from "@/lib/quiz";
 
@@ -28,16 +39,62 @@ export const Route = createFileRoute("/progresso")({
 });
 
 function Progresso() {
+  const session = useSession();
   const [state, setState] = useState<LocalState | null>(null);
   useEffect(() => setState(readLocal()), []);
+  const {
+    data: simulations = [],
+    isLoading: simulationsLoading,
+    error: simulationsError,
+    refetch: refetchSimulations,
+  } = useQuery({
+    queryKey: ["readiness-simulations", session.userId],
+    enabled: Boolean(session.userId),
+    queryFn: async () => {
+      if (!session.userId) return [];
+      const { data, error } = await supabase
+        .from("quiz_sessions")
+        .select("mode,total_questions,correct_count")
+        .eq("user_id", session.userId)
+        .eq("mode", "simulado")
+        .eq("total_questions", 25)
+        .order("completed_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return (data ?? []).map((result) => ({
+        mode: result.mode,
+        total: result.total_questions,
+        correct: result.correct_count,
+      }));
+    },
+  });
 
-  if (!state) {
+  if (session.loading || (session.userId && (!state || simulationsLoading))) {
     return (
       <AppShell>
         <div className="h-64 animate-pulse rounded-3xl bg-muted" />
       </AppShell>
     );
   }
+
+  if (!session.userId) {
+    return (
+      <AppShell>
+        <section className="surface mx-auto max-w-xl rounded-3xl p-6 text-center sm:p-10">
+          <h1 className="font-display text-2xl font-bold">Acompanhe o seu progresso</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Crie uma conta ou inicie sessão para ver o histórico dos seus simulados e o Índice de
+            Preparação.
+          </p>
+          <Link to="/auth" className="hero-button mt-6 inline-flex justify-center">
+            Criar conta ou entrar
+          </Link>
+        </section>
+      </AppShell>
+    );
+  }
+
+  if (!state) return null;
 
   const answered = state.answers.length;
   const correct = state.answers.filter((a) => a.correct).length;
@@ -48,7 +105,7 @@ function Progresso() {
   );
   const minutes = Math.round(state.sessions.reduce((acc, s) => acc + s.seconds, 0) / 60);
   const level = levelFor(state.xp);
-  const preparation = readiness(state.sessions);
+  const preparation = readiness(simulations);
   const chart = state.sessions.slice(-10).map((s, i) => ({
     name: `#${i + 1}`,
     resultado: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0,
@@ -71,9 +128,38 @@ function Progresso() {
 
       <section className="mt-6 border-b border-border pb-6">
         <h2 className="font-display text-lg font-semibold">Índice de preparação</h2>
-        <p className="mt-2 font-display text-4xl font-bold text-primary">{preparation.index === null ? "—" : `${preparation.index}%`}</p>
-        <p className="mt-2 text-sm text-muted-foreground">{preparation.exams ? `${preparation.passed} de ${preparation.exams} simulados de 25 questões com até 3 erros.` : "Ainda não há simulados de 25 questões concluídos."}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Desempenho nos últimos 10 simulados; não é uma garantia de aprovação no exame.</p>
+        {simulationsError ? (
+          <div className="mt-3" role="alert">
+            <p className="text-sm text-destructive">
+              Não foi possível carregar os simulados recentes.
+            </p>
+            <button
+              type="button"
+              onClick={() => void refetchSimulations()}
+              className="mt-2 text-sm font-semibold text-primary hover:underline"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : preparation.exams > 0 ? (
+          <>
+            <p className="mt-2 font-display text-4xl font-bold text-primary">
+              {preparation.index}%
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {preparation.passed} de {preparation.exams} simulados recentes de 25 questões
+              concluídos com até 3 erros.
+            </p>
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Complete um simulado de 25 questões para desbloquear o índice baseado no seu desempenho
+            recente.
+          </p>
+        )}
+        <p className="mt-1 text-xs text-muted-foreground">
+          Desempenho nos últimos 10 simulados; não é uma garantia de aprovação no exame.
+        </p>
       </section>
 
       <div className="surface mt-6 rounded-3xl p-6">

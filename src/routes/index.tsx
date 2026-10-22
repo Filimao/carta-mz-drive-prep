@@ -1,176 +1,250 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, WifiOff, BookOpen, Trophy, Gauge } from "lucide-react";
+import { BookOpen, Check, ClipboardList, ShieldCheck, Signpost, WifiOff } from "lucide-react";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { useSession } from "@/hooks/useSession";
 import { CategoryIcon } from "@/lib/category-icons";
 import { countQuestions, fetchCategories } from "@/lib/quiz";
+import { PLANS } from "@/lib/plans";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { title: "Carta MZ Quiz — Simulados da Carta de Condução em Moçambique" },
+      { title: "Carta MZ Quiz — Exame teórico de condução em Moçambique" },
       {
         name: "description",
         content:
-          "Pratique questões de condução, sinais de trânsito e segurança rodoviária com simulados interactivos para preparação da carta de condução em Moçambique.",
+          "Prepare-se para o exame teórico de condução em Moçambique com questões explicadas, mini-teste grátis, simulados e sinais de trânsito.",
       },
-      { property: "og:title", content: "Carta MZ Quiz — Aprende. Pratica. Passa." },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "/icon-512.png" },
+      {
+        property: "og:title",
+        content: "Prepare-se para o exame teórico de condução | Carta MZ Quiz",
+      },
       {
         property: "og:description",
         content:
-          "Questões, simulados completos e acompanhamento de progresso para o exame teórico de condução em Moçambique.",
+          "Experimente um mini-teste grátis e estude com questões, simulados, sinais e explicações em português.",
+      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/icon-512.png" },
+      { name: "twitter:title", content: "Carta MZ Quiz — Prepare-se para o exame teórico" },
+      {
+        name: "twitter:description",
+        content: "Questões explicadas e simulados para a carta de condução em Moçambique.",
       },
     ],
   }),
   component: Index,
 });
 
-const STEPS = [
-  "Escolha um tema",
-  "Responda às questões",
-  "Veja a explicação",
-  "Reveja os seus erros",
-  "Faça simulados",
-  "Acompanhe a evolução",
+const FEATURES = [
+  {
+    icon: BookOpen,
+    title: "Questões explicadas",
+    description: "Pratique e compreenda a resposta, não apenas a letra certa.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Simulados",
+    description: "Treine com sessões cronometradas e reveja o seu desempenho.",
+  },
+  {
+    icon: Signpost,
+    title: "Sinais de trânsito",
+    description: "Consulte sinais e explicações organizados por categoria.",
+  },
+  {
+    icon: WifiOff,
+    title: "Estudo offline",
+    description: "Guarde questões neste dispositivo com o plano Premium.",
+  },
 ];
 
 function Index() {
   const { data: total } = useQuery({ queryKey: ["question-count"], queryFn: countQuestions });
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
-  const session = useSession();
-  const navigate = useNavigate();
-
-  // O ecrã de entrada é o login: visitantes sem sessão vão directos para /auth.
-  useEffect(() => {
-    if (!session.loading && !session.userId) void navigate({ to: "/auth", replace: true });
-  }, [session.loading, session.userId, navigate]);
-
-  if (!session.loading && !session.userId) {
-    return (
-      <AppShell>
-        <p className="text-sm text-muted-foreground">A abrir o ecrã de início de sessão...</p>
-      </AppShell>
-    );
-  }
+  useEffect(() => trackProductEvent("landing_page_view"), []);
 
   return (
-        <AppShell>
-      <section className="relative -mx-4 -mt-8 min-h-[85vh] overflow-hidden px-4 pt-14 pb-16 sm:px-8 bg-[var(--hero-bg)]">
-        <div className="mx-auto max-w-5xl">
-          <div className="liquid-glass animate-fade-in-up p-6 md:p-10 lg:w-2/3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-white uppercase">
-              APRENDE. PRATICA. PASSA.
-            </span>
-            
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight text-white sm:text-5xl md:text-7xl">
-              Preparado para <br />
-              <span style={{ color: '#2d5bd7' }}>passar no exame?</span>
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-              Pratique questões, faça simulados e acompanha o teu progresso para o exame oficial da carta de condução.
+    <AppShell>
+      <section className="relative -mx-3 -mt-4 overflow-hidden bg-[var(--hero-bg)] px-4 py-12 sm:-mx-4 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="liquid-glass max-w-3xl p-6 sm:p-10">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold tracking-wide text-white">
+              CARTA MZ QUIZ
             </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link to="/praticar" className="hero-button group">
-                Começar Quiz
+            <h1 className="mt-6 font-display text-3xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
+              Prepare-se para o exame teórico de condução em Moçambique
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+              Estude com questões explicadas, imagens, sinais de trânsito e simulados. Com o
+              Premium, pode guardar o pacote de questões e continuar a estudar sem internet.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/mini-teste"
+                onClick={() => trackProductEvent("try_free_click")}
+                className="hero-button justify-center"
+              >
+                Experimentar grátis
               </Link>
-              <Link to="/simulados" className="hero-button-outline">
-                Fazer Simulado
-              </Link>
-              <span className="text-xs font-medium text-white/60">
-                230+ questões · Simulados completos
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-12 lg:mt-24">
-            <div className="liquid-glass flex flex-wrap items-center gap-6 p-6">
-              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
-                <span className="text-xs font-bold text-white/60 uppercase">Categoria</span>
-                <span className="text-lg font-semibold text-white">Ligeiros</span>
-              </div>
-              <div className="h-10 w-px bg-white/10 hidden md:block" />
-              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
-                <span className="text-xs font-bold text-white/60 uppercase">Tipo</span>
-                <span className="text-lg font-semibold text-white">Simulado</span>
-              </div>
-              <div className="h-10 w-px bg-white/10 hidden md:block" />
-              <div className="flex flex-1 flex-col gap-1 min-w-[120px]">
-                <span className="text-xs font-bold text-white/60 uppercase">Dificuldade</span>
-                <span className="text-lg font-semibold text-white">Intermédio</span>
-              </div>
-              <Link to="/praticar" className="hero-button w-full md:w-auto">
-                Pesquisar Teste
+              <Link
+                to="/auth"
+                onClick={() => trackProductEvent("create_account_click")}
+                className="hero-button-outline justify-center"
+              >
+                Criar conta
               </Link>
             </div>
+            <p className="mt-4 text-xs text-white/60">
+              {typeof total === "number" ? `${total} questões publicadas` : "Questões publicadas"} ·
+              Sem criar conta para experimentar
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5 px-4">
-
-        {[
-          { icon: BookOpen, label: `${total ?? 200}+ questões` },
-          { icon: Gauge, label: "Simulados completos" },
-          { icon: ShieldCheck, label: "Explicações das respostas" },
-          { icon: Trophy, label: "Progresso personalizado" },
-          { icon: WifiOff, label: "Modo offline" },
-        ].map((item) => (
-          <div key={item.label} className="surface flex items-center gap-3 rounded-2xl p-4">
-            <item.icon className="h-5 w-5 shrink-0 text-primary" />
-            <span className="text-sm font-semibold">{item.label}</span>
-          </div>
+      <section
+        className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="Funcionalidades"
+      >
+        {FEATURES.map(({ icon: Icon, title, description }) => (
+          <article key={title} className="surface rounded-2xl p-5">
+            <Icon className="h-6 w-6 text-primary" aria-hidden="true" />
+            <h2 className="mt-4 font-display text-lg font-semibold">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          </article>
         ))}
       </section>
 
-            <section className="mt-20">
-        <h2 className="font-display text-3xl font-bold">Como funciona?</h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <div key={step} className="liquid-glass group p-6 transition-all hover:bg-white/5">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/20 text-xl font-bold text-primary group-hover:scale-110 transition-transform">
-                {i + 1}
+      <section className="mt-16" aria-labelledby="how-it-works">
+        <h2 id="how-it-works" className="font-display text-2xl font-bold sm:text-3xl">
+          Como funciona
+        </h2>
+        <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+          {[
+            [
+              "1",
+              "Escolha como estudar",
+              "Experimente o mini-teste ou crie uma conta para praticar por tema.",
+            ],
+            [
+              "2",
+              "Responda e aprenda",
+              "Receba feedback e explicações para compreender cada resposta.",
+            ],
+            [
+              "3",
+              "Acompanhe o seu desempenho",
+              "Faça simulados e reveja os assuntos que precisam de mais prática.",
+            ],
+          ].map(([number, title, description]) => (
+            <li key={number} className="liquid-glass rounded-2xl p-5 sm:p-6">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/15 font-bold text-primary">
+                {number}
               </span>
-              <p className="mt-4 text-lg font-semibold">{step}</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Passo essencial para garantir que estás preparado para o sucesso no teu exame de condução.
-              </p>
-            </div>
+              <h3 className="mt-4 font-semibold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
-      <section className="mt-20 mb-12">
-        <div className="flex items-end justify-between gap-4">
+      <section className="mt-16" aria-labelledby="plans-heading">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-3xl font-bold">Categorias de estudo</h2>
-            <p className="mt-2 text-muted-foreground text-lg">Foca nos temas que mais precisas de praticar.</p>
+            <h2 id="plans-heading" className="font-display text-2xl font-bold sm:text-3xl">
+              Comece grátis. Evolua ao seu ritmo.
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Escolha o acesso adequado às suas necessidades de estudo.
+            </p>
           </div>
-          <Link to="/categorias" className="text-sm font-bold text-primary hover:underline">
-            Ver todas
+          <Link to="/precos" className="text-sm font-semibold text-primary hover:underline">
+            Ver preços e benefícios
           </Link>
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {(categories ?? []).slice(0, 8).map((cat) => (
-            <Link
-              key={cat.id}
-              to="/categorias"
-              className="liquid-glass p-6 transition-transform hover:-translate-y-2"
-            >
-              <CategoryIcon name={cat.icon} className="h-10 w-10 text-primary" />
-              <p className="mt-4 text-lg font-bold">{cat.name}</p>
-              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{cat.description}</p>
-            </Link>
-          ))}
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {(["free", "pro", "premium"] as const).map((tier) => {
+            const plan = PLANS[tier];
+            return (
+              <article
+                key={tier}
+                className={`surface rounded-2xl p-5 ${tier === "pro" ? "border-primary ring-1 ring-primary/40" : ""}`}
+              >
+                <h3 className="font-display text-xl font-bold">{plan.name}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{plan.tagline}</p>
+                <p className="mt-4 text-2xl font-bold">
+                  {plan.priceMzn === 0 ? "Grátis" : `${plan.priceMzn} MT`}
+                  {plan.priceMzn > 0 && (
+                    <span className="ml-1 text-sm font-medium text-muted-foreground">/ mês</span>
+                  )}
+                </p>
+                <ul className="mt-4 space-y-2 text-sm">
+                  {plan.benefits.slice(0, 3).map((benefit) => (
+                    <li key={benefit} className="flex gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
         </div>
       </section>
 
+      <section
+        className="mt-16 rounded-3xl border border-border bg-card/70 p-6 sm:p-8"
+        aria-labelledby="trust-heading"
+      >
+        <div className="flex items-start gap-4">
+          <ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
+          <div>
+            <h2 id="trust-heading" className="font-display text-xl font-bold">
+              Estude com informação clara
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              A Carta MZ Quiz é uma plataforma independente de estudo. O conteúdo não substitui os
+              materiais oficiais, não representa uma entidade pública e não garante aprovação. As
+              referências legais só são apresentadas quando confirmadas pela administração.
+            </p>
+          </div>
+        </div>
+        {categories && categories.length > 0 && (
+          <div className="mt-8">
+            <h3 className="font-semibold">Temas disponíveis</h3>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.slice(0, 4).map((category) => (
+                <Link
+                  key={category.id}
+                  to="/categorias"
+                  className="flex items-center gap-3 rounded-xl border border-border p-3 hover:bg-secondary/50"
+                >
+                  <CategoryIcon name={category.icon} className="h-8 w-8 shrink-0 text-primary" />
+                  <span className="text-sm font-semibold">{category.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to="/mini-teste"
+            onClick={() => trackProductEvent("try_free_click")}
+            className="hero-button justify-center"
+          >
+            Experimentar grátis
+          </Link>
+          <Link to="/sinais" className="hero-button-outline justify-center">
+            Explorar sinais de trânsito
+          </Link>
+        </div>
+      </section>
     </AppShell>
   );
 }

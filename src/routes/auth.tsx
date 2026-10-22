@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -22,7 +23,14 @@ export const Route = createFileRoute("/auth")({
         content: "Sincronize o seu estudo entre telemóvel, tablet e computador.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "/icon-512.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/icon-512.png" },
+      { name: "twitter:title", content: "Entrar ou criar conta — Carta MZ Quiz" },
+      {
+        name: "twitter:description",
+        content: "Crie uma conta para guardar o progresso e estudar em qualquer dispositivo.",
+      },
     ],
   }),
   component: Auth,
@@ -139,6 +147,7 @@ function Auth() {
           },
         });
         if (error) throw error;
+        trackProductEvent("registration_complete");
         toast.success("Conta criada no plano Free! Confirme o e-mail que lhe enviámos. Vamos lá!");
         setMode("login");
       } else {
@@ -323,7 +332,9 @@ function Auth() {
               <button
                 type="button"
                 onClick={() => {
-                  setMode(mode === "login" ? "register" : "login");
+                  const nextMode = mode === "login" ? "register" : "login";
+                  if (nextMode === "register") trackProductEvent("create_account_click");
+                  setMode(nextMode);
                   setTouched({});
                 }}
                 className="ml-2 font-bold text-primary hover:underline"
@@ -337,4 +348,3 @@ function Auth() {
     </AppShell>
   );
 }
-

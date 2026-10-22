@@ -1,11 +1,14 @@
-import type { Question } from "./quiz";
+import type { Category, Question } from "./quiz";
 
 export interface OfflinePack {
   userId: string;
+  tier: string;
   expiresAt: string;
   savedAt: string;
   questions: Question[];
+  categories: Category[];
   images: number;
+  failedImages?: number;
 }
 export interface PendingSession {
   id: string;
@@ -46,6 +49,11 @@ export function queueSession(session: PendingSession) { return access("sessions"
 export function queuedSessions() { return access<PendingSession[]>("sessions", "readonly", (s) => s.getAll()); }
 export function removeQueuedSession(id: string) { return access("sessions", "readwrite", (s) => s.delete(id)); }
 export function validPack(pack: OfflinePack | undefined, now = Date.now()): pack is OfflinePack {
-  return Boolean(pack && Date.parse(pack.expiresAt) > now && pack.questions.length > 0);
+  return Boolean(
+    pack &&
+      pack.tier === "premium" &&
+      Date.parse(pack.expiresAt) > now &&
+      pack.questions.length > 0,
+  );
 }
 export const OFFLINE_IMAGE_CACHE = "carta-mz-question-images-v1";

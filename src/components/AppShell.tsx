@@ -44,6 +44,7 @@ import {
 
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 const NAV = [
   { to: "/", label: "Início", icon: Home },
@@ -73,7 +74,7 @@ function Brand() {
       </span>
 
       <span className="truncate font-display text-lg sm:text-xl font-bold tracking-tight">
-        Carta MZ<span className="text-primary">Quiz</span>
+        Carta MZ <span className="text-primary">Quiz</span>
       </span>
     </Link>
   );
@@ -258,6 +259,13 @@ export function AppShell({
 
   const session = useSession();
 
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") trackProductEvent("login_complete");
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -369,7 +377,7 @@ export function AppShell({
       <footer className="border-t border-border px-4 py-8 text-center text-xs text-muted-foreground">
         <p className="mx-auto max-w-3xl">
           Esta plataforma é uma ferramenta independente de estudo e não
-          representa oficialmente o INATTER ou qualquer entidade
+          representa oficialmente o INATRO ou qualquer entidade
           governamental.
         </p>
 
@@ -424,4 +432,3 @@ export function AppShell({
     </div>
   );
 }
-

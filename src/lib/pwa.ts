@@ -1,8 +1,15 @@
+export function isPreviewContext(host: string): boolean {
+  return (
+    /^(localhost|127(?:\.\d{1,3}){3}|\[::1\])$/i.test(host) ||
+    /(^|[.-])preview([.-]|$)/i.test(host)
+  );
+}
+
 export async function registerAppWorker() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
   const host = location.hostname;
   const refused = !import.meta.env.PROD || window.self !== window.top ||
-    /^(id-preview--|preview--)/.test(host) ||
+    isPreviewContext(host) ||
     /(^|\.)(lovableproject\.com|lovableproject-dev\.com|beta\.lovable\.dev)$/.test(host) ||
     new URLSearchParams(location.search).get("sw") === "off";
   if (refused) {

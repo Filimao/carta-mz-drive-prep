@@ -10,6 +10,7 @@ import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PAYMENT_NUMBERS } from "@/lib/plan-access";
 import { PLANS, PLAN_ORDER, type PlanTier } from "@/lib/plans";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/precos")({
   head: () => ({
@@ -26,7 +27,14 @@ export const Route = createFileRoute("/precos")({
         content: "Free, Pro (97 MT) e Premium (180 MT) para preparar o exame teórico em Moçambique.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/icon-512.png" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/icon-512.png" },
+      { name: "twitter:title", content: "Planos e preços — Carta MZ Quiz" },
+      {
+        name: "twitter:description",
+        content: "Compare Free, Pro e Premium para preparar o exame teórico de condução em Moçambique.",
+      },
     ],
   }),
   component: Precos,
@@ -168,7 +176,10 @@ function Precos() {
                 ) : session.userId ? (
                   <button
                     type="button"
-                    onClick={() => setPending(tier)}
+                    onClick={() => {
+                      trackProductEvent("plan_conversion_intent", tier);
+                      setPending(tier);
+                    }}
                     className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
                   >
                     Quero o {plan.name}
@@ -176,6 +187,7 @@ function Precos() {
                 ) : (
                   <Link
                     to="/auth"
+                    onClick={() => trackProductEvent("create_account_click")}
                     className="block w-full rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground"
                   >
                     Entrar para subscrever

@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PLANS, type PlanTier } from "@/lib/plans";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 export const Route = createFileRoute("/_authenticated/admin/pagamentos")({
   head: () => ({
@@ -64,7 +65,7 @@ function Pagamentos() {
     },
   });
 
-  async function approve(id: string) {
+  async function approve(id: string, plan: PlanTier) {
     setBusy(id);
     const { error } = await supabase.rpc("approve_subscription_request", { _id: id });
     setBusy(null);
@@ -72,6 +73,7 @@ function Pagamentos() {
       toast.error("Não foi possível aprovar o pedido.");
       return;
     }
+    trackProductEvent("plan_conversion", plan);
     toast.success("Plano activado por 30 dias!");
     void queryClient.invalidateQueries({ queryKey: ["admin-pagamentos"] });
   }
@@ -225,7 +227,7 @@ function Pagamentos() {
                     <button
                       type="button"
                       disabled={busy === r.id}
-                      onClick={() => void approve(r.id)}
+                      onClick={() => void approve(r.id, r.plan)}
                       className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
                     >
                       {busy === r.id ? (

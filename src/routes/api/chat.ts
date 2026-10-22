@@ -13,7 +13,8 @@ Regras:
 - Usa as ferramentas disponíveis para buscar questões reais da app, procurar temas ou explicar os planos.
 - Quando mostras uma questão, apresenta as 4 alternativas e só revelas a resposta certa depois de o utilizador tentar (ou se ele pedir).
 - Se não souberes, diz que não sabes e sugere praticar a categoria relevante.
-- Nunca prometas resultados oficiais: a app é uma ferramenta de estudo independente do INATTER.`;
+- Nunca inventes referências legais nem números de artigos. Só menciona uma referência legal quando vier explicitamente numa questão publicada e tiver sido confirmada pela administração.
+- Nunca prometas resultados oficiais: a Carta MZ Quiz é uma ferramenta de estudo independente e não representa o INATRO.`;
 
 function serverSupabase() {
   const url = process.env["SUPABASE_URL"] ?? process.env["VITE_SUPABASE_URL"];

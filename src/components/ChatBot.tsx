@@ -196,7 +196,7 @@ export function ChatBot() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-24 right-4 z-40 md:bottom-6">
+    <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom)+0.5rem)] right-3 z-40 sm:right-4 md:bottom-6">
       {open ? (
         <ChatPanel onClose={() => setOpen(false)} />
       ) : (

@@ -9,6 +9,9 @@ export interface QuizResultsProps {
   total: number;
   elapsed: number;
   onRestart: () => void;
+  onRetryWrong?: () => void;
+  categoriesToReview?: string[];
+  showSignup?: boolean;
   maxErrors?: number | undefined;
 }
 
@@ -19,6 +22,9 @@ export function QuizResults({
   total,
   elapsed,
   onRestart,
+  onRetryWrong,
+  categoriesToReview = [],
+  showSignup = false,
   maxErrors,
 }: QuizResultsProps) {
   const wrong = answered - score;
@@ -26,7 +32,7 @@ export function QuizResults({
   const apto = official && wrong <= maxErrors && answered === total;
   const share = async () => {
     const text = official
-      ? `Carta MZ Quiz — Exame INATRO simulado: ${apto ? "APTO" : "NÃO APTO"} (${score}/${total} certas, ${wrong} erros, ${Math.floor(elapsed / 60)}m ${elapsed % 60}s).`
+      ? `Carta MZ Quiz — Simulação do exame teórico: ${apto ? "APTO" : "NÃO APTO"} (${score}/${total} certas, ${wrong} erros, ${Math.floor(elapsed / 60)}m ${elapsed % 60}s).`
       : `Carta MZ Quiz — ${title}: ${score}/${total} certas.`;
     try {
       if (navigator.share) await navigator.share({ text, url: window.location.origin });
@@ -67,16 +73,16 @@ export function QuizResults({
             className={`mx-auto mt-6 inline-flex -rotate-2 items-center gap-3 rounded-2xl border-4 px-6 py-3 font-display text-3xl font-black uppercase tracking-widest ${apto ? "border-success text-success" : "border-destructive text-destructive"}`}
           >
             {apto ? <BadgeCheck className="h-8 w-8" /> : <ShieldX className="h-8 w-8" />}
-            {apto ? "Apto" : "Não apto"}
+            {apto ? "APTO" : "NÃO APTO"}
           </div>
         ) : null}
         <p className="mt-6 font-display text-xl sm:text-2xl font-bold text-white">
           {official
             ? apto
-              ? "Passaria no exame teórico. Continue assim!"
+              ? "Resultado desta simulação: APTO. Continue a praticar."
               : wrong > maxErrors
                 ? `Ultrapassou o limite de ${maxErrors} erros permitidos.`
-                : "Exame não concluído dentro do tempo."
+                : "Resultado desta simulação: NÃO APTO. O exame não foi concluído dentro do tempo."
             : verdict}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm font-medium text-white/70">
@@ -109,6 +115,19 @@ export function QuizResults({
         </div>
       </div>
 
+      {categoriesToReview.length > 0 && (
+        <section className="liquid-glass rounded-2xl p-5" aria-labelledby="categories-review">
+          <h2 id="categories-review" className="font-display text-lg font-bold">Categorias a rever</h2>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {categoriesToReview.map((category) => (
+              <li key={category} className="rounded-full border border-border px-3 py-1.5 text-sm">
+                {category}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <div className="flex flex-wrap justify-center gap-4">
         <button type="button" onClick={onRestart} className="liquid-button min-w-[160px]">
           <RotateCcw className="h-5 w-5" /> Refazer Teste
@@ -116,11 +135,21 @@ export function QuizResults({
         <button type="button" onClick={() => void share()} className="liquid-button-outline min-w-[160px]">
           <Share2 className="h-5 w-5" /> Partilhar
         </button>
+        {onRetryWrong && wrong > 0 && (
+          <button type="button" onClick={onRetryWrong} className="liquid-button-outline min-w-[160px]">
+            Refazer erros
+          </button>
+        )}
         <Link to="/erros" className="liquid-button-outline min-w-[160px]">
           Praticar Erros
         </Link>
-        <Link to="/" className="liquid-button-outline min-w-[160px]">
-          Início
+        {showSignup && (
+          <Link to="/auth" className="liquid-button min-w-[160px]">
+            Criar conta
+          </Link>
+        )}
+        <Link to="/simulados" className="liquid-button-outline min-w-[160px]">
+          Novo simulado
         </Link>
       </div>
     </div>

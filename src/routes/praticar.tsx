@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
@@ -10,6 +10,7 @@ import { QuizEngine } from "@/components/QuizEngine";
 import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import { fetchCategories, type Difficulty } from "@/lib/quiz";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 
 export const Route = createFileRoute("/praticar")({
@@ -37,7 +38,7 @@ function Praticar() {
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
   const plano = usePlano();
   const maxAllowed = plano.status.plan.maxQuestionsPerQuiz;
-  const [count, setCount] = useState(20);
+  const [count, setCount] = useState(10);
   const [categoryId, setCategoryId] = useState<string>("");
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
   const [started, setStarted] = useState(false);
@@ -45,6 +46,9 @@ function Praticar() {
   const [limitOpen, setLimitOpen] = useState(false);
   const [starting, setStarting] = useState(false);
 
+  useEffect(() => {
+    setCount(maxAllowed >= 20 ? 20 : 10);
+  }, [maxAllowed]);
 
   async function start() {
     setStarting(true);
@@ -60,6 +64,7 @@ function Praticar() {
         );
       }
       setGranted(grant.grantedQuestions);
+      trackProductEvent("practice_start");
       setStarted(true);
     } catch {
       toast.error("Não foi possível iniciar a sessão. Tente novamente.");
@@ -183,4 +188,3 @@ function Praticar() {
     </AppShell>
   );
 }
-

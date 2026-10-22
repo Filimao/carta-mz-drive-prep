@@ -16,6 +16,7 @@ import { Route as CategoriasRouteImport } from './routes/categorias'
 import { Route as ErrosRouteImport } from './routes/erros'
 import { Route as EstatisticasRouteImport } from './routes/estatisticas'
 import { Route as FavoritosRouteImport } from './routes/favoritos'
+import { Route as MiniTesteRouteImport } from './routes/mini-teste'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as PraticarRouteImport } from './routes/praticar'
 import { Route as PrecosRouteImport } from './routes/precos'
@@ -23,8 +24,10 @@ import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as RedefinirPasswordRouteImport } from './routes/redefinir-password'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SimuladosRouteImport } from './routes/simulados'
 import { Route as SinaisRouteImport } from './routes/sinais'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -64,6 +67,11 @@ const FavoritosRoute = FavoritosRouteImport.update({
   path: '/favoritos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MiniTesteRoute = MiniTesteRouteImport.update({
+  id: '/mini-teste',
+  path: '/mini-teste',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
@@ -99,6 +107,11 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimuladosRoute = SimuladosRouteImport.update({
   id: '/simulados',
   path: '/simulados',
@@ -107,6 +120,11 @@ const SimuladosRoute = SimuladosRouteImport.update({
 const SinaisRoute = SinaisRouteImport.update({
   id: '/sinais',
   path: '/sinais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
@@ -138,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/erros': typeof ErrosRoute
   '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/mini-teste': typeof MiniTesteRoute
   '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -145,8 +164,10 @@ export interface FileRoutesByFullPath {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/simulados': typeof SimuladosRoute
   '/sinais': typeof SinaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -159,6 +180,7 @@ export interface FileRoutesByTo {
   '/erros': typeof ErrosRoute
   '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/mini-teste': typeof MiniTesteRoute
   '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -166,8 +188,10 @@ export interface FileRoutesByTo {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/simulados': typeof SimuladosRoute
   '/sinais': typeof SinaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -182,6 +206,7 @@ export interface FileRoutesById {
   '/erros': typeof ErrosRoute
   '/estatisticas': typeof EstatisticasRoute
   '/favoritos': typeof FavoritosRoute
+  '/mini-teste': typeof MiniTesteRoute
   '/offline': typeof OfflineRoute
   '/praticar': typeof PraticarRoute
   '/precos': typeof PrecosRoute
@@ -189,8 +214,10 @@ export interface FileRoutesById {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/redefinir-password': typeof RedefinirPasswordRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/simulados': typeof SimuladosRoute
   '/sinais': typeof SinaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -205,6 +232,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/estatisticas'
     | '/favoritos'
+    | '/mini-teste'
     | '/offline'
     | '/praticar'
     | '/precos'
@@ -212,8 +240,10 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/redefinir-password'
     | '/redefinir-senha'
+    | '/robots.txt'
     | '/simulados'
     | '/sinais'
+    | '/sitemap.xml'
     | '/perfil'
     | '/api/chat'
     | '/admin/pagamentos'
@@ -226,6 +256,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/estatisticas'
     | '/favoritos'
+    | '/mini-teste'
     | '/offline'
     | '/praticar'
     | '/precos'
@@ -233,8 +264,10 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/redefinir-password'
     | '/redefinir-senha'
+    | '/robots.txt'
     | '/simulados'
     | '/sinais'
+    | '/sitemap.xml'
     | '/perfil'
     | '/api/chat'
     | '/admin/pagamentos'
@@ -248,6 +281,7 @@ export interface FileRouteTypes {
     | '/erros'
     | '/estatisticas'
     | '/favoritos'
+    | '/mini-teste'
     | '/offline'
     | '/praticar'
     | '/precos'
@@ -255,8 +289,10 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/redefinir-password'
     | '/redefinir-senha'
+    | '/robots.txt'
     | '/simulados'
     | '/sinais'
+    | '/sitemap.xml'
     | '/_authenticated/perfil'
     | '/api/chat'
     | '/_authenticated/admin/pagamentos'
@@ -271,6 +307,7 @@ export interface RootRouteChildren {
   ErrosRoute: typeof ErrosRoute
   EstatisticasRoute: typeof EstatisticasRoute
   FavoritosRoute: typeof FavoritosRoute
+  MiniTesteRoute: typeof MiniTesteRoute
   OfflineRoute: typeof OfflineRoute
   PraticarRoute: typeof PraticarRoute
   PrecosRoute: typeof PrecosRoute
@@ -278,8 +315,10 @@ export interface RootRouteChildren {
   RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RedefinirPasswordRoute: typeof RedefinirPasswordRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SimuladosRoute: typeof SimuladosRoute
   SinaisRoute: typeof SinaisRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
 }
 
@@ -334,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FavoritosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mini-teste': {
+      id: '/mini-teste'
+      path: '/mini-teste'
+      fullPath: '/mini-teste'
+      preLoaderRoute: typeof MiniTesteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offline': {
       id: '/offline'
       path: '/offline'
@@ -383,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulados': {
       id: '/simulados'
       path: '/simulados'
@@ -395,6 +448,13 @@ declare module '@tanstack/react-router' {
       path: '/sinais'
       fullPath: '/sinais'
       preLoaderRoute: typeof SinaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/perfil': {
@@ -451,6 +511,7 @@ const rootRouteChildren: RootRouteChildren = {
   ErrosRoute: ErrosRoute,
   EstatisticasRoute: EstatisticasRoute,
   FavoritosRoute: FavoritosRoute,
+  MiniTesteRoute: MiniTesteRoute,
   OfflineRoute: OfflineRoute,
   PraticarRoute: PraticarRoute,
   PrecosRoute: PrecosRoute,
@@ -458,8 +519,10 @@ const rootRouteChildren: RootRouteChildren = {
   RecuperarPasswordRoute: RecuperarPasswordRoute,
   RedefinirPasswordRoute: RedefinirPasswordRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SimuladosRoute: SimuladosRoute,
   SinaisRoute: SinaisRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport

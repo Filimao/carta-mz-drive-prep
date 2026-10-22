@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -10,23 +10,31 @@ import { QuizEngine } from "@/components/QuizEngine";
 import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import type { Difficulty } from "@/lib/quiz";
+import { trackProductEvent } from "@/lib/product-analytics";
 
 
 export const Route = createFileRoute("/simulados")({
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "/icon-512.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/icon-512.png" },
       { title: "Simulados e Modo Exame — Carta MZ Quiz" },
       {
         name: "description",
         content:
-          "Gere simulados equilibrados com tempo cronometrado, sem ver respostas antes de terminar, como no exame real.",
+          "Pratique com simulados da carta de condução em Moçambique, incluindo um modo de exame independente com 25 questões e 30 minutos.",
       },
       { property: "og:title", content: "Simulados e Modo Exame — Carta MZ Quiz" },
       {
         property: "og:description",
         content: "Escolha o número de questões, a dificuldade e a fonte e gere o seu simulado.",
+      },
+      { name: "twitter:title", content: "Simulado da carta de condução em Moçambique — Carta MZ Quiz" },
+      {
+        name: "twitter:description",
+        content: "Treine para o exame teórico INATRO com simulados cronometrados e questões explicadas.",
       },
     ],
   }),
@@ -38,7 +46,7 @@ const INATRO = { questions: 25, minutes: 30, maxErrors: 3 } as const;
 function Simulados() {
   const plano = usePlano();
   const maxAllowed = plano.status.plan.maxExamQuestions;
-  const [count, setCount] = useState(30);
+  const [count, setCount] = useState(20);
 
   const [difficulty, setDifficulty] = useState<Difficulty | "todas">("todas");
   const [source, setSource] = useState<"todas" | "PDF" | "AUTHORED">("todas");
@@ -49,7 +57,15 @@ function Simulados() {
   const [starting, setStarting] = useState(false);
   const [official, setOfficial] = useState(false);
 
+  useEffect(() => {
+    setCount(maxAllowed >= 30 ? 30 : maxAllowed);
+  }, [maxAllowed]);
+
   async function start(isOfficial = false) {
+    if (isOfficial && maxAllowed < INATRO.questions) {
+      setLimitOpen(true);
+      return;
+    }
     setStarting(true);
     setOfficial(isOfficial);
     const wanted = isOfficial ? INATRO.questions : count;
@@ -60,11 +76,16 @@ function Simulados() {
         return;
       }
       if (grant.grantedQuestions < wanted) {
+        if (isOfficial) {
+          toast.error("O modo de exame de 25 questões requer um plano que permita simulados completos.");
+          return;
+        }
         toast.info(
           `O teu plano permite simulados até ${grant.maxQuestions} questões. Vamos usar ${grant.grantedQuestions}.`,
         );
       }
       setGranted(grant.grantedQuestions);
+      trackProductEvent("simulation_start");
       setStarted(true);
     } catch {
       toast.error("Não foi possível iniciar o simulado. Tente novamente.");
@@ -82,7 +103,7 @@ function Simulados() {
           </div>
           <QuizEngine
             mode="simulado"
-            title={official ? "Exame oficial INATRO" : "Exame simulado"}
+            title={official ? "Modo exame — simulação independente" : "Exame simulado"}
             config={official ? { count: granted } : { count: granted, difficulty, source }}
             {...(official
               ? { timeLimitSeconds: INATRO.minutes * 60, maxErrors: INATRO.maxErrors }
@@ -105,28 +126,35 @@ function Simulados() {
         <div className="mx-auto max-w-2xl">
           <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">Exame simulado</h1>
           <p className="mt-3 text-lg font-medium text-muted-foreground">
-            Durante o exame não são mostradas explicações nem respostas. O resultado aparece no fim.
+            Treine para o exame teórico INATRO com um simulado da carta de condução em Moçambique.
+            Durante o exame não são mostradas explicações nem respostas; o resultado aparece no fim.
           </p>
 
           <div className="liquid-glass mt-8 p-5 sm:p-8 border border-primary/30">
             <div className="flex items-start gap-3">
               <ShieldCheck className="h-8 w-8 shrink-0 text-primary" />
               <div className="min-w-0">
-                <h2 className="font-display text-xl font-bold">Exame oficial INATRO</h2>
+                <h2 className="font-display text-xl font-bold">Modo exame — simulação independente</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {INATRO.questions} perguntas · {INATRO.minutes} minutos · máximo {INATRO.maxErrors} erros.
-                  Ao {INATRO.maxErrors + 1}.º erro o exame termina como "Não apto", tal como no centro de exames.
+                  Ao {INATRO.maxErrors + 1}.º erro o simulado termina como "NÃO APTO". Esta plataforma não representa o INATRO.
                 </p>
               </div>
             </div>
             <button
               type="button"
-              disabled={starting}
+              disabled={starting || maxAllowed < INATRO.questions}
               onClick={() => void start(true)}
-              className="liquid-button mt-5 w-full !py-4 text-base"
+              className="liquid-button mt-5 w-full !py-4 text-base disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {starting && official ? "A preparar exame..." : "Iniciar exame oficial"}
+              {starting && official ? "A preparar simulado..." : "Iniciar modo exame"}
             </button>
+            {maxAllowed < INATRO.questions && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                O plano {plano.status.plan.name} permite até {maxAllowed} questões por simulado. O modo de 25 questões está disponível nos planos superiores.{" "}
+                <Link to="/precos" className="font-semibold text-primary hover:underline">Ver planos</Link>
+              </p>
+            )}
           </div>
 
           <h2 className="mt-10 font-display text-lg font-bold">Simulado personalizado</h2>

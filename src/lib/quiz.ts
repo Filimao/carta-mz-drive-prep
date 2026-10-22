@@ -71,6 +71,15 @@ export async function fetchCategories(): Promise<Category[]> {
   return (data ?? []) as Category[];
 }
 
+export async function fetchStudyCategories(): Promise<Category[]> {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    const { data } = await supabase.auth.getSession();
+    const pack = data.session ? await loadPack(data.session.user.id) : undefined;
+    return validPack(pack) ? pack.categories ?? [] : [];
+  }
+  return fetchCategories();
+}
+
 export async function countQuestions(): Promise<number> {
   const { count, error } = await supabase
     .from("questions")
@@ -296,7 +305,10 @@ export async function flushPendingSessions() {
   for (const row of await queuedSessions()) {
     if (row.user_id !== data.session.user.id) continue;
     const { error } = await supabase.from("quiz_sessions").upsert(row, { onConflict: "id", ignoreDuplicates: true });
-    if (error) break;
+    if (error) {
+      console.error("[quiz] Falha ao sincronizar uma sessão pendente:", error);
+      throw error;
+    }
     await removeQueuedSession(row.id);
   }
 }

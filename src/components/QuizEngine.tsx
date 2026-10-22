@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { QuizQuestion } from "@/components/quiz/QuizQuestion";
 import { haptics } from "@/lib/feedback";
+import { useSession } from "@/hooks/useSession";
 import {
+  fetchStudyCategories,
   fetchQuizQuestions,
   persistSession,
   recordAnswer,
@@ -28,14 +30,21 @@ export interface QuizEngineProps {
 
 export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }: QuizEngineProps) {
   const examMode = mode === "simulado";
+  const session = useSession();
+  const [activeConfig, setActiveConfig] = useState(config);
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["quiz", mode, config],
-    queryFn: () => fetchQuizQuestions(config),
+    queryKey: ["quiz", mode, activeConfig],
+    queryFn: () => fetchQuizQuestions(activeConfig),
     staleTime: 0,
     gcTime: 0,
   });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["study-categories"],
+    queryFn: fetchStudyCategories,
+    staleTime: 60_000,
+  });
 
-  const questions = data ?? [];
+  const questions = useMemo(() => data ?? [], [data]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<Letter | null>(null);
   const [answers, setAnswers] = useState<Record<string, Letter>>({});
@@ -71,7 +80,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }:
   useEffect(() => {
     if (!finished || questions.length === 0) return;
     const answered = Object.keys(answers).length;
-    recordSession(mode, questions.length, score, elapsed);
+    if (navigator.onLine) recordSession(mode, questions.length, score, elapsed);
     void persistSession({
       mode,
       total: questions.length,
@@ -79,6 +88,8 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }:
       wrong: answered - score,
       skipped: questions.length - answered,
       seconds: elapsed,
+    }).catch((error: unknown) => {
+      console.error("[quiz] Não foi possível guardar o resultado para sincronização:", error);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
@@ -132,8 +143,38 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }:
     setFinished(false);
     void refetch();
   };
+  const retryWrong = () => {
+    const wrongQuestions = questions.filter(
+      (question) =>
+        answers[question.id] !== undefined && answers[question.id] !== question.correct_answer,
+    );
+    if (wrongQuestions.length === 0) return;
+    setActiveConfig({
+      ...config,
+      count: wrongQuestions.length,
+      ids: wrongQuestions.map((question) => question.id),
+    });
+    setAnswers({});
+    setIndex(0);
+    setSelected(null);
+    setRevealed(false);
+    setElapsed(0);
+    setFinished(false);
+  };
 
   if (finished) {
+    const wrongCategoryIds = new Set(
+      questions
+        .filter(
+          (question) =>
+            answers[question.id] !== undefined && answers[question.id] !== question.correct_answer,
+        )
+        .map((question) => question.category_id)
+        .filter((categoryId): categoryId is string => categoryId !== null),
+    );
+    const categoriesToReview = categories
+      .filter((category) => wrongCategoryIds.has(category.id))
+      .map((category) => category.name);
     return (
       <QuizResults
         title={title}
@@ -142,6 +183,9 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }:
         total={questions.length}
         elapsed={elapsed}
         onRestart={restart}
+        onRetryWrong={retryWrong}
+        categoriesToReview={categoriesToReview}
+        showSignup={!session.loading && !session.userId}
         maxErrors={maxErrors}
       />
     );
@@ -154,7 +198,7 @@ export function QuizEngine({ config, mode, title, timeLimitSeconds, maxErrors }:
     const isCorrect = selected === (current.correct_answer as Letter);
     const nextAnswers = { ...answers, [current.id]: selected };
     setAnswers(nextAnswers);
-    recordAnswer(current.id, isCorrect);
+    if (navigator.onLine) recordAnswer(current.id, isCorrect);
     if (isCorrect) haptics.correct();
     else haptics.wrong();
     if (maxErrors !== undefined) {

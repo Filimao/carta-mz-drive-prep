@@ -175,6 +175,33 @@ export type Database = {
         }
         Relationships: []
       }
+      product_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          plan: string | null
+          source_path: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          plan?: string | null
+          source_path: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          plan?: string | null
+          source_path?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
