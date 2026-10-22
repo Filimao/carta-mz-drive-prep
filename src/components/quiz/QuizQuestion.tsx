@@ -73,7 +73,7 @@ export function QuizQuestion({
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="min-w-0">
           <h2 className="truncate font-display text-xl sm:text-2xl font-bold tracking-tight">{title}</h2>
-          <p className="text-sm font-bold text-white/50 uppercase tracking-widest">
+          <p className="text-sm font-bold text-foreground/50 uppercase tracking-widest">
             Questão <span className="text-primary">{index + 1}</span> de {total}
           </p>
         </div>
@@ -104,13 +104,13 @@ export function QuizQuestion({
             className="inline-flex h-11 w-11 items-center justify-center rounded-full liquid-glass !rounded-full transition-transform active:scale-90"
           >
             <Star
-              className={`h-5 w-5 ${isFavorite ? "fill-warning text-warning" : "text-white/40"}`}
+              className={`h-5 w-5 ${isFavorite ? "fill-warning text-warning" : "text-foreground/40"}`}
             />
           </button>}
         </div>
       </div>
 
-      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-glass-overlay rounded-full overflow-hidden">
         <div
           className="h-full bg-primary shadow-[0_0_15px_oklch(var(--primary)/0.5)] transition-all duration-500 ease-out"
           style={{ width: `${((index + (revealed ? 1 : 0)) / total) * 100}%` }}
@@ -126,13 +126,13 @@ export function QuizQuestion({
           <span className="rounded-full bg-primary/20 border-primary/30 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary">
             {DIFFICULTY_LABEL[current.difficulty]}
           </span>
-          <span className="rounded-full bg-white/5 border-white/10 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white/40">
+          <span className="rounded-full bg-glass-overlay border-glass-line px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-foreground/40">
             {current.source === "PDF" ? "PDF" : "Prática"}
           </span>
           {current.is_verified && <span className="inline-flex items-center gap-1 text-xs text-success"><CheckCircle2 className="h-3.5 w-3.5" />Verificada</span>}
         </div>
 
-        <h3 className="font-display text-base sm:text-lg leading-snug font-bold text-white mb-5 break-words">
+        <h3 className="font-display text-base sm:text-lg leading-snug font-bold text-foreground mb-5 break-words">
           {current.question_text}
         </h3>
 
@@ -142,16 +142,16 @@ export function QuizQuestion({
             const showCorrect = revealed && letter === correct;
             const showWrong = revealed && chosen && letter !== correct;
 
-            let statusClass = "border-white/10 bg-white/5 text-white/80 hover:bg-white/10";
+            let statusClass = "border-glass-line bg-glass-overlay text-foreground/80 hover:bg-glass-overlay-strong";
             if (showCorrect)
               statusClass =
-                "border-success bg-success/20 text-white shadow-[0_0_20px_oklch(var(--success)/0.2)]";
+                "border-success bg-success/20 text-foreground shadow-[0_0_20px_oklch(var(--success)/0.2)]";
             else if (showWrong)
               statusClass =
-                "border-destructive bg-destructive/20 text-white shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
+                "border-destructive bg-destructive/20 text-foreground shadow-[0_0_20px_oklch(var(--destructive)/0.2)]";
             else if (chosen)
               statusClass =
-                "border-primary bg-primary/20 text-white shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
+                "border-primary bg-primary/20 text-foreground shadow-[0_0_20px_oklch(var(--primary)/0.2)]";
 
             return (
               <button
@@ -167,8 +167,8 @@ export function QuizQuestion({
                 <span
                   className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-sm font-black transition-colors ${
                     chosen || showCorrect || showWrong
-                      ? "border-transparent bg-white/20"
-                      : "border-white/20"
+                      ? "border-transparent bg-glass-overlay-strong"
+                      : "border-glass-line-strong"
                   }`}
                 >
                   {letter}
@@ -210,19 +210,19 @@ export function QuizQuestion({
               </div>
 
               <div className="space-y-4">
-                <p className="text-base leading-relaxed text-white/80 border-l-2 border-white/20 pl-4 py-1 italic">
+                <p className="text-base leading-relaxed text-foreground/80 border-l-2 border-glass-line-strong pl-4 py-1 italic">
                   {current.explanation}
                 </p>
                 {current.is_verified && current.legal_reference && <p className="flex items-start gap-2 text-sm text-muted-foreground"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />{current.legal_reference}</p>}
 
                 {current.tip && (
-                  <div className="flex items-start gap-3 bg-white/5 rounded-2xl p-4">
+                  <div className="flex items-start gap-3 bg-glass-overlay rounded-2xl p-4">
                     <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider text-warning mb-1">
                         Dica de Especialista
                       </p>
-                      <p className="text-sm font-medium text-white/90">{current.tip}</p>
+                      <p className="text-sm font-medium text-foreground/90">{current.tip}</p>
                     </div>
                   </div>
                 )}
@@ -231,7 +231,7 @@ export function QuizQuestion({
           </div>
         )}
 
-        <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/10">
+        <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 pt-6 border-t border-glass-line">
           {!revealed ? (
             <button
               type="button"

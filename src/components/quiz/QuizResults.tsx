@@ -66,7 +66,7 @@ export function QuizResults({
           {title} concluído
         </p>
         <div className="relative inline-block">
-          <span className="font-display text-6xl sm:text-8xl font-black text-white drop-shadow-2xl">
+          <span className="font-display text-6xl sm:text-8xl font-black text-foreground drop-shadow-2xl">
             {percent}%
           </span>
           <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full -z-10" />
@@ -79,7 +79,7 @@ export function QuizResults({
             {apto ? "APTO" : "NÃO APTO"}
           </div>
         ) : null}
-        <p className="mt-6 font-display text-xl sm:text-2xl font-bold text-white">
+        <p className="mt-6 font-display text-xl sm:text-2xl font-bold text-foreground">
           {official
             ? apto
               ? "Resultado desta simulação: APTO. Continue a praticar."
@@ -88,7 +88,7 @@ export function QuizResults({
                 : "Resultado desta simulação: NÃO APTO. O exame não foi concluído dentro do tempo."
             : verdict}
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm font-medium text-white/70">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm font-medium text-foreground/70">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-success" /> {score} Certas
           </span>
@@ -102,19 +102,23 @@ export function QuizResults({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
+        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-glass-overlay transition-colors">
           <p className="text-3xl font-black text-success">{score}</p>
-          <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">
+          <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mt-1">
             Correctas
           </p>
         </div>
-        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
+        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-glass-overlay transition-colors">
           <p className="text-3xl font-black text-destructive">{answered - score}</p>
-          <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Erradas</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mt-1">
+            Erradas
+          </p>
         </div>
-        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-white/5 transition-colors">
-          <p className="text-3xl font-black text-white">{total - answered}</p>
-          <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1">Saltadas</p>
+        <div className="liquid-glass !rounded-2xl p-6 text-center group hover:bg-glass-overlay transition-colors">
+          <p className="text-3xl font-black text-foreground">{total - answered}</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mt-1">
+            Saltadas
+          </p>
         </div>
       </div>
 

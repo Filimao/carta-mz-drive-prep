@@ -176,8 +176,8 @@ function Simulados() {
                       onClick={() => setCount(n)}
                       className={`h-12 min-w-[3rem] rounded-2xl border px-5 text-sm font-bold transition-all ${
                         count === n 
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" 
-                          : "border-white/10 bg-white/5 text-foreground/80 hover:bg-white/10"
+                          ? "border-primary bg-primary text-foreground shadow-lg shadow-primary/20" 
+                          : "border-glass-line bg-glass-overlay text-foreground/80 hover:bg-glass-overlay-strong"
                       } ${locked ? "cursor-not-allowed opacity-30" : ""}`}
                     >
                       {n}
@@ -203,7 +203,7 @@ function Simulados() {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty | "todas")}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
                 >
                   <option value="todas" className="bg-background">Todas</option>
                   <option value="facil" className="bg-background">Fácil</option>
@@ -218,7 +218,7 @@ function Simulados() {
                 <select
                   value={source}
                   onChange={(e) => setSource(e.target.value as "todas" | "PDF" | "AUTHORED")}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
                 >
                   <option value="todas" className="bg-background">Todas</option>
                   <option value="PDF" className="bg-background">Materiais fornecidos</option>
@@ -227,13 +227,13 @@ function Simulados() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 liquid-glass !rounded-2xl p-4 bg-white/5">
+            <div className="flex items-center gap-4 liquid-glass !rounded-2xl p-4 bg-glass-overlay">
               <input
                 id="timed"
                 type="checkbox"
                 checked={timed}
                 onChange={(e) => setTimed(e.target.checked)}
-                className="h-6 w-6 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary"
+                className="h-6 w-6 rounded-md border-glass-line-strong bg-glass-overlay text-primary focus:ring-primary"
               />
               <label htmlFor="timed" className="text-base font-semibold cursor-pointer">
                 Cronometrado ({count} minutos)

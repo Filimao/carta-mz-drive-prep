@@ -82,7 +82,7 @@ export function ZoomableImage({ src, alt }: { src: string; alt: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group relative mb-4 block w-full overflow-hidden rounded-xl border border-white/10 bg-black/20"
+        className="group relative mb-4 block w-full overflow-hidden rounded-xl border border-glass-line bg-black/20"
         aria-label="Ampliar imagem"
       >
         <img src={displaySrc} alt={alt} className="max-h-[45vh] w-full object-contain sm:max-h-[55vh]" />

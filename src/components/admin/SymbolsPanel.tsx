@@ -203,13 +203,13 @@ export function SymbolsPanel() {
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <p className="mt-1 text-xs text-white/70 leading-relaxed">{s.description}</p>
+                <p className="mt-1 text-xs text-foreground/70 leading-relaxed">{s.description}</p>
                 {s.imagePrompt && (
                   <details className="mt-2">
                     <summary className="cursor-pointer text-[10px] text-primary hover:underline">
                       Prompt IA
                     </summary>
-                    <p className="mt-1 text-[10px] text-white/50 leading-relaxed bg-white/5 rounded-lg p-2">
+                    <p className="mt-1 text-[10px] text-foreground/50 leading-relaxed bg-glass-overlay rounded-lg p-2">
                       {s.imagePrompt}
                     </p>
                   </details>
@@ -275,7 +275,7 @@ function SymbolCard({
         </button>
       </div>
       {symbol.image_url && (
-        <div className="mt-3 rounded-xl overflow-hidden border border-white/10 bg-white/5">
+        <div className="mt-3 rounded-xl overflow-hidden border border-glass-line bg-glass-overlay">
           <img
             src={symbol.image_url}
             alt={symbol.name}
@@ -283,7 +283,7 @@ function SymbolCard({
           />
         </div>
       )}
-      <p className="mt-2 text-xs text-white/70 leading-relaxed">{symbol.description}</p>
+      <p className="mt-2 text-xs text-foreground/70 leading-relaxed">{symbol.description}</p>
       {catName && (
         <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
           {catName}
@@ -299,7 +299,7 @@ function SymbolCard({
             Ver prompt IA
           </button>
           {showPrompt && (
-            <p className="mt-1 text-[10px] text-white/50 leading-relaxed bg-white/5 rounded-lg p-2">
+            <p className="mt-1 text-[10px] text-foreground/50 leading-relaxed bg-glass-overlay rounded-lg p-2">
               {symbol.image_prompt}
             </p>
           )}

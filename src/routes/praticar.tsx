@@ -121,8 +121,8 @@ function Praticar() {
                       onClick={() => setCount(n)}
                       className={`h-12 min-w-[3rem] rounded-2xl border px-5 text-sm font-bold transition-all ${
                         count === n 
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" 
-                          : "border-white/10 bg-white/5 text-foreground/80 hover:bg-white/10"
+                          ? "border-primary bg-primary text-foreground shadow-lg shadow-primary/20" 
+                          : "border-glass-line bg-glass-overlay text-foreground/80 hover:bg-glass-overlay-strong"
                       } ${locked ? "cursor-not-allowed opacity-30" : ""}`}
                     >
                       {n}
@@ -148,7 +148,7 @@ function Praticar() {
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
                 >
                   <option value="" className="bg-background">Todas as categorias</option>
                   {(categories ?? []).map((c) => (
@@ -165,7 +165,7 @@ function Praticar() {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as Difficulty | "todas")}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
+                  className="w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-primary outline-none transition-all"
                 >
                   <option value="todas" className="bg-background">Todas</option>
                   <option value="facil" className="bg-background">Fácil</option>

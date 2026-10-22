@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { trackProductEvent } from "@/lib/product-analytics";
@@ -80,6 +81,7 @@ function Field({
 
 function Auth() {
   const navigate = useNavigate();
+  const session = useSession();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [showPass, setShowPass] = useState(false);
   const [keepSession, setKeepSession] = useState(true);
@@ -93,6 +95,21 @@ function Auth() {
     password: "",
     confirm: "",
   });
+
+  // A criacao de contas so existe para visitantes: quem ja tem sessao autenticada
+  // nunca deve encontrar o fluxo de registo.
+  const canRegister = !session.loading && !session.userId;
+
+  useEffect(() => {
+    if (session.userId) void navigate({ to: "/praticar" });
+  }, [session.userId, navigate]);
+
+  useEffect(() => {
+    if (!canRegister && mode === "register") {
+      setMode("login");
+      setTouched({});
+    }
+  }, [canRegister, mode]);
 
   const errors = useMemo(() => {
     const e: {
@@ -134,6 +151,11 @@ function Auth() {
     setLoading(true);
     try {
       if (mode === "register") {
+        if (!canRegister) {
+          setMode("login");
+          toast.error("Já tem uma sessão iniciada. Use a sua conta para entrar.");
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email: form.email.trim(),
           password: form.password,
@@ -190,15 +212,15 @@ function Auth() {
       <div className="relative -mx-4 -mt-20 min-h-screen flex items-center justify-center px-4 pt-20">
         {/* Background Image/Overlay */}
         <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1454165833767-027ffea9e778?q=80&w=2070')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 page-overlay backdrop-blur-sm" />
         </div>
 
         <div className="mx-auto w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="font-display text-4xl font-bold text-white tracking-tight">
+            <h1 className="font-display text-4xl font-bold text-foreground tracking-tight">
               {mode === "login" ? "Bem-vindo de volta" : "Junte-se a nós"}
             </h1>
-            <p className="mt-3 text-lg font-medium text-white/70">
+            <p className="mt-3 text-lg font-medium text-foreground/70">
               {mode === "login" 
                 ? "Entre para continuar a sua jornada rumo à carta." 
                 : "Crie a sua conta e acompanhe o seu progresso."}
@@ -213,7 +235,7 @@ function Auth() {
                     value={form.name}
                     onChange={(e) => set("name", e.target.value)}
                     onBlur={() => setTouched((t) => ({ ...t, name: true }))}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                    className="mt-2 w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-primary transition-all"
                     autoComplete="name"
                     maxLength={120}
                   />
@@ -223,7 +245,7 @@ function Auth() {
                     value={form.phone}
                     onChange={(e) => set("phone", e.target.value.replace(/[^\d]/g, "").slice(0, 9))}
                     onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                    className="mt-2 w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-primary transition-all"
                     placeholder="84XXXXXXX"
                     inputMode="numeric"
                     autoComplete="tel"
@@ -239,7 +261,7 @@ function Auth() {
                   value={form.email}
                   onChange={(e) => set("email", e.target.value)}
                   onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="mt-2 w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-primary transition-all"
                   autoComplete="email"
                   maxLength={255}
                 />
@@ -252,13 +274,13 @@ function Auth() {
                     value={form.password}
                     onChange={(e) => set("password", e.target.value)}
                     onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                    className="mt-2 w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
                     autoComplete={mode === "login" ? "current-password" : "new-password"}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPass((v) => !v)}
-                    className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-white/50 hover:text-white"
+                    className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-foreground/50 hover:text-foreground"
                   >
                     {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -273,7 +295,7 @@ function Auth() {
                   value={form.confirm}
                   onChange={(e) => set("confirm", e.target.value)}
                   onBlur={() => setTouched((t) => ({ ...t, confirm: true }))}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary transition-all"
+                  className="mt-2 w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-primary transition-all"
                   autoComplete="new-password"
                 />
               </Field>
@@ -281,22 +303,22 @@ function Auth() {
 
             <div className="flex items-center justify-between">
               {mode === "register" ? (
-                <label className="flex items-start gap-2 text-xs font-medium text-white/60 cursor-pointer">
+                <label className="flex items-start gap-2 text-xs font-medium text-foreground/60 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={terms}
                     onChange={(e) => setTerms(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/5 text-primary"
+                    className="mt-0.5 h-4 w-4 rounded border-glass-line-strong bg-glass-overlay text-primary"
                   />
                   <span>Aceito os Termos de Uso</span>
                 </label>
               ) : (
-                <label className="flex items-center gap-2 text-xs font-medium text-white/60 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs font-medium text-foreground/60 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={keepSession}
                     onChange={(e) => setKeepSession(e.target.checked)}
-                    className="h-4 w-4 rounded border-white/20 bg-white/5 text-primary"
+                    className="h-4 w-4 rounded border-glass-line-strong bg-glass-overlay text-primary"
                   />
                   Manter sessão
                 </label>
@@ -327,21 +349,23 @@ function Auth() {
               </button>
             </div>
 
-            <p className="text-center text-sm font-medium text-white/60">
-              {mode === "login" ? "Não tem uma conta?" : "Já tem uma conta?"}
-              <button
-                type="button"
-                onClick={() => {
-                  const nextMode = mode === "login" ? "register" : "login";
-                  if (nextMode === "register") trackProductEvent("create_account_click");
-                  setMode(nextMode);
-                  setTouched({});
-                }}
-                className="ml-2 font-bold text-primary hover:underline"
-              >
-                {mode === "login" ? "Registe-se" : "Entre aqui"}
-              </button>
-            </p>
+            {canRegister && (
+              <p className="text-center text-sm font-medium text-foreground/60">
+                {mode === "login" ? "Não tem uma conta?" : "Já tem uma conta?"}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextMode = mode === "login" ? "register" : "login";
+                    if (nextMode === "register") trackProductEvent("create_account_click");
+                    setMode(nextMode);
+                    setTouched({});
+                  }}
+                  className="ml-2 font-bold text-primary hover:underline"
+                >
+                  {mode === "login" ? "Registe-se" : "Entre aqui"}
+                </button>
+              </p>
+            )}
           </form>
         </div>
       </div>

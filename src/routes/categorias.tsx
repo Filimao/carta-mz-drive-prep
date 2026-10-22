@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { CategoryIcon } from "@/lib/category-icons";
@@ -11,6 +11,9 @@ import { requireRouteAuth } from "@/lib/route-auth";
 export const Route = createFileRoute("/categorias")({
   ssr: false,
   beforeLoad: requireRouteAuth,
+  validateSearch: (search: Record<string, unknown>): { categoria?: string | undefined } => ({
+    categoria: typeof search["categoria"] === "string" ? search["categoria"] : undefined,
+  }),
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
@@ -33,10 +36,20 @@ export const Route = createFileRoute("/categorias")({
 
 function Categorias() {
   const { data, isLoading } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
+  const search = Route.useSearch();
+  const navigate = useNavigate();
   const [active, setActive] = useState<{ id: string; name: string } | null>(null);
+  const [dismissed, setDismissed] = useState(false);
   const [term, setTerm] = useState("");
 
-    if (active) {
+  // deep-link: /categorias?categoria=<id|slug> abre directamente a pratica do tema
+  useEffect(() => {
+    if (dismissed || !search.categoria || !data) return;
+    const match = data.find((c) => c.id === search.categoria || c.slug === search.categoria);
+    if (match) setActive({ id: match.id, name: match.name });
+  }, [dismissed, search.categoria, data]);
+
+  if (active) {
     return (
       <AppShell>
         <div className="relative -mx-4 -mt-8 min-h-screen px-4 pt-20">
@@ -45,7 +58,11 @@ function Categorias() {
           </div>
           <button
             type="button"
-            onClick={() => setActive(null)}
+            onClick={() => {
+              setDismissed(true);
+              setActive(null);
+              void navigate({ to: "/categorias" });
+            }}
             className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
           >
             ← Voltar às categorias
@@ -75,8 +92,10 @@ function Categorias() {
         <div className="mx-auto max-w-5xl">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="flex-1">
-              <h1 className="font-display text-4xl font-bold tracking-tight text-white">Categorias de Estudo</h1>
-              <p className="mt-2 text-lg font-medium text-white/70">
+              <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
+                Categorias de Estudo
+              </h1>
+              <p className="mt-2 text-lg font-medium text-foreground/70">
                 Foque o seu estudo nos temas mais importantes para o exame.
               </p>
             </div>
@@ -87,7 +106,7 @@ function Categorias() {
                 onChange={(e) => setTerm(e.target.value)}
                 placeholder="Pesquisar tema (ex.: sinais)"
                 aria-label="Pesquisar categoria"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-white placeholder:text-white/40 focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="w-full rounded-2xl border border-glass-line bg-glass-overlay px-4 py-3.5 text-foreground placeholder:text-foreground/40 focus:ring-2 focus:ring-primary outline-none transition-all"
               />
             </div>
           </div>
@@ -95,26 +114,36 @@ function Categorias() {
           {isLoading ? (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-48 animate-pulse rounded-3xl bg-white/5 border border-white/10" />
+                <div
+                  key={i}
+                  className="h-48 animate-pulse rounded-3xl bg-glass-overlay border border-glass-line"
+                />
               ))}
             </div>
           ) : filtered.length === 0 ? (
             <div className="mt-16 text-center py-20 liquid-glass">
-              <p className="text-xl font-medium text-white/70">Nenhum tema corresponde à pesquisa.</p>
+              <p className="text-xl font-medium text-foreground/70">
+                Nenhum tema corresponde à pesquisa.
+              </p>
             </div>
           ) : (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((cat) => (
-                <article key={cat.id} className="liquid-glass flex flex-col p-6 group hover:bg-white/10 transition-all duration-300 hover:-translate-y-1">
+                <article
+                  key={cat.id}
+                  className="liquid-glass flex flex-col p-6 group hover:bg-glass-overlay-strong transition-all duration-300 hover:-translate-y-1"
+                >
                   <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <CategoryIcon name={cat.icon} className="h-8 w-8 text-primary" />
                   </div>
-                  <h2 className="font-display text-xl font-bold text-white mb-2">{cat.name}</h2>
-                  <p className="flex-1 text-sm leading-relaxed text-white/60 mb-6">
+                  <h2 className="font-display text-xl font-bold text-foreground mb-2">
+                    {cat.name}
+                  </h2>
+                  <p className="flex-1 text-sm leading-relaxed text-muted-foreground mb-6">
                     {cat.description}
                   </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-white/40">
+                  <div className="flex items-center justify-between pt-4 border-t border-glass-line">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       {answers.length > 0 ? `${answers.length} respostas` : "Novo tema"}
                     </span>
                     <button

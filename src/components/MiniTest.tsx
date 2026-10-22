@@ -5,12 +5,15 @@ import { useMemo, useRef, useState } from "react";
 
 import { QuizQuestion } from "@/components/quiz/QuizQuestion";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/hooks/useSession";
 import { countQuestions, fetchQuizQuestions, type Letter } from "@/lib/quiz";
 import { trackProductEvent } from "@/lib/product-analytics";
 
 const QUESTION_COUNT = 10;
 
 export function MiniTest() {
+  const session = useSession();
+  const isGuest = !session.userId;
   const {
     data: questions = [],
     isLoading,
@@ -93,9 +96,11 @@ export function MiniTest() {
           São necessárias 10 questões publicadas. Consulte os preços ou crie uma conta para conhecer
           a plataforma.
         </p>
-        <Link to="/auth" className="hero-button mt-5 inline-flex">
-          Criar conta
-        </Link>
+        {isGuest && (
+          <Link to="/auth" className="hero-button mt-5 inline-flex">
+            Criar conta
+          </Link>
+        )}
       </div>
     );
   }
@@ -127,24 +132,28 @@ export function MiniTest() {
           {recommendation}
         </p>
         <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            to="/auth"
-            onClick={() => trackProductEvent("create_account_click")}
-            className="hero-button justify-center"
-          >
-            <UserRound className="h-4 w-4" aria-hidden="true" /> Criar conta gratuita
-          </Link>
+          {isGuest && (
+            <Link
+              to="/auth"
+              onClick={() => trackProductEvent("create_account_click")}
+              className="hero-button justify-center"
+            >
+              <UserRound className="h-4 w-4" aria-hidden="true" /> Criar conta gratuita
+            </Link>
+          )}
           <Button variant="outline" onClick={restart} className="min-h-11">
             <RotateCcw className="h-4 w-4" aria-hidden="true" /> Repetir mini-teste
           </Button>
         </div>
-        <p className="mt-5 text-xs text-muted-foreground">
-          Crie a sua conta gratuita para desbloquear{" "}
-          {availableQuestionCount
-            ? `todas as ${availableQuestionCount} questões publicadas`
-            : "todas as questões publicadas"}
-          , simulados cronometrados e modo offline.
-        </p>
+        {isGuest && (
+          <p className="mt-5 text-xs text-muted-foreground">
+            Crie a sua conta gratuita para desbloquear{" "}
+            {availableQuestionCount
+              ? `todas as ${availableQuestionCount} questões publicadas`
+              : "todas as questões publicadas"}
+            , simulados cronometrados e modo offline.
+          </p>
+        )}
       </section>
     );
   }

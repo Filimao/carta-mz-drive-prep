@@ -14,3 +14,5 @@
 - Display exam preparation as a recent-simulation performance index, never as a calibrated probability of passing.
 - Legal citations are optional administrator-confirmed question data; never generate legal article numbers automatically.
 - The learner signs catalog combines bundled standard diagrams with active public symbols; persist category UUIDs rather than slugs.
+- Colour is theme-driven: declare new palettes as token blocks in src/styles.css (`.dark`, `.midnight`, `.light`, `.whiteblue`) and consume them through semantic utilities; never hardcode white, black or alpha overlays in components.
+- Account creation is a guest-only flow: authenticated sessions must never reach the register UI or account-creation calls to action.

@@ -15,6 +15,7 @@ import {
   Moon,
   Sun,
   Sparkles,
+  CloudSun,
   Tag,
   ShieldCheck,
   Receipt,
@@ -200,28 +201,46 @@ function MobileMenu({
 }
 
 
-type ThemeName = "light" | "dark" | "midnight";
+type ThemeName = "light" | "dark" | "midnight" | "whiteblue";
 const THEMES: { value: ThemeName; label: string; icon: typeof Sun }[] = [
   { value: "light", label: "Tema claro", icon: Sun },
   { value: "dark", label: "Tema escuro", icon: Moon },
   { value: "midnight", label: "Tema azul-noite", icon: Sparkles },
+  { value: "whiteblue", label: "Tema branco e azul", icon: CloudSun },
 ];
+const THEME_COLORS: Record<ThemeName, string> = {
+  light: "#f4f6fb",
+  dark: "#101a2e",
+  midnight: "#101a2e",
+  whiteblue: "#f2f7ff",
+};
+const THEME_STORAGE_KEY = "carta-mz-theme";
+
+function isThemeName(value: string | null): value is ThemeName {
+  return value === "light" || value === "dark" || value === "midnight" || value === "whiteblue";
+}
+
 function applyTheme(theme: ThemeName) {
   const root = document.documentElement;
-  root.classList.toggle("dark", theme !== "light");
+  root.classList.toggle("dark", theme === "dark" || theme === "midnight");
   root.classList.toggle("midnight", theme === "midnight");
+  root.classList.toggle("light", theme === "light");
+  root.classList.toggle("whiteblue", theme === "whiteblue");
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  meta?.setAttribute("content", THEME_COLORS[theme]);
 }
+
 function ThemeToggle({ className = "" }: { className?: string }) {
   const [theme, setTheme] = useState<ThemeName>("dark");
   useEffect(() => {
     let stored: string | null = null;
     try {
-      stored = window.localStorage.getItem("carta-mz-theme");
+      stored = window.localStorage.getItem(THEME_STORAGE_KEY);
     } catch {
       stored = null;
     }
-    const initial: ThemeName =
-      stored === "light" || stored === "dark" || stored === "midnight" ? stored : "dark";
+    const initial: ThemeName = isThemeName(stored) ? stored : "dark";
     setTheme(initial);
     applyTheme(initial);
   }, []);
@@ -237,7 +256,7 @@ function ThemeToggle({ className = "" }: { className?: string }) {
         setTheme(next.value);
         applyTheme(next.value);
         try {
-          window.localStorage.setItem("carta-mz-theme", next.value);
+          window.localStorage.setItem(THEME_STORAGE_KEY, next.value);
         } catch {
           /* armazenamento indisponível */
         }
@@ -290,7 +309,7 @@ export function AppShell({
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`rounded-full px-3 py-2 text-sm font-semibold transition-all hover:bg-white/10 xl:px-4 ${pathname === item.to
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition-all hover:bg-glass-overlay-strong xl:px-4 ${pathname === item.to
                       ? "text-primary bg-primary/10"
                       : "text-foreground/70 hover:text-foreground"
                     }`}
@@ -299,7 +318,7 @@ export function AppShell({
                 </Link>
               ))}
               <DropdownMenu>
-                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-foreground/70 hover:bg-white/10 hover:text-foreground">
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-foreground/70 hover:bg-glass-overlay-strong hover:text-foreground">
                   Mais <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
@@ -337,7 +356,7 @@ export function AppShell({
               <div className="flex items-center gap-2">
                 <Link
                   to="/perfil"
-                  className="hidden h-10 w-10 items-center justify-center rounded-full liquid-glass text-foreground hover:bg-white/10 sm:inline-flex"
+                  className="hidden h-10 w-10 items-center justify-center rounded-full liquid-glass text-foreground hover:bg-glass-overlay-strong sm:inline-flex"
                 >
                   <UserRound className="h-4 w-4" />
                 </Link>
