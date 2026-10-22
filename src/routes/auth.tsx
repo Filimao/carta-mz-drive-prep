@@ -164,7 +164,7 @@ function Auth() {
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta! Continua assim!");
-        void navigate({ to: "/" });
+        void navigate({ to: "/praticar" });
       }
     } catch (err) {
       toast.error(translateAuthError(err instanceof Error ? err.message : ""));
@@ -182,7 +182,7 @@ function Auth() {
       return;
     }
     if (result.redirected) return;
-    void navigate({ to: "/" });
+    void navigate({ to: "/praticar" });
   }
 
   return (
