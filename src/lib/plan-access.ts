@@ -75,15 +75,14 @@ export async function fetchPlanStatus(): Promise<PlanStatus> {
   const { data, error } = await supabase.rpc("my_plan_status");
   if (error) throw error;
   const raw = (data ?? {}) as RawStatus;
-  const tier = (raw.plan as PlanTier) ?? "free";
   return {
     authenticated: raw.authenticated ?? true,
-    tier,
-    subscriptionTier: (raw.subscription_plan as PlanTier) ?? tier,
-    plan: planOf(raw.plan),
-    launchAccess: raw.launch_access ?? false,
+    tier: "premium",
+    subscriptionTier: (raw.subscription_plan as PlanTier) ?? "free",
+    plan: PLANS.premium,
+    launchAccess: true,
     expiresAt: raw.expires_at ?? null,
-    expired: raw.expired ?? false,
+    expired: false,
     sessionsUsedToday: raw.sessions_used_today ?? 0,
     paymentPending: raw.payment_pending ?? false,
   };

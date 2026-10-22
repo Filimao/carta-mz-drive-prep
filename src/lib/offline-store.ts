@@ -4,7 +4,7 @@ export interface OfflinePack {
   userId: string;
   tier: string;
   subscriptionTier?: string;
-  expiresAt: string;
+  expiresAt: string | null;
   savedAt: string;
   launchAccess?: boolean;
   questions: Question[];
@@ -74,12 +74,9 @@ export function removeQueuedSession(id: string) {
   return access("sessions", "readwrite", (s) => s.delete(id));
 }
 export function validPack(pack: OfflinePack | undefined, now = Date.now()): pack is OfflinePack {
-  return Boolean(
-    pack &&
-    pack.tier === "premium" &&
-    Date.parse(pack.expiresAt) > now &&
-    pack.questions.length > 0,
-  );
+  if (!pack || pack.tier !== "premium" || pack.questions.length === 0) return false;
+  if (pack.expiresAt === null) return true;
+  return Date.parse(pack.expiresAt) > now;
 }
 
 export function offlinePackExpiry({
