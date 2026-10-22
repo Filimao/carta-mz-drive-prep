@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Camera, ShieldCheck, Sparkles } from "lucide-react";
+import { BookOpen, Camera, ShieldCheck, Sparkles, Trophy, Target, Globe, Smartphone, BrainCircuit, Users } from "lucide-react";
 import { useEffect } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -8,6 +8,7 @@ import { CategoryIcon } from "@/lib/category-icons";
 import { MiniTest } from "@/components/MiniTest";
 import { countQuestions, countQuestionsWithImages, fetchCategories } from "@/lib/quiz";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { useSession } from "@/hooks/useSession";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const session = useSession();
   const { data: questionCount } = useQuery({
     queryKey: ["question-count"],
     queryFn: countQuestions,
@@ -126,30 +128,102 @@ function Index() {
         </section>
       )}
 
-      <section
-        id="mini-teste"
-        className="mx-auto mt-10 max-w-4xl space-y-6"
-        aria-labelledby="mini-test-title"
-      >
-        <header>
-          <h2 id="mini-test-title" className="font-display text-2xl font-bold sm:text-3xl">
-            Experimente o mini-teste gratuito
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Responda a 10 questões rápidas, receba feedback e veja o resultado sem iniciar sessão.
-          </p>
-        </header>
-        <MiniTest />
-      </section>
-
-      <section className="mx-auto my-10 max-w-4xl text-center">
-        <Link
-          to="/auth"
-          onClick={() => trackProductEvent("create_account_click")}
-          className="hero-button inline-flex justify-center"
+      {!session.userId && (
+        <section
+          id="mini-teste"
+          className="mx-auto mt-16 max-w-4xl space-y-6"
+          aria-labelledby="mini-test-title"
         >
-          Criar conta gratuita
-        </Link>
+          <header className="text-center">
+            <h2 id="mini-test-title" className="font-display text-3xl font-bold sm:text-4xl">
+              Experimente o mini-teste gratuito
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              Responda a 10 questões rápidas, receba feedback e veja o resultado sem iniciar sessão.
+            </p>
+          </header>
+          <MiniTest />
+        </section>
+      )}
+
+      {session.userId && (
+        <section className="mx-auto mt-16 max-w-5xl space-y-12">
+          <div className="text-center">
+            <h2 className="font-display text-3xl font-bold sm:text-4xl text-white">Porquê estudar connosco?</h2>
+            <p className="mt-4 text-lg text-white/60">A ferramenta mais completa para o teu sucesso no exame teórico.</p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { 
+                icon: BrainCircuit, 
+                title: "IA Generativa", 
+                desc: "Dúvidas numa questão? O nosso tutor de IA explica o Código da Estrada de forma simples e direta." 
+              },
+              { 
+                icon: Smartphone, 
+                title: "Modo Offline", 
+                desc: "Estuda em qualquer lugar, mesmo sem internet. Descarrega os pacotes de questões e pratica no autocarro." 
+              },
+              { 
+                icon: Target, 
+                title: "Simulados Reais", 
+                desc: "Ambiente idêntico ao do exame oficial, com cronómetro e a mesma distribuição de temas." 
+              },
+              { 
+                icon: Trophy, 
+                title: "Gamificação", 
+                desc: "Ganha XP, sobe de nível e conquista badges enquanto dominas as regras de trânsito." 
+              },
+              { 
+                icon: Users, 
+                title: "Comunidade", 
+                desc: "Vê como te comparas com outros candidatos e foca-te nos temas onde a maioria mais erra." 
+              },
+              { 
+                icon: Globe, 
+                title: "Actualizado 2024", 
+                desc: "Questões baseadas na legislação mais recente e nos novos sinais de trânsito em vigor." 
+              }
+            ].map((feature, i) => (
+              <div key={i} className="liquid-glass p-8 group hover:bg-white/5 transition-all">
+                <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-sm leading-relaxed text-white/60">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="liquid-glass p-10 text-center relative overflow-hidden bg-primary/5">
+             <div className="relative z-10">
+               <h3 className="font-display text-2xl font-bold text-white">Pronto para o próximo passo?</h3>
+               <p className="mt-2 text-white/70">Acede ao teu painel de progresso e vê que temas precisas de reforçar.</p>
+               <div className="mt-8 flex flex-wrap justify-center gap-4">
+                 <Link to="/progresso" className="liquid-button">Ver Meu Progresso</Link>
+                 <Link to="/simulados" className="liquid-button-outline">Fazer Simulado Completo</Link>
+               </div>
+             </div>
+          </div>
+        </section>
+      )}
+
+      <section className="mx-auto my-20 max-w-4xl text-center">
+        {!session.userId ? (
+          <Link
+            to="/auth"
+            onClick={() => trackProductEvent("create_account_click")}
+            className="liquid-button !px-10 !py-4 text-lg"
+          >
+            Criar conta gratuita agora
+          </Link>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-white/40 font-bold uppercase tracking-widest text-xs">Aprende. Pratica. Passa.</p>
+            <div className="h-px w-20 bg-white/10" />
+          </div>
+        )}
       </section>
     </AppShell>
   );
