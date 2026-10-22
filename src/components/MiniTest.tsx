@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 
 import { QuizQuestion } from "@/components/quiz/QuizQuestion";
 import { Button } from "@/components/ui/button";
-import { fetchQuizQuestions, type Letter } from "@/lib/quiz";
+import { countQuestions, fetchQuizQuestions, type Letter } from "@/lib/quiz";
 import { trackProductEvent } from "@/lib/product-analytics";
 
 const QUESTION_COUNT = 10;
@@ -21,6 +21,11 @@ export function MiniTest() {
     queryFn: () => fetchQuizQuestions({ count: QUESTION_COUNT }),
     staleTime: 0,
     gcTime: 0,
+  });
+  const { data: availableQuestionCount } = useQuery({
+    queryKey: ["question-count"],
+    queryFn: countQuestions,
+    staleTime: 60_000,
   });
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
@@ -127,15 +132,18 @@ export function MiniTest() {
             onClick={() => trackProductEvent("create_account_click")}
             className="hero-button justify-center"
           >
-            <UserRound className="h-4 w-4" aria-hidden="true" /> Criar conta
+            <UserRound className="h-4 w-4" aria-hidden="true" /> Criar conta gratuita
           </Link>
           <Button variant="outline" onClick={restart} className="min-h-11">
             <RotateCcw className="h-4 w-4" aria-hidden="true" /> Repetir mini-teste
           </Button>
         </div>
         <p className="mt-5 text-xs text-muted-foreground">
-          Crie uma conta para desbloquear prática por tema, simulados, favoritos e acompanhamento do
-          progresso.
+          Crie a sua conta gratuita para desbloquear{" "}
+          {availableQuestionCount
+            ? `todas as ${availableQuestionCount} questões publicadas`
+            : "todas as questões publicadas"}
+          , simulados cronometrados e modo offline.
         </p>
       </section>
     );
@@ -159,7 +167,7 @@ export function MiniTest() {
             setStarted(true);
           }}
         >
-          Iniciar mini-teste
+          Experimentar Mini-Teste Gratuito
         </Button>
       </section>
     );

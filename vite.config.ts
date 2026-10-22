@@ -74,7 +74,9 @@ export default defineConfig({
               options: { cacheName: "carta-mz-assets", expiration: { maxEntries: 250 } },
             },
             {
-              urlPattern: ({ url }) => url.pathname.includes("/storage/v1/object/public/question-images/"),
+              urlPattern: ({ request, url }) =>
+                request.destination === "image" ||
+                url.pathname.includes("/storage/v1/object/public/question-images/"),
               handler: "CacheFirst",
               options: { cacheName: "carta-mz-question-images-v1", expiration: { maxEntries: 2500 } },
             },

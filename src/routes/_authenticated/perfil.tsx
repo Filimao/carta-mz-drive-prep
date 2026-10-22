@@ -10,6 +10,7 @@ import { usePlano } from "@/hooks/usePlano";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteMyAccount } from "@/lib/account.functions";
 import { SUPPORT_WHATSAPP } from "@/lib/plan-access";
+import { PLANS } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -106,18 +107,25 @@ function Perfil() {
     );
   }
 
-  const tier = plano.status.tier;
-  const planName = plano.status.plan.name;
+  const tier = plano.status.subscriptionTier;
+  const planName = PLANS[tier].name;
 
   return (
     <AppShell>
       <div className="mx-auto max-w-xl">
-        {plano.status.expired && <ExpiredBanner />}
+        {plano.status.expired && !plano.status.launchAccess && <ExpiredBanner />}
         <h1 className="font-display text-3xl font-semibold">A minha conta</h1>
 
         <div className="surface mt-6 space-y-4 rounded-3xl p-6">
           <div className="flex flex-wrap items-center gap-2">
-            <PlanBadge tier={tier} label={`Plano ${planName}`} />
+            <PlanBadge
+              tier={tier}
+              label={
+                plano.status.launchAccess
+                  ? "Acesso total gratuito"
+                  : `Plano ${planName}`
+              }
+            />
             {plano.status.paymentPending && (
               <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                 <Clock className="h-3 w-3" /> Pagamento em análise
@@ -140,11 +148,15 @@ function Perfil() {
             </div>
             <div>
               <dt className="text-xs font-semibold text-muted-foreground">Expira em</dt>
-              <dd className="font-semibold">{formatDate(plano.status.expiresAt)}</dd>
+              <dd className="font-semibold">
+                {plano.status.launchAccess
+                  ? "Acesso gratuito durante a fase de lançamento"
+                  : formatDate(plano.status.expiresAt)}
+              </dd>
             </div>
           </dl>
 
-          {tier === "free" && (
+          {tier === "free" && !plano.status.launchAccess && (
             <Link
               to="/precos"
               className="inline-flex rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"

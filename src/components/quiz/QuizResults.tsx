@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, XCircle, Timer, RotateCcw, BadgeCheck, ShieldX, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { whatsappAptoShareUrl } from "@/lib/sharing";
 
 export interface QuizResultsProps {
   title: string;
@@ -29,7 +30,9 @@ export function QuizResults({
 }: QuizResultsProps) {
   const wrong = answered - score;
   const official = maxErrors !== undefined;
-  const apto = official && wrong <= maxErrors && answered === total;
+  const apto = official && total === 25 && wrong <= maxErrors && answered === total;
+  const whatsappHref =
+    typeof window === "undefined" ? "#" : whatsappAptoShareUrl(score, window.location.origin);
   const share = async () => {
     const text = official
       ? `Carta MZ Quiz — Simulação do exame teórico: ${apto ? "APTO" : "NÃO APTO"} (${score}/${total} certas, ${wrong} erros, ${Math.floor(elapsed / 60)}m ${elapsed % 60}s).`
@@ -117,7 +120,9 @@ export function QuizResults({
 
       {categoriesToReview.length > 0 && (
         <section className="liquid-glass rounded-2xl p-5" aria-labelledby="categories-review">
-          <h2 id="categories-review" className="font-display text-lg font-bold">Categorias a rever</h2>
+          <h2 id="categories-review" className="font-display text-lg font-bold">
+            Categorias a rever
+          </h2>
           <ul className="mt-3 flex flex-wrap gap-2">
             {categoriesToReview.map((category) => (
               <li key={category} className="rounded-full border border-border px-3 py-1.5 text-sm">
@@ -132,11 +137,29 @@ export function QuizResults({
         <button type="button" onClick={onRestart} className="liquid-button min-w-[160px]">
           <RotateCcw className="h-5 w-5" /> Refazer Teste
         </button>
-        <button type="button" onClick={() => void share()} className="liquid-button-outline min-w-[160px]">
+        <button
+          type="button"
+          onClick={() => void share()}
+          className="liquid-button-outline min-w-[160px]"
+        >
           <Share2 className="h-5 w-5" /> Partilhar
         </button>
+        {apto && (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="liquid-button-outline min-w-[160px]"
+          >
+            <Share2 className="h-5 w-5" /> Partilhar no WhatsApp
+          </a>
+        )}
         {onRetryWrong && wrong > 0 && (
-          <button type="button" onClick={onRetryWrong} className="liquid-button-outline min-w-[160px]">
+          <button
+            type="button"
+            onClick={onRetryWrong}
+            className="liquid-button-outline min-w-[160px]"
+          >
             Refazer erros
           </button>
         )}

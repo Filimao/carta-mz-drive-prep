@@ -19,7 +19,9 @@ export const PLAN_BADGE: Record<PlanTier, string> = {
 export interface PlanStatus {
   authenticated: boolean;
   tier: PlanTier;
+  subscriptionTier: PlanTier;
   plan: PlanDefinition;
+  launchAccess: boolean;
   expiresAt: string | null;
   expired: boolean;
   sessionsUsedToday: number;
@@ -29,7 +31,9 @@ export interface PlanStatus {
 export const GUEST_STATUS: PlanStatus = {
   authenticated: false,
   tier: "free",
+  subscriptionTier: "free",
   plan: PLANS.free,
+  launchAccess: false,
   expiresAt: null,
   expired: false,
   sessionsUsedToday: 0,
@@ -39,6 +43,8 @@ export const GUEST_STATUS: PlanStatus = {
 interface RawStatus {
   authenticated?: boolean;
   plan?: string;
+  subscription_plan?: string;
+  launch_access?: boolean;
   expires_at?: string | null;
   expired?: boolean;
   sessions_used_today?: number;
@@ -47,29 +53,40 @@ interface RawStatus {
 
 /** Reads the plan from the server (expiry-aware, cannot be faked on the client). */
 export async function fetchPlanStatus(): Promise<PlanStatus> {
-  try {
-    const { data: auth } = await supabase.auth.getSession();
-    if (!auth.session) return GUEST_STATUS;
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      const pack = await loadPack(auth.session.user.id);
-      if (!validPack(pack)) return GUEST_STATUS;
-      return { authenticated: true, tier: "premium", plan: PLANS.premium, expiresAt: pack.expiresAt, expired: false, sessionsUsedToday: 0, paymentPending: false };
-    }
-    const { data, error } = await supabase.rpc("my_plan_status");
-    if (error) throw error;
-    const raw = (data ?? {}) as RawStatus;
+  const { data: auth, error: authError } = await supabase.auth.getSession();
+  if (authError) throw authError;
+  if (!auth.session) return GUEST_STATUS;
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    const pack = await loadPack(auth.session.user.id);
+    if (!validPack(pack)) return GUEST_STATUS;
+    const subscriptionTier = planOf(pack.subscriptionTier).tier;
     return {
-      authenticated: raw.authenticated ?? true,
-      tier: (raw.plan as PlanTier) ?? "free",
-      plan: planOf(raw.plan),
-      expiresAt: raw.expires_at ?? null,
-      expired: raw.expired ?? false,
-      sessionsUsedToday: raw.sessions_used_today ?? 0,
-      paymentPending: raw.payment_pending ?? false,
+      authenticated: true,
+      tier: "premium",
+      subscriptionTier,
+      plan: PLANS.premium,
+      launchAccess: pack.launchAccess ?? false,
+      expiresAt: pack.expiresAt,
+      expired: false,
+      sessionsUsedToday: 0,
+      paymentPending: false,
     };
-  } catch {
-    return GUEST_STATUS;
   }
+  const { data, error } = await supabase.rpc("my_plan_status");
+  if (error) throw error;
+  const raw = (data ?? {}) as RawStatus;
+  const tier = (raw.plan as PlanTier) ?? "free";
+  return {
+    authenticated: raw.authenticated ?? true,
+    tier,
+    subscriptionTier: (raw.subscription_plan as PlanTier) ?? tier,
+    plan: planOf(raw.plan),
+    launchAccess: raw.launch_access ?? false,
+    expiresAt: raw.expires_at ?? null,
+    expired: raw.expired ?? false,
+    sessionsUsedToday: raw.sessions_used_today ?? 0,
+    paymentPending: raw.payment_pending ?? false,
+  };
 }
 
 export interface SessionGrant {
@@ -95,7 +112,15 @@ export async function requestSession(
   if (typeof navigator !== "undefined" && !navigator.onLine && auth.session) {
     const pack = await loadPack(auth.session.user.id);
     const allowed = validPack(pack);
-    return { allowed, ...(allowed ? {} : { reason: "error" as const }), tier: "premium", maxQuestions: 100, grantedQuestions: allowed ? Math.min(100, Math.max(1, requested)) : 0, sessionsUsed: 0, sessionsLimit: null };
+    return {
+      allowed,
+      ...(allowed ? {} : { reason: "error" as const }),
+      tier: "premium",
+      maxQuestions: 100,
+      grantedQuestions: allowed ? Math.min(100, Math.max(1, requested)) : 0,
+      sessionsUsed: 0,
+      sessionsLimit: null,
+    };
   }
   if (!auth.session) {
     const { canStartSession, countSessionStart, sessionsToday } = await import("@/lib/plans");

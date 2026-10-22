@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validPack, type OfflinePack } from "./offline-store";
+import { offlinePackExpiry, validPack, type OfflinePack } from "./offline-store";
 import type { Question } from "./quiz";
 describe("downloaded pack access", () => {
   const question: Question = {
@@ -36,5 +36,23 @@ describe("downloaded pack access", () => {
   });
   it("only grants access to Premium packs", () => {
     expect(validPack({ ...pack, tier: "free" }, Date.parse("2026-10-17T00:00:00Z"))).toBe(false);
+  });
+
+  it("keeps launch packs valid for one year without a subscription expiry", () => {
+    const now = Date.parse("2026-10-17T00:00:00Z");
+    expect(offlinePackExpiry({ now, launchAccess: true, subscriptionExpiresAt: null })).toBe(
+      "2027-10-17T00:00:00.000Z",
+    );
+  });
+
+  it("keeps regular paid packs bounded by their subscription expiry", () => {
+    const now = Date.parse("2026-10-17T00:00:00Z");
+    expect(
+      offlinePackExpiry({
+        now,
+        launchAccess: false,
+        subscriptionExpiresAt: "2026-10-25T00:00:00Z",
+      }),
+    ).toBe("2026-10-25T00:00:00.000Z");
   });
 });

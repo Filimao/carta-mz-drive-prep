@@ -1,5 +1,8 @@
 export type PlanTier = "free" | "pro" | "premium";
 
+// Keep this UI flag aligned with launch_access_settings.full_access_enabled in Supabase.
+export const LAUNCH_ACCESS_ENABLED = true;
+
 export interface PlanDefinition {
   tier: PlanTier;
   name: string;

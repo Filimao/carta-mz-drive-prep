@@ -89,6 +89,16 @@ export async function countQuestions(): Promise<number> {
   return count ?? 0;
 }
 
+export async function countQuestionsWithImages(): Promise<number> {
+  const { count, error } = await supabase
+    .from("questions")
+    .select("id", { count: "exact", head: true })
+    .eq("is_published", true)
+    .not("image_url", "is", null);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export interface QuizConfig {
   count: number;
   categoryId?: string | null;

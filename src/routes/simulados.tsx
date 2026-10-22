@@ -23,7 +23,7 @@ export const Route = createFileRoute("/simulados")({
       { property: "og:image", content: "/icon-512.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "/icon-512.png" },
-      { title: "Simulados e Modo Exame — Carta MZ Quiz" },
+      { title: "Simulados para o exame teórico — Carta MZ Quiz" },
       {
         name: "description",
         content:
@@ -32,9 +32,9 @@ export const Route = createFileRoute("/simulados")({
       { property: "og:title", content: "Simulados e Modo Exame — Carta MZ Quiz" },
       {
         property: "og:description",
-        content: "Escolha o número de questões, a dificuldade e a fonte e gere o seu simulado.",
+        content: "Pratique com simulados independentes para o exame teórico de condução em Moçambique.",
       },
-      { name: "twitter:title", content: "Simulado da carta de condução em Moçambique — Carta MZ Quiz" },
+      { name: "twitter:title", content: "Simulados para o exame teórico — Carta MZ Quiz" },
       {
         name: "twitter:description",
         content: "Treine para o exame teórico INATRO com simulados cronometrados e questões explicadas.",

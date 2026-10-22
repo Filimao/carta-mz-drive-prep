@@ -37,6 +37,8 @@ export function usePlano(): UsePlano {
   const status = query.data ?? GUEST_STATUS;
   const estado: UsePlano["estado"] = status.expired
     ? "expirado"
+    : status.launchAccess
+      ? "activo"
     : status.paymentPending && status.tier === "free"
       ? "pendente"
       : status.tier === "free"
@@ -46,7 +48,7 @@ export function usePlano(): UsePlano {
   return {
     loading: query.isLoading,
     status,
-    isPago: status.tier !== "free" && !status.expired,
+    isPago: status.subscriptionTier !== "free" && !status.expired,
     estado,
     refresh: () => void queryClient.invalidateQueries({ queryKey: ["plan-status"] }),
   };

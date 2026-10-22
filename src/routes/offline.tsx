@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { QuizEngine } from "@/components/QuizEngine";
 import {
   loadPack,
+  offlinePackExpiry,
   savePack,
   validPack,
   queuedSessions,
@@ -44,9 +45,13 @@ export const Route = createFileRoute("/offline")({
 function Offline() {
   const plano = usePlano();
   const session = useSession();
-  const allowed = (plano.status.plan.offline && !plano.status.expired) || session.isAdmin;
+  const allowed =
+    plano.status.launchAccess ||
+    (plano.status.plan.offline && !plano.status.expired) ||
+    session.isAdmin;
   const [count, setCount] = useState(0);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [packExpiresAt, setPackExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [online, setOnline] = useState(true);
   const [images, setImages] = useState(0);
@@ -84,6 +89,7 @@ function Offline() {
         setDownloadedQuestions(pack.questions.length);
         setQuestionTotal(pack.questions.length);
         setSavedAt(pack.savedAt);
+        setPackExpiresAt(pack.expiresAt);
         setImages(pack.images);
         setFailedImages(pack.failedImages ?? 0);
         setImageTotal(pack.images + (pack.failedImages ?? 0));
@@ -126,7 +132,7 @@ function Offline() {
     try {
       const { data: auth } = await supabase.auth.getSession();
       if (!auth.session || !allowed)
-        throw new Error("Inicie sessão com uma conta Premium activa ou de administrador.");
+        throw new Error("Inicie sessão para descarregar o pacote de estudo.");
       const { count: publishedCount, error: countError } = await supabase
         .from("questions")
         .select("id", { count: "exact", head: true })
@@ -183,18 +189,17 @@ function Offline() {
         }
       }
       const now = new Date();
-      const localExpiry = new Date(now);
-      localExpiry.setDate(localExpiry.getDate() + 30);
-      const subscriptionExpiry =
-        plano.status.plan.offline && !plano.status.expired && plano.status.expiresAt !== null
-          ? new Date(plano.status.expiresAt)
-          : localExpiry;
-      const expiresAt = new Date(
-        Math.min(localExpiry.getTime(), subscriptionExpiry.getTime()),
-      ).toISOString();
+      const expiresAt = offlinePackExpiry({
+        now: now.getTime(),
+        launchAccess: plano.status.launchAccess,
+        subscriptionExpiresAt:
+          plano.status.plan.offline && !plano.status.expired ? plano.status.expiresAt : null,
+      });
       const pack = {
         userId: auth.session.user.id,
         tier: "premium" as const,
+        subscriptionTier: plano.status.subscriptionTier,
+        launchAccess: plano.status.launchAccess,
         expiresAt,
         savedAt: now.toISOString(),
         questions: questions.map((question) => ({
@@ -212,6 +217,7 @@ function Offline() {
       setFailedImages(failed);
       setQuestionTotal(questions.length);
       setSavedAt(pack.savedAt);
+      setPackExpiresAt(pack.expiresAt);
       setPackIsValid(validPack(pack));
       setProgress(100);
       let syncFailed = false;
@@ -273,7 +279,7 @@ function Offline() {
     <AppShell>
       <h1 className="font-display text-3xl font-semibold">Modo offline</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Instale a app e guarde as questões neste dispositivo (computador ou telemóvel). Depois pode
+        Instale a app e mantenha as questões guardadas no dispositivo (computador ou telemóvel). Depois pode
         estudar sem internet; quando a ligação regressar, os resultados pendentes são sincronizados.
       </p>
 
@@ -289,10 +295,15 @@ function Offline() {
             ? `${count} perguntas descarregadas · ${images} imagens guardadas · ${failedImages} imagens falharam${savedAt ? ` · última actualização ${new Date(savedAt).toLocaleString("pt-MZ")}` : ""}.`
             : "Ainda não há questões guardadas neste dispositivo."}
         </p>
+        {packExpiresAt && (
+          <p className="text-sm text-muted-foreground">
+            Pacote válido até {new Date(packExpiresAt).toLocaleDateString("pt-MZ")}.
+          </p>
+        )}
         {count > 0 && !packIsValid && (
           <p className="text-sm text-destructive" role="status">
-            Este pacote já não está válido para estudo offline. Sincronize novamente com um plano
-            Premium activo.
+            Este pacote já não está válido para estudo offline. Ligue-se à internet e descarregue-o
+            novamente para continuar a estudar.
           </p>
         )}
         {(loading || imageTotal > 0) && (
@@ -332,6 +343,7 @@ function Offline() {
           </p>
         )}
         {session.isAdmin &&
+          !plano.status.launchAccess &&
           (!plano.status.plan.offline || plano.status.expired || !plano.status.expiresAt) && (
             <p className="text-xs text-muted-foreground">
               O pacote de administrador é válido por 30 dias após cada sincronização.
@@ -374,7 +386,7 @@ function Offline() {
       {!allowed && (
         <div className="mt-5 rounded-2xl border border-border bg-card/70 p-5">
           <p className="text-sm text-muted-foreground">
-            O modo offline completo está disponível no plano Premium.
+            O modo offline completo está disponível durante o Acesso Total Gratuito ou no plano Premium.
           </p>
           <Link
             to="/precos"

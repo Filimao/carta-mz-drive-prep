@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Crown, Loader2, X } from "lucide-react";
+import { Check, Crown, Loader2, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -48,6 +48,7 @@ const PHONE_RE = /^8[4-7]\d{7}$/;
 function Precos() {
   const session = useSession();
   const plano = usePlano();
+  const launchAccess = plano.status.launchAccess;
   const [pending, setPending] = useState<PlanTier | null>(null);
   const [method, setMethod] = useState<"mpesa" | "emola">("mpesa");
   const [payerPhone, setPayerPhone] = useState("");
@@ -109,15 +110,34 @@ function Precos() {
 
   return (
     <AppShell>
-      {plano.status.expired && <ExpiredBanner />}
+      {plano.status.expired && !plano.status.launchAccess && <ExpiredBanner />}
       <h1 className="font-display text-3xl font-semibold">Planos e preços</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Comece grátis. Quando estiver pronto para estudar a sério, active o Pro ou o Premium por
-        M-Pesa ou e-Mola.
+        Os planos Free, Pro e Premium continuam preparados para o futuro. Durante o lançamento,
+        todas as funcionalidades estão incluídas gratuitamente para todos os formandos.
       </p>
+      {launchAccess && (
+        <div
+          role="status"
+          className="mt-5 flex items-start gap-3 rounded-2xl border border-primary/30 bg-primary/10 p-4"
+        >
+          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Actualmente Gratuito para Todos os Formandos</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Acesso total gratuito durante a fase de lançamento em Moçambique, incluindo
+              simulados, questões com fotografias e estudo offline.
+            </p>
+          </div>
+        </div>
+      )}
       {!session.loading && session.userId && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <PlanBadge tier={plano.status.tier} label={`Plano actual: ${plano.status.plan.name}`} />
+          {plano.status.launchAccess ? (
+            <PlanBadge tier="premium" label="Acesso total gratuito" />
+          ) : (
+            <PlanBadge tier={plano.status.subscriptionTier} label={`Plano actual: ${PLANS[plano.status.subscriptionTier].name}`} />
+          )}
           {plano.status.paymentPending && (
             <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
               Pagamento em análise
@@ -129,7 +149,6 @@ function Precos() {
       <div className="mt-8 grid gap-5 lg:grid-cols-3">
         {PLAN_ORDER.map((tier) => {
           const plan = PLANS[tier];
-          const active = plano.status.tier === tier && session.userId != null && !plano.status.expired;
           return (
             <div
               key={tier}
@@ -145,9 +164,23 @@ function Precos() {
               <h2 className="font-display text-xl font-semibold">{plan.name}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{plan.tagline}</p>
               <p className="mt-4 font-display text-3xl font-bold">
-                {plan.priceMzn === 0 ? "0 MT" : `${plan.priceMzn} MT`}
-                <span className="ml-1 text-sm font-medium text-muted-foreground">{plan.period}</span>
+                {launchAccess ? (
+                  <span>Grátis durante o lançamento</span>
+                ) : (
+                  <>
+                    {plan.priceMzn === 0 ? "0 MT" : `${plan.priceMzn} MT`}
+                    <span className="ml-1 text-sm font-medium text-muted-foreground">{plan.period}</span>
+                  </>
+                )}
               </p>
+              {launchAccess && plan.priceMzn > 0 && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Preço de referência:{" "}
+                  <span className="font-semibold line-through">
+                    {plan.priceMzn} MT {plan.period}
+                  </span>
+                </p>
+              )}
 
               <ul className="mt-5 space-y-2 text-sm">
                 {plan.benefits.map((b) => (
@@ -156,7 +189,7 @@ function Precos() {
                     <span>{b}</span>
                   </li>
                 ))}
-                {plan.limits.map((l) => (
+                {!launchAccess && plan.limits.map((l) => (
                   <li key={l} className="flex gap-2 text-muted-foreground">
                     <X className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>{l}</span>
@@ -165,14 +198,21 @@ function Precos() {
               </ul>
 
               <div className="mt-6">
-                {tier === "free" ? (
+                {launchAccess ? (
+                  <Link
+                    to="/praticar"
+                    className="block w-full rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+                  >
+                    Acesso total incluído
+                  </Link>
+                ) : tier === "free" ? (
                   <Link
                     to="/praticar"
                     className="block w-full rounded-xl border border-border px-4 py-2.5 text-center text-sm font-semibold"
                   >
                     Praticar grátis
                   </Link>
-                ) : active ? (
+                ) : plano.status.tier === tier && session.userId != null && !plano.status.expired ? (
                   <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-center text-sm font-semibold">
                     <Crown className="h-4 w-4 text-primary" /> Plano activo
                   </span>

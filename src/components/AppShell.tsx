@@ -45,6 +45,7 @@ import {
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { LAUNCH_ACCESS_ENABLED } from "@/lib/plans";
 
 const NAV = [
   { to: "/", label: "Início", icon: Home },
@@ -370,6 +371,12 @@ export function AppShell({
       </header>
 
       <main className="mx-auto max-w-7xl px-3 pt-[calc(4rem+env(safe-area-inset-top))] sm:px-4 sm:pt-20 overflow-x-hidden">
+        {LAUNCH_ACCESS_ENABLED && (
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            Acesso Total Gratuito · Fase de Lançamento Moçambique
+          </p>
+        )}
         {children}
       </main>
 
