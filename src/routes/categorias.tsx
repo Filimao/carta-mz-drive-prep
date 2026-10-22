@@ -6,8 +6,11 @@ import { AppShell } from "@/components/AppShell";
 import { CategoryIcon } from "@/lib/category-icons";
 import { QuizEngine } from "@/components/QuizEngine";
 import { fetchCategories, readLocal } from "@/lib/quiz";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/categorias")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
@@ -131,4 +134,3 @@ function Categorias() {
     </AppShell>
   );
 }
-

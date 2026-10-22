@@ -3,11 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 const INDEXABLE_PATHS = [
   "/",
   "/mini-teste",
-  "/precos",
-  "/sinais",
-  "/auth",
-  "/praticar",
-  "/simulados",
 ] as const;
 
 export const Route = createFileRoute("/sitemap.xml")({

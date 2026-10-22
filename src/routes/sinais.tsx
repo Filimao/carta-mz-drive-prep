@@ -7,9 +7,12 @@ import { ZoomableImage } from "@/components/quiz/ZoomableImage";
 import { Button } from "@/components/ui/button";
 import { BASIC_SIGNS } from "@/lib/signs";
 import { fetchPublicSigns } from "@/lib/signs.functions";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 const catalogQuery = queryOptions({ queryKey: ["public-signs"], queryFn: () => fetchPublicSigns(), staleTime: 60_000 });
 export const Route = createFileRoute("/sinais")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({ meta: [
     { title: "Sinais de trânsito — Carta MZ Quiz" },
     { name: "description", content: "Consulte sinais de trânsito em Moçambique, pesquise por categoria e aprenda o significado de cada sinal." },

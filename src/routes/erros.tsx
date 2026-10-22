@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { QuizEngine } from "@/components/QuizEngine";
 import { readLocal } from "@/lib/quiz";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/erros")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },

@@ -19,8 +19,11 @@ import {
 } from "@/lib/offline-store";
 import { fetchCategories, flushPendingSessions, type Category, type Question } from "@/lib/quiz";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/offline")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { title: "Modo offline — Carta MZ Quiz" },

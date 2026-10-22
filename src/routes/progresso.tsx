@@ -16,8 +16,11 @@ import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { readiness } from "@/lib/readiness";
 import { levelFor, readLocal, streakDays, type LocalState } from "@/lib/quiz";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/progresso")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { title: "O meu progresso — Carta MZ Quiz" },

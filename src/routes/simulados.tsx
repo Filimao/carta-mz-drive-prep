@@ -11,9 +11,12 @@ import { usePlano } from "@/hooks/usePlano";
 import { requestSession } from "@/lib/plan-access";
 import type { Difficulty } from "@/lib/quiz";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 
 export const Route = createFileRoute("/simulados")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },

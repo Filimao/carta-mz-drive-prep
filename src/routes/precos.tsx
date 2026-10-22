@@ -11,8 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { PAYMENT_NUMBERS } from "@/lib/plan-access";
 import { PLANS, PLAN_ORDER, type PlanTier } from "@/lib/plans";
 import { trackProductEvent } from "@/lib/product-analytics";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/precos")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { title: "Planos e preços — Carta MZ Quiz" },

@@ -14,8 +14,11 @@ import { AppShell } from "@/components/AppShell";
 import { ExpiredBanner, UpgradeRequired } from "@/components/PlanGate";
 import { usePlano } from "@/hooks/usePlano";
 import { supabase } from "@/integrations/supabase/client";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/estatisticas")({
+  ssr: false,
+  beforeLoad: requireRouteAuth,
   head: () => ({
     meta: [
       { title: "Estatísticas avançadas — Carta MZ Quiz" },
